@@ -6,10 +6,15 @@ from subprocess import check_output
 
 
 class ShellAbstract():
-    shell_path = None
+    executable_path = ""
+    executable_args = []
     version = ""
     supported_platforms = []
     LOG_PERFIX = "shell."
+
+    @property
+    def name(self) -> str:
+        return self.__class__.__name__.lower()
 
     @classmethod
     def _inheritors(cls) -> list:
@@ -39,26 +44,58 @@ class ShellAbstract():
     def is_installed(self) -> bool:
         return self.is_platform_supported()
 
+    def check_command(self, command) -> bool:
+        return None # can't check!
+
     def __init__(self):
         self.logger = logging.getLogger(
-            f'{self.LOG_PERFIX}{self.__class__.__name__}')
+            f'{self.LOG_PERFIX}{self.name}')
 
-        if not self.is_installed():
-            self.logger.error(f"Not Found {self.__class__.__name__}!!")
+#         if not self.is_installed():
+#             self.logger.warn(f"Not Found {self.name}!!")
 
-    def cell(self, command: list, shell=False, *args, **kwargs):
-        if self.shell_path is None:
-            return check_output(command, shell=shell).decode("utf-8")
-        else:
-            return check_output(command, shell=shell, executable=self.shell_path).decode("utf-8")
+    # executable_path - это добавка к команде!!!
+    def cell(
+                self, 
+                command: list, 
+                shell=False, 
+                executable_path="", 
+                executable_args=[],
+                *args, 
+                **kwargs
+            ) -> str:
+        out_command = command
+        
+        if executable_path == "":
+            executable_path = self.executable_path
+            
+        if executable_args == []:
+            executable_args = self.executable_args
+        
+        if executable_path != "" and executable_path != None:
+            if type(command) == list:
+                command = " ".join(command)
+            out_command = [executable_path]
+            out_command.extend(executable_args)
+            out_command.append(command)
+            
+        self.logger.info(f"Try call command: {out_command}")
+        return check_output(out_command, shell=shell, **kwargs).decode("utf-8")
 
 
 class Bash(ShellAbstract):
-    shell_path = '/bin/bash'
+    executable_path = "/bin/bash"
+    executable_args = ["-c"]
+    
     supported_platforms = {
         'Linux': {}
     }
 
+    def whereis(self, command: str):
+        out = self.cell(["whereis", command])
+        out = out.replace("\n", "")
+        return out.split(" ")[1:]
+        
     def is_installed(self) -> bool:
         if self.is_platform_supported():
             try:
@@ -76,7 +113,7 @@ class Bash(ShellAbstract):
 
     ) -> list:
         command = 'compgen -abcdefgjksuv'
-        out = self.cell(command, shell=True).splitlines()
+        out = self.cell(command, shell=False).splitlines()
         if perfix != None:
             out = list(filter(lambda c: c.startswith(perfix), out))
         return out
@@ -109,12 +146,15 @@ class ZSH(Bash):
 
 
 class Cmd(ShellAbstract):
+    executable_path = "cmd.exe"
+    executable_args = ["-c"]
     supported_platforms = {
         'Windows': {}
     }
 
 
 class PowerShell(Cmd):
+    executable_path = "powershell.exe"
     supported_platforms = {
         'Windows': {
             'releases_perfix': [
@@ -122,12 +162,6 @@ class PowerShell(Cmd):
             ]
         }
     }
-
-    def cell(self, command: list, *args, **kwargs):
-        command.insert(0, "powershell.exe")
-        p = subprocess.Popen(
-            command, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-        return p.communicate()[0].decode("utf-8")
 
     def is_installed(self) -> bool:
         if self.is_platform_supported():
@@ -147,8 +181,11 @@ class PowerShell(Cmd):
         return False
 
 
-def AutoShell(*args, **kwargs) -> ShellAbstract:
+def AutoShell(name=None, *args, **kwargs) -> ShellAbstract:
     for cls in ShellAbstract._inheritors():
         obj = cls(*args, **kwargs)
-        if obj.is_installed():
+        if name != None:
+            if obj.name == name :
+                return obj
+        elif obj.is_installed():
             return obj
