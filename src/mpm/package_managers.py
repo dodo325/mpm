@@ -5,7 +5,7 @@
 from shell import AutoShell
 from typing import List, Tuple
 from text_parse import is_first_ascii_alpha
-import logging
+from my_logging import logging
 
 _LOG_PERFIX = "package_managers."
 
@@ -55,7 +55,13 @@ class NPM(PackageManager):
 
 class Pip(PackageManager):
     """ Python Package Manager """
-    pass
+
+    def get_all_packages(self) -> List[str]:
+        li = self.shell.cell([self.name, "freeze"]).split("\n")
+        li = [s[:s.find("==")] for s in li]
+        li = list(filter(None, li))
+        self.logger.info(f"Detect {len(li)} packages")
+        return li
 
 class Conda(PackageManager):
     """ Anaconda Python Package Manager """
@@ -67,8 +73,9 @@ class AptGet(PackageManager):
 
     def get_all_packages(self) -> List[str]:
         li = self.shell.cell(['dpkg -l | cut -d " " -f 3 | grep ""']).split("\n")
+        li = list(filter(is_first_ascii_alpha, li))
         self.logger.info(f"Detect {len(li)} packages")
-        return list(filter(is_first_ascii_alpha, li))
+        return li
     
     def update(
             self, 
@@ -89,13 +96,25 @@ def get_installed_pms() -> List[PackageManager]:
         if obj.is_installed():
             pms_list.append(cls)
     return pms_list
-
 # Package:
 class Package:
     """ Package Class """
     package_name: str
     pm_class: "PackageManager" = None
     pm = None
+
+    _info = None
+
+    @property
+    def info(self) -> dict:
+        if not self._info:
+            self._info = self._get_info()
+        return self._info
+
+    def _get_info(self) -> dict:
+        return {
+            'package': self.package_name
+        }
 
     def __init__(self, package_name, shell=None):
         if shell == None:
@@ -125,14 +144,6 @@ class AptGetPackage(Package):
     """ AptGet Package """
     pm_class = AptGet
 
-    _info = None
-
-    @property
-    def info(self) -> dict:
-        if not self._info:
-            self._info = self._get_info()
-        return self._info
-
     def _get_info(self) -> dict:
         out = self.shell.cell(["apt-cache", "show", self.package_name])
         _TMP_MARK = "<!>"
@@ -142,7 +153,9 @@ class AptGetPackage(Package):
         for line in lines:
             if line == "":
                 continue
-            key, value = line.split(": ")
+            mark = ": "
+            n = line.find(mark)
+            key, value = line[:n], line[n+len(mark):]
             info[key.lower()] = value.replace(_TMP_MARK, "\n ")
         return info
 
@@ -152,17 +165,40 @@ class AptGetPackage(Package):
         ):
 
         if self.is_installed():
-            self.logger.info("Package already installed/")
+            self.logger.success("Package already installed/")
             return
         self.logger.info(f"Installing {self.package_name}...")
         self.pm.update(enter_password=enter_password)
         self.shell.sudo_cell([self.pm.name, 'install', '-y', self.package_name],
                              enter_password=enter_password)
-        
+            
+        if self.is_installed():
+            self.logger.success("Package installed!")
 
 class AptPackage(AptGetPackage):
     """ Apt Package """
     pm_class = Apt
+
+
+class PipPackage(Package):
+    """ Python PIP Package """
+    pm_class = Pip
+
+    def _get_info(self) -> dict:
+        out = self.shell.cell(["pip", "show", self.package_name])
+        _TMP_MARK = "<!>"
+        out = out.replace("\n ", _TMP_MARK)
+        lines = out.split("\n")
+        lines = list(filter(None, lines))
+        info = dict()
+        for line in lines:
+            if line == "":
+                continue
+            mark = ": "
+            n = line.find(mark)
+            key, value = line[:n], line[n+len(mark):]
+            info[key.lower()] = value.replace(_TMP_MARK, "\n ")
+        return info
 
 def main():
     zsh = AptPackage("zsh")
