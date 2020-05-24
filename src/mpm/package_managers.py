@@ -71,8 +71,8 @@ class AptGet(PackageManager):
         return list(filter(is_first_ascii_alpha, li))
     
     def update(self, enter_password=False):
-        self.shell.cell([self.name, 'update'], sudo=True,
-                        executable_path=None, enter_password=enter_password)
+        self.shell.sudo_cell([self.name, 'update'],
+                             enter_password=enter_password)
 
 
 class Apt(AptGet):
