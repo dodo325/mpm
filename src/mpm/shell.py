@@ -7,7 +7,7 @@ from typing import List, Tuple
 from getpass import getpass
 
 _LOG_PERFIX = "shell."
-class ShellAbstract():
+class AbstractShell():
     executable_path = ""
     executable_args = []
     version = ""
@@ -97,7 +97,7 @@ class ShellAbstract():
         return check_output(out_command, shell=shell, **kwargs).decode("utf-8")
 
 
-class Bash(ShellAbstract):
+class Bash(AbstractShell):
     executable_path = "/bin/bash"
     executable_args = ["-c"]
     
@@ -196,7 +196,7 @@ class ZSH(Bash):
         return False
 
 
-class Cmd(ShellAbstract):
+class Cmd(AbstractShell):
     executable_path = "cmd.exe"
     executable_args = ["-c"]
     supported_platforms = {
@@ -232,16 +232,16 @@ class PowerShell(Cmd):
         return False
 
 
-def get_installed_shells() -> List[ShellAbstract]:
+def get_installed_shells() -> List[AbstractShell]:
     shells_list = []
-    for cls in ShellAbstract._inheritors():
+    for cls in AbstractShell._inheritors():
         obj = cls()
         if obj.is_installed():
             shells_list.append(cls)
     return shells_list
 
-def AutoShell(name=None, *args, **kwargs) -> ShellAbstract:
-    for cls in ShellAbstract._inheritors():
+def AutoShell(name=None, *args, **kwargs) -> AbstractShell:
+    for cls in AbstractShell._inheritors():
         obj = cls(*args, **kwargs)
         if name != None:
             if obj.name == name :
