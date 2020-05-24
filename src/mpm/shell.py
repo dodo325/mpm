@@ -2,15 +2,17 @@ import subprocess
 import platform
 import logging
 import re
-from subprocess import check_output
+from subprocess import check_output, Popen, PIPE
 from typing import List, Tuple
+from getpass import getpass
 
+_LOG_PERFIX = "shell."
 class ShellAbstract():
     executable_path = ""
     executable_args = []
     version = ""
     supported_platforms = []
-    LOG_PERFIX = "shell."
+    
 
     @property
     def name(self) -> str:
@@ -49,12 +51,24 @@ class ShellAbstract():
 
     def __init__(self):
         self.logger = logging.getLogger(
-            f'{self.LOG_PERFIX}{self.name}')
+            f'{_LOG_PERFIX}{self.name}')
 
 #         if not self.is_installed():
 #             self.logger.warn(f"Not Found {self.name}!!")
 
     # executable_path - это добавка к команде!!!
+    def is_sudo_mode():
+        return False
+
+    def sudo_cell(
+        self,
+        command: list,
+        enter_password = False,
+        *args,
+        **kwargs
+        ):
+        raise NoneType()
+        
     def cell(
                 self, 
                 command: list, 
@@ -65,7 +79,7 @@ class ShellAbstract():
                 **kwargs
             ) -> str:
         out_command = command
-        
+
         if executable_path == "":
             executable_path = self.executable_path
             
@@ -78,7 +92,7 @@ class ShellAbstract():
             out_command = [executable_path]
             out_command.extend(executable_args)
             out_command.append(command)
-            
+
         self.logger.info(f"Try call command: {out_command}")
         return check_output(out_command, shell=shell, **kwargs).decode("utf-8")
 
@@ -90,6 +104,51 @@ class Bash(ShellAbstract):
     supported_platforms = {
         'Linux': {}
     }
+
+    def sudo_cell(
+            self,
+            command: list,
+            enter_password=False,
+            *args,
+            **kwargs
+        ) -> str:
+        raise NoneType()
+
+    def cell(
+        self,
+        command: list,
+        shell=False,
+        executable_path="",
+        executable_args=[],
+        sudo=False,
+        *args,
+        **kwargs
+    ) -> str:
+        out_command = command
+
+        if executable_path == "":
+            executable_path = self.executable_path
+
+        if executable_args == []:
+            executable_args = self.executable_args
+
+        if executable_path != "" and executable_path != None:
+            if type(command) == list:
+                command = " ".join(command)
+            out_command = [executable_path]
+            out_command.extend(executable_args)
+            out_command.append(command)
+
+        self.logger.info(f"Try call command: {out_command}")
+        if sudo:  # myby getpass
+            if enter_password:
+                sudo_password = getpass('Sudo password: ')
+                p = Popen(['sudo', '--stdin'] + out_command, stdin=PIPE, stderr=PIPE,
+                          universal_newlines=True, shell=shell)
+                return p.communicate(sudo_password + '\n')[1]
+            else:
+                out_command.insert(0, 'sudo')
+        return check_output(out_command, shell=shell, **kwargs).decode("utf-8")
 
     def whereis(self, command: str):
         out = self.cell(["whereis", command])
@@ -197,3 +256,12 @@ def AutoShell(name=None, *args, **kwargs) -> ShellAbstract:
                 return obj
         elif obj.is_installed():
             return obj
+
+
+def main():
+    shell = AutoShell()
+    print(f"is sudo: {shell.is_sudo_mode()}")
+
+
+if __name__ == "__main__":
+    main()
