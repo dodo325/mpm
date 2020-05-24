@@ -3,7 +3,7 @@ import platform
 import logging
 import re
 from subprocess import check_output
-
+from typing import List, Tuple
 
 class ShellAbstract():
     executable_path = ""
@@ -180,6 +180,14 @@ class PowerShell(Cmd):
                 pass
         return False
 
+
+def get_installed_shells() -> List[ShellAbstract]:
+    shells_list = []
+    for cls in ShellAbstract._inheritors():
+        obj = cls()
+        if obj.is_installed():
+            shells_list.append(cls)
+    return shells_list
 
 def AutoShell(name=None, *args, **kwargs) -> ShellAbstract:
     for cls in ShellAbstract._inheritors():
