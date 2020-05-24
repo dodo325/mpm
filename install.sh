@@ -1,0 +1,1 @@
+bash scripts/bash/install_python3.sh
