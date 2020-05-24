@@ -70,7 +70,10 @@ class AptGet(PackageManager):
         self.logger.info(f"Detect {len(li)} packages")
         return list(filter(is_first_ascii_alpha, li))
     
-    def update(self, enter_password=False):
+    def update(
+            self, 
+            enter_password=False
+        ):
         self.shell.sudo_cell([self.name, 'update'],
                              enter_password=enter_password)
 
@@ -102,7 +105,7 @@ class Package:
         self.package_name = package_name
 
         self.pm = self.pm_class(
-            shell=shell
+            shell=self.shell
         )
 
         self.logger = logging.getLogger(
@@ -122,11 +125,39 @@ class AptGetPackage(Package):
     """ AptGet Package """
     pm_class = AptGet
 
-    def install(self):
+    _info = None
+
+    @property
+    def info(self) -> dict:
+        if not self._info:
+            self._info = self._get_info()
+        return self._info
+
+    def _get_info(self) -> dict:
+        out = self.shell.cell(["apt-cache", "show", self.package_name])
+        _TMP_MARK = "<!>"
+        out = out.replace("\n ", _TMP_MARK)
+        lines = out.split("\n")
+        info = dict()
+        for line in lines:
+            if line == "":
+                continue
+            key, value = line.split(": ")
+            info[key.lower()] = value.replace(_TMP_MARK, "\n ")
+        return info
+
+    def install(
+            self,
+            enter_password=False
+        ):
+
         if self.is_installed():
             self.logger.info("Package already installed/")
-            self.pm.update()
             return
+        self.logger.info(f"Installing {self.package_name}...")
+        self.pm.update(enter_password=enter_password)
+        self.shell.sudo_cell([self.pm.name, 'install', '-y', self.package_name],
+                             enter_password=enter_password)
         
 
 class AptPackage(AptGetPackage):
