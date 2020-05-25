@@ -1,0 +1,27 @@
+{
+    "package_managers":{
+        "snap":{
+            "package_name": "code",
+            "install":{
+                "args": ["--classi"]
+            }
+        }
+    },
+    "plugins": {
+        "rogalmic.bash-debug":{},
+        "robbowen.synthwave-vscode ":{}
+    },
+    "plugins_install": {
+        "template_cmd": "code --install-extension {plugin_name}"
+    },
+    "plugins_get_all": {
+        "shell": {
+            "cmd": "code --list-extensions",
+            "parser": "simple_list"
+        }
+    },
+    "requirements":{
+        "GUI":{}
+    }
+    
+}

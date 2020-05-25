@@ -1,0 +1,13 @@
+{
+    "[package name]": {
+        "dependence":[
+        
+        ]
+    },
+    "pytest": {
+        "package_managers":{
+            "pip":{}
+        }
+    }
+
+}

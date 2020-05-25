@@ -2,9 +2,6 @@
 # -*- coding: utf-8 -*-
 ''' Main Package Manager
 '''
-
-def main():
-    pass
-
+from mpm.cli import main
 if __name__ == "__main__":
     main()
