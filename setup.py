@@ -9,10 +9,19 @@ from glob import glob
 from setuptools import setup, find_packages
 import sys
 import mpm
+import os
+
+def get_all_files(base_dir: str) -> list:
+    files = []
+    for r, d, f in os.walk(base_dir):
+        for file in f:
+            files.append(os.path.join(r, file))
+    return files
 
 REQUIREMENTS = [
     "click>=7.0"
 ]
+
 
 def main():
     setup(name='mpm',
@@ -47,7 +56,11 @@ def main():
               'console_scripts':
               ['mpm = mpm.cli:main']
           },
-          data_files=[('packages', glob('packages/**/*', recursive=True))],
+          data_files=[
+                ('configs', get_all_files("configs/")),
+                ('kits', get_all_files("kits/")),
+                ('configs', get_all_files("scripts/")),
+              ],,
         #   project_urls={  # Optional
         #       'Bug Reports': 'https://github.com/pypa/sampleproject/issues',
         #       'Funding': 'https://donate.pypi.org',
