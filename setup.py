@@ -54,13 +54,14 @@ def main():
           packages=find_packages(include=['mpm']),
           entry_points={
               'console_scripts':
-              ['mpm = mpm.cli:main']
+              ['mpm = mpm.core.cli:main']
           },
+          include_package_data=True,
           data_files=[
                 ('configs', get_all_files("configs/")),
                 ('kits', get_all_files("kits/")),
                 ('configs', get_all_files("scripts/")),
-              ],,
+              ],
         #   project_urls={  # Optional
         #       'Bug Reports': 'https://github.com/pypa/sampleproject/issues',
         #       'Funding': 'https://donate.pypi.org',

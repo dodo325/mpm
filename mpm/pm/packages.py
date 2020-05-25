@@ -2,110 +2,17 @@
 # -*- coding: utf-8 -*-
 """ Main Package Manager 
 """
-from mpm.shell import AutoShell
 from typing import List, Tuple
-from mpm.utils.text_parse import is_first_ascii_alpha
-from mpm.utils.my_logging import logging
 from subprocess import CalledProcessError, STDOUT
+
+from mpm.shell import AutoShell
+from mpm.pm.package_managers import Apt, AptGet, Pip
+from mpm.utils.text_parse import is_first_ascii_alpha
+from mpm.core.logging import logging
+from mpm.core.exceptions import PackageDoesNotExist, ShellError
+
 _LOG_PERFIX = "package_managers."
 
-
-class PackageManager:
-    """ Main Package Manager """
-
-    executable_path: str
-
-    @property
-    def name(self) -> str:
-        return self.__class__.__name__.lower()
-
-    def __init__(self, shell=None):
-        if shell == None:
-            self.shell = AutoShell()
-        else:
-            self.shell = shell
-
-        self.logger = logging.getLogger(f"{_LOG_PERFIX}{self.name}")
-
-    def __str__(self):
-        return f"{self.name}"
-
-    @classmethod
-    def _inheritors(cls) -> list:
-        subclasses = set()
-        work = [cls]
-        while work:
-            parent = work.pop()
-            for child in parent.__subclasses__():
-                if child not in subclasses:
-                    subclasses.add(child)
-                    work.append(child)
-        return list(subclasses)
-
-    def is_installed(self) -> bool:
-        return self.shell.check_command(self.name)
-
-
-class Snap(PackageManager):
-    """ Python Package Manager """
-
-    pass
-
-
-class NPM(PackageManager):
-    """ Node js package manager """
-
-    pass
-
-
-class Pip(PackageManager):
-    """ Python Package Manager """
-
-    def get_all_packages(self) -> List[str]:
-        li = self.shell.cell([self.name, "freeze"]).split("\n")
-        li = [s[: s.find("==")].lower() for s in li]
-        li = list(filter(None, li))
-        self.logger.info(f"Detect {len(li)} packages")
-        return li
-
-
-class Conda(PackageManager):
-    """ Anaconda Python Package Manager """
-
-    pass
-
-
-class AptGet(PackageManager):
-    """ Apt Package """
-
-    name = "apt-get"
-
-    def get_all_packages(self) -> List[str]:
-        li = self.shell.cell(['dpkg -l | cut -d " " -f 3 | grep ""']).split("\n")
-        li = list(filter(is_first_ascii_alpha, li))
-        self.logger.info(f"Detect {len(li)} packages")
-        return li
-
-    def update(self, enter_password=False):
-        self.shell.sudo_cell([self.name, "update"], enter_password=enter_password)
-
-
-class Apt(AptGet):
-    """ Apt Package """
-
-    name = "apt"
-
-
-def get_installed_pms() -> List[PackageManager]:
-    pms_list = []
-    for cls in PackageManager._inheritors():
-        obj = cls()
-        if obj.is_installed():
-            pms_list.append(cls)
-    return pms_list
-
-
-# Package:
 class Package:
     """ Package Class """
 
@@ -153,7 +60,13 @@ class AptGetPackage(Package):
     pm_class = AptGet
 
     def _get_info(self) -> dict:
-        out = self.shell.cell(["apt-cache", "show", self.package_name])
+        try:
+            out = self.shell.cell(["apt-cache", "show", self.package_name])
+        except CalledProcessError as e:
+            if 'E: ' in e.output.decode("utf-8"):
+                raise PackageDoesNotExist("Package not found: "+ self.package_name)
+            raise ShellError("command '{}' return with error (code {}): {}".format(
+                e.cmd, e.returncode, e.output))
         _TMP_MARK = "<!>"
         out = out.replace("\n ", _TMP_MARK)
         lines = out.split("\n")
@@ -163,7 +76,7 @@ class AptGetPackage(Package):
                 continue
             mark = ": "
             n = line.find(mark)
-            key, value = line[:n], line[n + len(mark) :]
+            key, value = line[:n], line[n + len(mark):]
             info[key.lower()] = value.replace(_TMP_MARK, "\n ")
         return info
 
@@ -172,7 +85,6 @@ class AptGetPackage(Package):
         if not shell.check_command("add-apt-repository"):
             self.logger.error("Not found add-apt-repository!!!")
             # self._install_software_properties_common()
-        
 
     def add_repository(self, repository: str):
         self.logger.info(f"Add repository {repository}")
@@ -181,7 +93,6 @@ class AptGetPackage(Package):
             # self._install_software_properties_common()
         if check_repository(repository):
             self.logger.success("Repository already add")
-        
 
     def install(self, enter_password: bool = False, repository: str = None):
         if repository != None:
@@ -190,7 +101,8 @@ class AptGetPackage(Package):
         if self.is_installed():
             self.logger.success("Package already installed")
             return
-        self.logger.info(f"Installing {self.package_name}...")
+            
+        self.logger.info(f"Installing {self.package_name} ({self.info})...")
         self.pm.update(enter_password=enter_password)
         self.shell.sudo_cell(
             [self.pm.name, "install", "-y", self.package_name],
@@ -217,9 +129,10 @@ class PipPackage(Package):
             out = self.shell.cell(
                 ["pip", "show", self.package_name])
         except CalledProcessError as e:
-            raise RuntimeError("command '{}' return with error (code {}): {}".format(
+            if 'not found:' in e.output.decode("utf-8"):
+                raise PackageDoesNotExist("Package not found: "+ self.package_name)
+            raise ShellError("command '{}' return with error (code {}): {}".format(
                 e.cmd, e.returncode, e.output))
-
         _TMP_MARK = "<!>"
         out = out.replace("\n ", _TMP_MARK)
         lines = out.split("\n")
@@ -230,7 +143,7 @@ class PipPackage(Package):
                 continue
             mark = ": "
             n = line.find(mark)
-            key, value = line[:n], line[n + len(mark) :]
+            key, value = line[:n], line[n + len(mark):]
             info[key.lower()] = value.replace(_TMP_MARK, "\n ")
         return info
 
@@ -238,20 +151,12 @@ class PipPackage(Package):
         if self.is_installed():
             self.logger.success("Package already installed")
             return
-            
+
         if repository != None:
             self.add_repository(repository)
-
-        self.logger.info(f"Installing {self.package_name}...")
+        
+        self.logger.info(f"Installing {self.package_name} ({self.info})...")
         self.shell.cell([self.pm.name, "install", self.package_name])
 
         if self.is_installed():
             self.logger.success("Package installed!")
-
-def main():
-    zsh = AptPackage("zsh")
-    zsh.pm.update()
-
-
-if __name__ == "__main__":
-    main()

@@ -112,6 +112,8 @@ class Bash(AbstractShell):
         executable_path="",
         executable_args=[],
         enter_password=False,
+        stdin=PIPE,
+        stderr=STDOUT,
         *args,
         **kwargs,
     ) -> str:
@@ -139,13 +141,13 @@ class Bash(AbstractShell):
                 self.__sudo_password = getpass("Sudo password: ")
             p = Popen(
                 out_command,
-                stdin=PIPE,
-                stderr=STDOUT,
+                stdin=stdin,
+                stderr=stderr,
                 universal_newlines=True,
                 shell=shell,
             )
             return p.communicate(self.__sudo_password + "\n")[1]
-        return check_output(out_command, shell=shell, **kwargs).decode("utf-8")
+        return check_output(out_command, stdin=stdin, stderr=stderr, shell=shell, **kwargs).decode("utf-8")
 
     def whereis(self, command: str):
         out = self.cell(["whereis", command])
