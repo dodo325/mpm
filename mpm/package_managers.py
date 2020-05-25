@@ -6,7 +6,7 @@ from mpm.shell import AutoShell
 from typing import List, Tuple
 from mpm.utils.text_parse import is_first_ascii_alpha
 from mpm.utils.my_logging import logging
-
+from subprocess import CalledProcessError, STDOUT
 _LOG_PERFIX = "package_managers."
 
 
@@ -213,7 +213,13 @@ class PipPackage(Package):
     pm_class = Pip
 
     def _get_info(self) -> dict:
-        out = self.shell.cell(["pip", "show", self.package_name])
+        try:
+            out = self.shell.cell(
+                ["pip", "show", self.package_name])
+        except CalledProcessError as e:
+            raise RuntimeError("command '{}' return with error (code {}): {}".format(
+                e.cmd, e.returncode, e.output))
+
         _TMP_MARK = "<!>"
         out = out.replace("\n ", _TMP_MARK)
         lines = out.split("\n")
@@ -229,12 +235,13 @@ class PipPackage(Package):
         return info
 
     def install(self, repository: str = None):
-        if repository != None:
-            self.add_repository(repository)
-
         if self.is_installed():
             self.logger.success("Package already installed")
             return
+            
+        if repository != None:
+            self.add_repository(repository)
+
         self.logger.info(f"Installing {self.package_name}...")
         self.shell.cell([self.pm.name, "install", self.package_name])
 

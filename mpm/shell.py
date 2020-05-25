@@ -2,7 +2,7 @@ import subprocess
 import platform
 import logging
 import re
-from subprocess import check_output, Popen, PIPE
+from subprocess import check_output, Popen, PIPE, STDOUT
 from typing import List, Tuple
 from getpass import getpass
 
@@ -10,6 +10,9 @@ _LOG_PERFIX = "shell."
 
 
 class AbstractShell:
+    '''
+    Абстрактный Класс для работы с коммандными строками  
+    '''
     executable_path = ""
     executable_args = []
     version = ""
@@ -45,6 +48,9 @@ class AbstractShell:
         return False
 
     def is_installed(self) -> bool:
+        '''
+        Оределяет установленна данная коммандная оболоска
+        '''
         return self.is_platform_supported()
 
     def check_command(self, command) -> bool:
@@ -69,6 +75,7 @@ class AbstractShell:
         shell=False,
         executable_path="",
         executable_args=[],
+        stderr=STDOUT,
         *args,
         **kwargs,
     ) -> str:
@@ -88,7 +95,7 @@ class AbstractShell:
             out_command.append(command)
 
         self.logger.info(f"Try call command: {out_command}")
-        return check_output(out_command, shell=shell, **kwargs).decode("utf-8")
+        return check_output(out_command, shell=shell, stderr=stderr, ** kwargs).decode("utf-8")
 
 
 class Bash(AbstractShell):
@@ -133,7 +140,7 @@ class Bash(AbstractShell):
             p = Popen(
                 out_command,
                 stdin=PIPE,
-                stderr=PIPE,
+                stderr=STDOUT,
                 universal_newlines=True,
                 shell=shell,
             )
