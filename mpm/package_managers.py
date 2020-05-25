@@ -2,10 +2,10 @@
 # -*- coding: utf-8 -*-
 """ Main Package Manager 
 """
-from shell import AutoShell
+from mpm.shell import AutoShell
 from typing import List, Tuple
-from text_parse import is_first_ascii_alpha
-from my_logging import logging
+from mpm.utils.text_parse import is_first_ascii_alpha
+from mpm.utils.my_logging import logging
 
 _LOG_PERFIX = "package_managers."
 

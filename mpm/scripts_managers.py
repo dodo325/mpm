@@ -6,7 +6,7 @@ from shell import AutoShell
 from typing import List, Tuple
 from text_parse import is_first_ascii_alpha
 from my_logging import logging
-from shell import AutoShell, Bash
+from mpm.shell import AutoShell, Bash
 _LOG_PERFIX = __file__
 
 
