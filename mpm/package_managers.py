@@ -167,10 +167,28 @@ class AptGetPackage(Package):
             info[key.lower()] = value.replace(_TMP_MARK, "\n ")
         return info
 
-    def install(self, enter_password=False):
+    # def _install_software_properties_common():
+    def check_repository(self, repository: str) -> bool:
+        if not shell.check_command("add-apt-repository"):
+            self.logger.error("Not found add-apt-repository!!!")
+            # self._install_software_properties_common()
+        
+
+    def add_repository(self, repository: str):
+        self.logger.info(f"Add repository {repository}")
+        if not shell.check_command("add-apt-repository"):
+            self.logger.error("Not found add-apt-repository!!!")
+            # self._install_software_properties_common()
+        if check_repository(repository):
+            self.logger.success("Repository already add")
+        
+
+    def install(self, enter_password: bool = False, repository: str = None):
+        if repository != None:
+            self.add_repository(repository)
 
         if self.is_installed():
-            self.logger.success("Package already installed/")
+            self.logger.success("Package already installed")
             return
         self.logger.info(f"Installing {self.package_name}...")
         self.pm.update(enter_password=enter_password)

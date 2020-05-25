@@ -1,0 +1,81 @@
+{
+    "pytest": {"package_managers":{"pip":{}}},
+    "django": {
+        "package_managers":{"pip":{}},
+        "plugins": {
+            "rogalmic.bash-debug":{},
+            "robbowen.synthwave-vscode ":{}
+        },
+        "plugins_install": {
+            "pip": {
+                "template_package_name": "django-{plugin_name}"
+            }
+        }
+    },
+    "qbittorrent": {"package_managers":{"apt":{}}},
+    "remmina": {
+        "package_managers":{
+            "apt":{
+                "repository": "ppa:remmina-ppa-team/remmina-next"
+            }
+        },
+        "plugins_install": {
+            "apt": {
+                "template_package_name": "remmina-plugin-{plugin_name}"
+            }
+        },
+        "plugins": {
+            "rdp":{},
+            "secret":{}
+        }
+    },
+    "google-chrome": {"package_managers":{"apt":{"package_name": "google-chrome-stable"}}},
+    "nodejs": {"package_managers":{"apt":{}}},
+    "npm": {"package_managers":{"apt":{"dependence":["nodejs"]}}},
+    "synergy": {"package_managers":{"apt":{}}},
+    "telegram": {
+        "package_managers":{
+            "snap": {},
+            "apt": {
+                "repository": "ppa:atareao/telegram"
+            }
+        }
+    },
+    "discord": {
+        "package_managers":{
+            "snap":{
+                "install":{
+                    "args": ["--classi"]
+                }
+            }
+        }
+    },
+    "vscode": {
+        "package_managers":{
+            "snap":{
+                "package_name": "code",
+                "install":{
+                    "args": ["--classi"]
+                }
+            }
+        },
+        "plugins": {
+            "rogalmic.bash-debug":{},
+            "robbowen.synthwave-vscode ":{}
+        },
+        "plugins_install": {
+            "shell": {
+                "template_cmd": "code --install-extension {plugin_name}"
+            }
+        },
+        "plugins_get_all": {
+            "shell": {
+                "cmd": "code --list-extensions",
+                "parser": "simple_list"
+            }
+        },
+        "requirements":{
+            "GUI":{}
+        }
+    }
+}
