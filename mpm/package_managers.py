@@ -63,7 +63,7 @@ class Pip(PackageManager):
 
     def get_all_packages(self) -> List[str]:
         li = self.shell.cell([self.name, "freeze"]).split("\n")
-        li = [s[: s.find("==")] for s in li]
+        li = [s[: s.find("==")].lower() for s in li]
         li = list(filter(None, li))
         self.logger.info(f"Detect {len(li)} packages")
         return li
@@ -228,6 +228,18 @@ class PipPackage(Package):
             info[key.lower()] = value.replace(_TMP_MARK, "\n ")
         return info
 
+    def install(self, repository: str = None):
+        if repository != None:
+            self.add_repository(repository)
+
+        if self.is_installed():
+            self.logger.success("Package already installed")
+            return
+        self.logger.info(f"Installing {self.package_name}...")
+        self.shell.cell([self.pm.name, "install", self.package_name])
+
+        if self.is_installed():
+            self.logger.success("Package installed!")
 
 def main():
     zsh = AptPackage("zsh")
