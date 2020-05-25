@@ -1,13 +1,14 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-''' Main Package Manager 
-'''
+""" Main Package Manager 
+"""
 from shell import AutoShell
 from typing import List, Tuple
 from text_parse import is_first_ascii_alpha
 from my_logging import logging
 
 _LOG_PERFIX = "package_managers."
+
 
 class PackageManager:
     """ Main Package Manager """
@@ -24,8 +25,7 @@ class PackageManager:
         else:
             self.shell = shell
 
-        self.logger = logging.getLogger(
-            f'{_LOG_PERFIX}{self.name}')
+        self.logger = logging.getLogger(f"{_LOG_PERFIX}{self.name}")
 
     def __str__(self):
         return f"{self.name}"
@@ -45,30 +45,39 @@ class PackageManager:
     def is_installed(self) -> bool:
         return self.shell.check_command(self.name)
 
+
 class Snap(PackageManager):
     """ Python Package Manager """
+
     pass
+
 
 class NPM(PackageManager):
     """ Node js package manager """
+
     pass
+
 
 class Pip(PackageManager):
     """ Python Package Manager """
 
     def get_all_packages(self) -> List[str]:
         li = self.shell.cell([self.name, "freeze"]).split("\n")
-        li = [s[:s.find("==")] for s in li]
+        li = [s[: s.find("==")] for s in li]
         li = list(filter(None, li))
         self.logger.info(f"Detect {len(li)} packages")
         return li
 
+
 class Conda(PackageManager):
     """ Anaconda Python Package Manager """
+
     pass
+
 
 class AptGet(PackageManager):
     """ Apt Package """
+
     name = "apt-get"
 
     def get_all_packages(self) -> List[str]:
@@ -76,18 +85,16 @@ class AptGet(PackageManager):
         li = list(filter(is_first_ascii_alpha, li))
         self.logger.info(f"Detect {len(li)} packages")
         return li
-    
-    def update(
-            self, 
-            enter_password=False
-        ):
-        self.shell.sudo_cell([self.name, 'update'],
-                             enter_password=enter_password)
+
+    def update(self, enter_password=False):
+        self.shell.sudo_cell([self.name, "update"], enter_password=enter_password)
 
 
 class Apt(AptGet):
     """ Apt Package """
+
     name = "apt"
+
 
 def get_installed_pms() -> List[PackageManager]:
     pms_list = []
@@ -96,9 +103,12 @@ def get_installed_pms() -> List[PackageManager]:
         if obj.is_installed():
             pms_list.append(cls)
     return pms_list
+
+
 # Package:
 class Package:
     """ Package Class """
+
     package_name: str
     pm_class: "PackageManager" = None
     pm = None
@@ -112,9 +122,7 @@ class Package:
         return self._info
 
     def _get_info(self) -> dict:
-        return {
-            'package': self.package_name
-        }
+        return {"package": self.package_name}
 
     def __init__(self, package_name, shell=None):
         if shell == None:
@@ -123,25 +131,25 @@ class Package:
             self.shell = shell
         self.package_name = package_name
 
-        self.pm = self.pm_class(
-            shell=self.shell
-        )
+        self.pm = self.pm_class(shell=self.shell)
 
         self.logger = logging.getLogger(
-            f'{_LOG_PERFIX}{self.__class__.__name__.lower()}')
+            f"{_LOG_PERFIX}{self.__class__.__name__.lower()}"
+        )
 
     def __str__(self):
         return f"{self.package_name}"
 
     def is_pm_installed(self) -> bool:
         return self.pm.is_installed()
-        
+
     def is_installed(self) -> bool:
         return self.package_name in self.pm.get_all_packages()
 
 
 class AptGetPackage(Package):
     """ AptGet Package """
+
     pm_class = AptGet
 
     def _get_info(self) -> dict:
@@ -155,33 +163,35 @@ class AptGetPackage(Package):
                 continue
             mark = ": "
             n = line.find(mark)
-            key, value = line[:n], line[n+len(mark):]
+            key, value = line[:n], line[n + len(mark) :]
             info[key.lower()] = value.replace(_TMP_MARK, "\n ")
         return info
 
-    def install(
-            self,
-            enter_password=False
-        ):
+    def install(self, enter_password=False):
 
         if self.is_installed():
             self.logger.success("Package already installed/")
             return
         self.logger.info(f"Installing {self.package_name}...")
         self.pm.update(enter_password=enter_password)
-        self.shell.sudo_cell([self.pm.name, 'install', '-y', self.package_name],
-                             enter_password=enter_password)
-            
+        self.shell.sudo_cell(
+            [self.pm.name, "install", "-y", self.package_name],
+            enter_password=enter_password,
+        )
+
         if self.is_installed():
             self.logger.success("Package installed!")
 
+
 class AptPackage(AptGetPackage):
     """ Apt Package """
+
     pm_class = Apt
 
 
 class PipPackage(Package):
     """ Python PIP Package """
+
     pm_class = Pip
 
     def _get_info(self) -> dict:
@@ -196,13 +206,15 @@ class PipPackage(Package):
                 continue
             mark = ": "
             n = line.find(mark)
-            key, value = line[:n], line[n+len(mark):]
+            key, value = line[:n], line[n + len(mark) :]
             info[key.lower()] = value.replace(_TMP_MARK, "\n ")
         return info
+
 
 def main():
     zsh = AptPackage("zsh")
     zsh.pm.update()
+
 
 if __name__ == "__main__":
     main()
