@@ -1,11 +1,12 @@
 import subprocess
 import platform
-import logging
 import re
 from subprocess import check_output, Popen, PIPE, STDOUT
 from typing import List, Tuple
 from getpass import getpass
+from pathlib import Path
 
+from mpm.core.logging import logging
 _LOG_PERFIX = "shell."
 
 
@@ -33,6 +34,18 @@ class AbstractShell:
                     subclasses.add(child)
                     work.append(child)
         return list(subclasses)
+
+    def get_home(self) -> str:
+        '''
+        Pls use Path.home()
+        '''
+        return str(Path.home())
+    
+    def pwd(self) -> str:
+        '''
+        Pls use Path.cwd()
+        '''
+        return str(Path.cwd())
 
     def is_platform_supported(self) -> bool:
         if platform.system() in self.supported_platforms:
@@ -104,6 +117,7 @@ class Bash(AbstractShell):
 
     supported_platforms = {"Linux": {}}
     __sudo_password = None
+
 
     def sudo_cell(
         self,
@@ -202,10 +216,10 @@ class Cmd(AbstractShell):
     executable_args = ["-c"]
     supported_platforms = {"Windows": {}}
 
-
 class PowerShell(Cmd):
     executable_path = "powershell.exe"
     supported_platforms = {"Windows": {"releases_perfix": ["10"]}}
+
 
     def is_installed(self) -> bool:
         if self.is_platform_supported():

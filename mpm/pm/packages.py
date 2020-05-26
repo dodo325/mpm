@@ -101,7 +101,7 @@ class AptGetPackage(Package):
         if self.is_installed():
             self.logger.success("Package already installed")
             return
-            
+
         self.logger.info(f"Installing {self.package_name} ({self.info})...")
         self.pm.update(enter_password=enter_password)
         self.shell.sudo_cell(
@@ -160,3 +160,34 @@ class PipPackage(Package):
 
         if self.is_installed():
             self.logger.success("Package installed!")
+
+# Универсальный пакет!
+
+
+class UniPackage:
+    """ Package Class """
+
+    package_name: str
+    _info = None
+
+    @property
+    def info(self) -> dict:
+        if not self._info:
+            self._info = self._get_info()
+        return self._info
+
+    def _get_info(self) -> dict:
+        return {"package": self.package_name}
+
+    def __init__(self, package_name, shell=None):
+        if shell == None:
+            self.shell = AutoShell()
+        else:
+            self.shell = shell
+        self.package_name = package_name
+
+        self.pm = self.pm_class(shell=self.shell)
+
+        self.logger = logging.getLogger(
+            f"{_LOG_PERFIX}{self.__class__.__name__.lower()}"
+        )
