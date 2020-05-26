@@ -32,7 +32,10 @@
             "DE": {
                 "GNOME":{}
             }
-        }
+        },
+        "dependence":[
+            "dbus"
+        ]
     },
     "django": {
         "package_managers":{"pip":{}},
@@ -84,6 +87,17 @@
                 }
             }
         }
+    },
+    "zsh": {
+        "package_managers":{
+            "apt":{}
+        }
+    },
+    "oh-my-zsh": {
+        "// хз что с этим делать":"",
+        "dependence":[
+            "zsh"
+        ]
     },
     "vscode": {
         "package_managers":{

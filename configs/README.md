@@ -62,7 +62,10 @@
             "platform": {
 
             }
-    }
+    },
+    "dependence":[
+        "package1"
+    ]
 }
 ```
 * template_package_name
@@ -126,7 +129,7 @@
     },
     "requirements":{
         "DE":{}
-    }
+    },
 }
 ```
 
