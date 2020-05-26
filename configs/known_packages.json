@@ -1,10 +1,45 @@
 {
     "pytest": {"package_managers":{"pip":{}}},
+    "dbus": {"package_managers":{"apt-get":{}}},
+    "gnome-shell-extension-installer": {
+        "package_managers":{
+            "script":{
+                "file": "https://github.com/brunelli/gnome-shell-extension-installer/raw/master/gnome-shell-extension-installer",
+                "script_name": "gnome-shell-extension-installer",
+                "install": {
+                    "directory": "/usr/bin/"
+                }
+            }
+        },
+        "plugins": {
+            "arc-men": {"plugin_id": 1228},
+            "dash-to-panel": {"plugin_id": 1160}
+        },
+        "plugins_install": {
+            "shell": {
+                "template_cmd": "{package_name} {plugin_id} --yes",
+                "get_all": {
+                    "cmd": "ls /usr/share/gnome-shell/extensions/ -1; ls $HOME/.local/share/gnome-shell/extensions -1",
+                    "parser": {
+                        "new_line": "\n",
+                        "remove_blank": true,
+                        "re_inline": "^.+(?=@)"
+                    }
+                }
+            }
+        },
+        "requirements":{
+            "DE": {
+                "GNOME":{}
+            }
+        }
+    },
     "django": {
         "package_managers":{"pip":{}},
         "plugins": {
-            "rogalmic.bash-debug":{},
-            "robbowen.synthwave-vscode ":{}
+            "guardian":{},
+            "extensions":{},
+            "cors-headers":{}
         },
         "plugins_install": {
             "pip": {
@@ -65,17 +100,18 @@
         },
         "plugins_install": {
             "shell": {
-                "template_cmd": "code --install-extension {plugin_name}"
-            }
-        },
-        "plugins_get_all": {
-            "shell": {
-                "cmd": "code --list-extensions",
-                "parser": "simple_list"
+                "template_cmd": "code --install-extension {plugin_name}",
+                "get_all": {
+                    "cmd": "code --list-extensions",
+                    "parser": {
+                        "new_line": "\n",
+                        "remove_blank": true
+                    }
+                }
             }
         },
         "requirements":{
-            "GUI":{}
+            "DE":{}
         }
     }
 }
