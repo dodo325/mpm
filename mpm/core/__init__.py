@@ -9,4 +9,8 @@ USER_DATA_DIR = Path.home() / ".mpm"
 USER_CONFIGS_DIR = USER_DATA_DIR / "configs"
 USER_SCRIPTS_DIR = USER_DATA_DIR / "scripts"
 
-PACKAGE_DIR = Path(mpm__file__).resolve().parent
+PACKAGE_DIR = Path(mpm__file__).resolve().parent.parent
+SCRIPTS_DIR = PACKAGE_DIR / "scripts"
+CONFIGS_DIR = PACKAGE_DIR / "configs"
+
+
