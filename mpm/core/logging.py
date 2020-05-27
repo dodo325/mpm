@@ -3,10 +3,33 @@ import logging
 from logging.handlers import TimedRotatingFileHandler
 import coloredlogs
 from mpm.core.__init__ import LOGGING_DIR
+
 FORMATTER_FULL = logging.Formatter(
     "[%(levelname)s](%(asctime)s)LINE: %(lineno)d %(pathname)s - %(name)s %(funcName)s - %(message)s")
-FORMATTER = logging.Formatter(
-    "[%(levelname)s](%(asctime)s) %(name)s %(funcName)s - %(message)s")
+
+
+# colors = red green magenta blue yellow black cyan white
+# params = bold faint 
+LEVEL_STYLES = {
+    'critical': {'bold': True, 'color': 'red'}, 
+    'debug': {'color': 'green'}, 
+    'error': {'color': 'red'}, 
+    'info': {'color': 'blue'},
+    'notice': {'color': 'magenta'}, 
+    'spam': {'color': 'green', 'faint': True}, 
+    'success': {'bold': True, 'color': 'green'}, 
+    'verbose': {'color': 'blue'}, 
+    'warning': {'color': 'yellow'}
+}
+FIELD_STYLES = {
+    'asctime': {'bold': True, 'color': 'black'},
+    'hostname': {'color': 'magenta'},
+    # 'levelname': {'bold': True, 'color': 'black'},
+    'name': {'color': 'magenta'},
+    'programname': {'color': 'cyan'},
+    'username': {'color': 'yellow'},
+    'funcName': {'color': 'magenta'}
+}
 
 def get_logging():
     SUCCESS_LEVEL = 25
@@ -21,19 +44,13 @@ def get_logging():
 
 def get_console_handler(level=logging.INFO):
     logging = get_logging()
-    console_handler = logging.StreamHandler()#sys.stdout)
-
-
+    console_handler = logging.StreamHandler()
+    # console_handler.addFilter(coloredlogs.HostNameFilter())  # %(hostname)s
+    # console_handler.addFilter(coloredlogs.UserNameFilter())  # %(username)s
     formatter = coloredlogs.ColoredFormatter(
         "[%(levelname)s](%(asctime)s) %(name)s %(funcName)s - %(message)s",
-        # log_colors={
-        #     'DEBUG': 'cyan',
-        #     'INFO': 'blue',
-        #     'WARNING': 'yellow',
-        #     'ERROR': 'red',
-        #     # 'SUCCESS': 'green',
-        #     'CRITICAL': 'red'
-        # }
+        level_styles=LEVEL_STYLES,
+        field_styles=FIELD_STYLES
     )
     console_handler.setFormatter(formatter)
     console_handler.setLevel(level)
