@@ -65,7 +65,7 @@ class AbstractShell:
 
     def is_installed(self) -> bool:
         '''
-        Оределяет установленна данная коммандная оболоска
+        Оределяет установленна данная коммандная оболочка и обновляет self.version
         '''
         return self.is_platform_supported()
 
@@ -91,9 +91,14 @@ class AbstractShell:
         executable_path="",
         executable_args=[],
         stderr=STDOUT,
+        debug=False,
         *args,
         **kwargs,
     ) -> str:
+        self.logger.debug(
+            f"Args:\n\traw command = {command}\n\tshell = {shell}\n\t\
+executable_path = {executable_path}\n\texecutable_args={executable_args}\n\t\
+stderr = {stderr}\n\targs = {args}\n\tkwargs = {kwargs}")
         out_command = command
 
         if executable_path == "":
@@ -109,8 +114,12 @@ class AbstractShell:
             out_command.extend(executable_args)
             out_command.append(command)
 
-        self.logger.info(f"Try call command: {out_command}")
-        return check_output(out_command, shell=shell, stderr=stderr, ** kwargs).decode("utf-8")
+        self.logger.debug(f"Try call command: {out_command}")
+        out = check_output(out_command, shell=shell, stderr=stderr,
+                     ** kwargs).decode("utf-8")
+        if debug:
+            self.logger.debug(f"Output: {out}")
+        return out
 
 
 class Bash(AbstractShell):
@@ -130,9 +139,15 @@ class Bash(AbstractShell):
         enter_password=False,
         stdin=PIPE,
         stderr=STDOUT,
+        debug=False,
         *args,
         **kwargs,
     ) -> str:
+        self.logger.debug(
+            f"Args:\n\traw command = {command}\n\tshell = {shell}\n\t\
+executable_path = {executable_path}\n\texecutable_args={executable_args}\n\t\
+stderr = {stderr}\n\targs = {args}\n\tkwargs = {kwargs}")
+
         if self.is_sudo_mode():
             return self.cell(command, *args, **kwargs)
 
@@ -151,9 +166,11 @@ class Bash(AbstractShell):
             out_command.extend(executable_args)
             out_command.append(command)
 
-        self.logger.info(f"Try call command: {out_command}")
+        self.logger.debug(f"Try call command: {out_command}")
+        out = None
         if enter_password:
             if not self.__sudo_password:
+                self.logger.debug(f"Try get pass")
                 self.__sudo_password = getpass("Sudo password: ")
             p = Popen(
                 out_command,
@@ -162,8 +179,12 @@ class Bash(AbstractShell):
                 universal_newlines=True,
                 shell=shell,
             )
-            return p.communicate(self.__sudo_password + "\n")[1]
-        return check_output(out_command, stdin=stdin, stderr=stderr, shell=shell, **kwargs).decode("utf-8")
+            out = p.communicate(self.__sudo_password + "\n")[1]
+        else:
+            out =  check_output(out_command, stdin=stdin, stderr=stderr, shell=shell, **kwargs).decode("utf-8")
+        if debug:
+            self.logger.debug(f"Output: {out}")
+        return out
 
     def whereis(self, command: str):
         out = self.cell(["whereis", command])
@@ -176,6 +197,7 @@ class Bash(AbstractShell):
                 out = self.cell(["bash", "--version"])
                 result = re.search(r"\d.+\n", out).group(0)[:-1]
                 self.version = result
+                self.logger.info(f"installed! ver: {result}")
                 return True
             except FileNotFoundError:
                 pass
@@ -205,8 +227,9 @@ class ZSH(Bash):
         if self.is_platform_supported():
             try:
                 out = self.cell(["zsh", "--version"])
-                result = re.search(r"\d.+\n", out).group(0)[:-1]
-                self.version = result
+                out = out.replace("\n", "") 
+                self.version = out
+                self.logger.info(f"installed! ver: {out}")
                 return True
             except FileNotFoundError:
                 pass
@@ -224,6 +247,9 @@ class PowerShell(Cmd):
 
 
     def is_installed(self) -> bool:
+        f'''
+        Check is {self.name} installed and update {self.name}.version
+        '''
         if self.is_platform_supported():
             try:
                 out = self.cell(["Get-Host"])
@@ -258,12 +284,3 @@ def AutoShell(name=None, *args, **kwargs) -> AbstractShell:
                 return obj
         elif obj.is_installed():
             return obj
-
-
-def main():
-    shell = AutoShell()
-    print(f"is sudo: {shell.is_sudo_mode()}")
-
-
-if __name__ == "__main__":
-    main()

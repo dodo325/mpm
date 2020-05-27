@@ -44,7 +44,8 @@ def get_known_packages():
     try:
         known_packages = get_remote_known_packages()
     except urllib.request.HTTPError as e:
-        logger.error(f"HTTPError: code = {e.code}, url = {e.url}")
+        logger.error(
+            f"HTTPError: code = {e.code}, url = {e.url}", exc_info=True)
         known_packages_file = CONFIGS_DIR / "known_packages.json"
         with known_packages_file.open() as sf:
                 known_packages = json.load(sf)

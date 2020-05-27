@@ -95,8 +95,10 @@ class Apt(AptGet):
 
 def get_installed_pms() -> List[PackageManager]:
     pms_list = []
+    shell = AutoShell()
     for cls in PackageManager._inheritors():
-        obj = cls()
+        obj = cls(shell=shell)
         if obj.is_installed():
             pms_list.append(cls)
+    logger.debug(f"Output: {pms_list}")
     return pms_list
