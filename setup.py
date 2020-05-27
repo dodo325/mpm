@@ -51,7 +51,7 @@ def main():
           keywords=[
               "package-manager"
           ],
-          packages=find_packages(include=['mpm']),
+          packages=find_packages(exclude=['tests']),
           entry_points={
               'console_scripts':
               ['mpm = mpm.core.cli:main']
@@ -60,7 +60,7 @@ def main():
           data_files=[
                 ('configs', get_all_files("configs/")),
                 ('kits', get_all_files("kits/")),
-                ('configs', get_all_files("scripts/")),
+                ('scripts', get_all_files("scripts/")),
               ],
         #   project_urls={  # Optional
         #       'Bug Reports': 'https://github.com/pypa/sampleproject/issues',
