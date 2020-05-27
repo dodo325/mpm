@@ -24,7 +24,7 @@ LEVEL_STYLES = {
 FIELD_STYLES = {
     'asctime': {'bold': True, 'color': 'black'},
     'hostname': {'color': 'magenta'},
-    # 'levelname': {'bold': True, 'color': 'black'},
+    'levelname': {'bold': True, 'color': 'cyan'},
     'name': {'color': 'magenta'},
     'programname': {'color': 'cyan'},
     'username': {'color': 'yellow'},
