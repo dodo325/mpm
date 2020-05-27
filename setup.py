@@ -19,7 +19,9 @@ def get_all_files(base_dir: str) -> list:
     return files
 
 REQUIREMENTS = [
-    "click>=7.0"
+    "click>=7.0",
+    "colorama",
+    "coloredlogs"
 ]
 
 

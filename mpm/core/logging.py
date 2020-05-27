@@ -1,13 +1,12 @@
 import sys
 import logging
 from logging.handlers import TimedRotatingFileHandler
-
+import coloredlogs
 from mpm.core.__init__ import LOGGING_DIR
 FORMATTER_FULL = logging.Formatter(
     "[%(levelname)s](%(asctime)s)LINE: %(lineno)d %(pathname)s - %(name)s %(funcName)s - %(message)s")
 FORMATTER = logging.Formatter(
     "[%(levelname)s](%(asctime)s) %(name)s %(funcName)s - %(message)s")
-
 
 def get_logging():
     SUCCESS_LEVEL = 25
@@ -23,7 +22,20 @@ def get_logging():
 def get_console_handler(level=logging.INFO):
     logging = get_logging()
     console_handler = logging.StreamHandler()#sys.stdout)
-    console_handler.setFormatter(FORMATTER)
+
+
+    formatter = coloredlogs.ColoredFormatter(
+        "[%(levelname)s](%(asctime)s) %(name)s %(funcName)s - %(message)s",
+        # log_colors={
+        #     'DEBUG': 'cyan',
+        #     'INFO': 'blue',
+        #     'WARNING': 'yellow',
+        #     'ERROR': 'red',
+        #     # 'SUCCESS': 'green',
+        #     'CRITICAL': 'red'
+        # }
+    )
+    console_handler.setFormatter(formatter)
     console_handler.setLevel(level)
     return console_handler
 
@@ -42,10 +54,10 @@ def getLogger(logger_name):
         LOGGING_DIR.mkdir()
     logging = get_logging()
     logging.basicConfig(level=logging.DEBUG)
-
+    
     logger = logging.getLogger(logger_name)
 
-    logger.addHandler(get_console_handler())
+    logger.addHandler(get_console_handler(level=logging.INFO))
     logger.addHandler(get_file_handler(
         "debug.log", logging.DEBUG, formatter=FORMATTER_FULL))
     logger.addHandler(get_file_handler(

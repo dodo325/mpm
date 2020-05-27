@@ -20,12 +20,12 @@ def install(package_name, pm_name):  # install kit
     '''
     Установить пакет
     '''
-    logger.debug(f"package_name = {package_name}, pm_name = {pm_name}")
-    logger.info(f"package_name = {package_name}, pm_name = {pm_name}")
-    logger.warn(f"package_name = {package_name}, pm_name = {pm_name}")
-    logger.success(f"package_name = {package_name}, pm_name = {pm_name}")
-    logger.error(f"package_name = {package_name}, pm_name = {pm_name}")
-    logger.critical(f"package_name = {package_name}, pm_name = {pm_name}")
+    logger.debug(f"package_name = {package_name}\n\tpm_name = {pm_name}")
+    logger.info(f"package_name = {package_name}\n\tpm_name = {pm_name}")
+    logger.warn(f"package_name = {package_name}\n\tpm_name = {pm_name}")
+    logger.success(f"package_name = {package_name}\n\tpm_name = {pm_name}")
+    logger.error(f"package_name = {package_name}\n\tpm_name = {pm_name}")
+    logger.critical(f"package_name = {package_name}\n\tpm_name = {pm_name}")
     click.echo('0000')
 
 
