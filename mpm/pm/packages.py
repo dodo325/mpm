@@ -8,10 +8,9 @@ from subprocess import CalledProcessError, STDOUT
 from mpm.shell import AutoShell
 from mpm.pm.package_managers import Apt, AptGet, Pip
 from mpm.utils.text_parse import is_first_ascii_alpha
-from mpm.core.logging import logging
+from mpm.core.logging import getLogger
 from mpm.core.exceptions import PackageDoesNotExist, ShellError
-
-_LOG_PERFIX = "package_managers."
+logger = getLogger(__name__)
 
 class Package:
     """ Package Class """
@@ -40,7 +39,7 @@ class Package:
 
         self.pm = self.pm_class(shell=self.shell)
 
-        self.logger = logging.getLogger(
+        self.logger = getLogger(
             f"{_LOG_PERFIX}{self.__class__.__name__.lower()}"
         )
 
@@ -188,6 +187,6 @@ class UniPackage:
 
         self.pm = self.pm_class(shell=self.shell)
 
-        self.logger = logging.getLogger(
+        self.logger = getLogger(
             f"{_LOG_PERFIX}{self.__class__.__name__.lower()}"
         )

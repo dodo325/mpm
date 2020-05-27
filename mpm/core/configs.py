@@ -8,8 +8,9 @@ import urllib.request
 import json
 
 from mpm.core import PACKAGE_DIR, USER_DATA_DIR, USER_CONFIGS_DIR, SCRIPTS_DIR, CONFIGS_DIR, USER_SCRIPTS_DIR
-from mpm.core.logging import get_logger
-logger = get_logger(__file__)
+from mpm.core.logging import getLogger
+
+logger = getLogger(__name__)
 
 
 def get_settings():

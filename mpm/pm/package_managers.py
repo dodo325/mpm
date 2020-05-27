@@ -5,11 +5,11 @@
 from mpm.shell import AutoShell
 from typing import List, Tuple
 from mpm.utils.text_parse import is_first_ascii_alpha
-from mpm.core.logging import logging
+from mpm.core.logging import getLogger
 from mpm.core.exceptions import PackageDoesNotExist
 from subprocess import CalledProcessError, STDOUT
-_LOG_PERFIX = "package_managers."
 
+logger = getLogger(__name__)
 
 class PackageManager:
     """ Main Package Manager """
@@ -20,13 +20,12 @@ class PackageManager:
     def name(self) -> str:
         return self.__class__.__name__.lower()
 
-    def __init__(self, shell=None):
+    def __init__(self, shell: "AbstractShell" = None):
+        self.logger = logger.getChild(self.__class__.__name__)
         if shell == None:
             self.shell = AutoShell()
         else:
             self.shell = shell
-
-        self.logger = logging.getLogger(f"{_LOG_PERFIX}{self.name}")
 
     def __str__(self):
         return f"{self.name}"

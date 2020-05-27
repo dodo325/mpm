@@ -6,8 +6,8 @@ from typing import List, Tuple
 from getpass import getpass
 from pathlib import Path
 
-from mpm.core.logging import logging
-_LOG_PERFIX = "shell."
+from mpm.core.logging import getLogger
+logger = getLogger(__name__)
 
 
 class AbstractShell:
@@ -25,6 +25,9 @@ class AbstractShell:
 
     @classmethod
     def _inheritors(cls) -> list:
+        '''
+        return all subclasses
+        '''
         subclasses = set()
         work = [cls]
         while work:
@@ -70,16 +73,15 @@ class AbstractShell:
         return None  # can't check!
 
     def __init__(self):
-        self.logger = logging.getLogger(f"{_LOG_PERFIX}{self.name}")
+        self.logger = logger.getChild(self.__class__.__name__)
 
     #         if not self.is_installed():
     #             self.logger.warn(f"Not Found {self.name}!!")
 
-    # executable_path - это добавка к команде!!!
-    def is_sudo_mode(self):
-        return
+    def is_sudo_mode(self) -> bool:
+        return False
 
-    def sudo_cell(self, command: list, enter_password=False, *args, **kwargs):
+    def sudo_cell(self, command: list, enter_password=False, *args, **kwargs) -> str:
         raise NoneType()
 
     def cell(

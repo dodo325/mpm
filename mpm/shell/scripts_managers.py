@@ -5,9 +5,9 @@
 from shell import AutoShell
 from typing import List, Tuple
 from text_parse import is_first_ascii_alpha
-from my_logging import logging
 from mpm.shell import AutoShell, Bash
-_LOG_PERFIX = __file__
+from mpm.core.logging import getLogger
+logger = getLogger(__name__)
 
 
 class ScriptManager:
@@ -19,7 +19,7 @@ class ScriptManager:
 
     def __init__(self, path):
         self.path
-    
+        self.logger = logger.getChild(self.__class__.__name__)
 
 class BashScript(ScriptManager):
     pass
