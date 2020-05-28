@@ -273,6 +273,15 @@ class PowerShell(Cmd):
     executable_args = ["-Command"]
     supported_platforms = {"Windows": {"releases_perfix": ["10"]}}
 
+    def whereis(self, command: str) -> list:
+        try:
+            out = self.cell([f"(get-command {command}).Path"])
+            li = out.split("\n")
+            li = list(filter(None, li))
+            return li
+        except Exception as e:
+            self.logger.error(f"Not found {command}!", exc_info=True)
+            return []
 
     def is_installed(self) -> bool:
         f'''
