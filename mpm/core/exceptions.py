@@ -8,6 +8,11 @@ class ShellError(Exception):
     pass
 
 
+class CommandNotFound(ShellError):
+    """The requested model field does not exist"""
+    pass
+
+
 class PackageDoesNotExist(ShellError):
     """The requested model field does not exist"""
     pass

@@ -8,6 +8,7 @@ from pathlib import Path
 
 from mpm.core.logging import getLogger
 from mpm.utils.string import auto_decode
+from mpm.core.exceptions import CommandNotFound, ShellError
 logger = getLogger(__name__)
 
 
@@ -126,6 +127,8 @@ stderr = {stderr}\n\targs = {args}\n\tkwargs = {kwargs}")
         out = auto_decode(out)
         if debug:
             self.logger.debug(f"Output: {out}")
+        if out.startswith("get-command"):
+            raise CommandNotFound(f"Command not found: {command}")
         return out
 
 
