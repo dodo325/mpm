@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 """ Main Package Manager 
 """
-from mpm.shell import AutoShell
+from mpm.shell import AutoShell, AbstractShell
 from typing import List, Tuple
 from mpm.utils.text_parse import is_first_ascii_alpha
 from mpm.core.logging import getLogger
@@ -20,7 +20,7 @@ class PackageManager:
     def name(self) -> str:
         return self.__class__.__name__.lower()
 
-    def __init__(self, shell: "AbstractShell" = None):
+    def __init__(self, shell: AbstractShell = None):
         self.logger = logger.getChild(self.__class__.__name__)
         if shell == None:
             self.shell = AutoShell()
@@ -118,9 +118,10 @@ class Apt(AptGet):
     name = "apt"
 
 
-def get_installed_pms() -> List[PackageManager]:
+def get_installed_pms(shell: AbstractShell = None) -> List[PackageManager]:
     pms_list = []
-    shell = AutoShell()
+    if not shell:
+        shell = AutoShell()
     for cls in PackageManager._inheritors():
         obj = cls(shell=shell)
         if obj.is_installed():
