@@ -1,3 +1,3 @@
 __version__ = '0.1'
 
-from mpm.shell import *
+from mpm.utils.string import auto_decode

@@ -7,6 +7,7 @@ from getpass import getpass
 from pathlib import Path
 
 from mpm.core.logging import getLogger
+from mpm.utils.string import auto_decode
 logger = getLogger(__name__)
 
 
@@ -116,7 +117,8 @@ stderr = {stderr}\n\targs = {args}\n\tkwargs = {kwargs}")
 
         self.logger.debug(f"Try call command: {out_command}")
         out = check_output(out_command, shell=shell, stderr=stderr,
-                     ** kwargs).decode("utf-8")
+                     ** kwargs)
+        out = auto_decode(out)
         if debug:
             self.logger.debug(f"Output: {out}")
         return out
@@ -181,9 +183,10 @@ stderr = {stderr}\n\targs = {args}\n\tkwargs = {kwargs}")
             )
             out = p.communicate(self.__sudo_password + "\n")[1]
         else:
-            out =  check_output(out_command, stdin=stdin, stderr=stderr, shell=shell, **kwargs).decode("utf-8")
+            out =  check_output(out_command, stdin=stdin, stderr=stderr, shell=shell, **kwargs)
         if debug:
             self.logger.debug(f"Output: {out}")
+        out = auto_decode(out)
         return out
 
     def whereis(self, command: str):
@@ -251,6 +254,7 @@ class Cmd(AbstractShell):
 
 class PowerShell(Cmd):
     executable_path = "powershell.exe"
+    executable_args = ["-Command"]
     supported_platforms = {"Windows": {"releases_perfix": ["10"]}}
 
 

@@ -8,6 +8,7 @@ from subprocess import CalledProcessError, STDOUT
 from mpm.shell import AutoShell
 from mpm.pm.package_managers import Apt, AptGet, Pip
 from mpm.utils.text_parse import is_first_ascii_alpha
+from mpm.utils.string import auto_decode
 from mpm.core.logging import getLogger
 from mpm.core.exceptions import PackageDoesNotExist, ShellError
 logger = getLogger(__name__)
@@ -128,7 +129,7 @@ class PipPackage(Package):
             out = self.shell.cell(
                 ["pip", "show", self.package_name])
         except CalledProcessError as e:
-            if 'not found:' in e.output.decode("utf-8"):
+            if 'not found:' in auto_decode(e.output):
                 raise PackageDoesNotExist("Package not found: "+ self.package_name)
             raise ShellError("command '{}' return with error (code {}): {}".format(
                 e.cmd, e.returncode, e.output))
@@ -163,8 +164,10 @@ class PipPackage(Package):
 # Универсальный пакет!
 
 
-class UniPackage:
-    """ Package Class """
+class UniversalePackage:
+    """ Universale Package Class 
+    Единый интерфейс взаимодействия с пакетными менеджарами. Кушает конфиги из known_packages
+    """
 
     package_name: str
     _info = None
