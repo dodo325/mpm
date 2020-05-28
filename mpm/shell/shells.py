@@ -241,6 +241,15 @@ class Cmd(AbstractShell):
     executable_args = ["-c"]
     supported_platforms = {"Windows": {}}
 
+    def get_all_exe(self) -> list:
+        return self.whereis("*.exe")
+        
+    def whereis(self, command: str) -> list: # TODO: fix freezing
+        out = self.cell(["where", command])
+        li = out.split("\n")
+        li = list(filter(None, li))
+        return li
+
 class PowerShell(Cmd):
     executable_path = "powershell.exe"
     supported_platforms = {"Windows": {"releases_perfix": ["10"]}}
