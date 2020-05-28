@@ -134,7 +134,7 @@ class Bash(AbstractShell):
         self,
         command: list,
         shell=False,
-        executable_path="",
+        executable_path="", # если надо, чтобы команда вообще не использовала это, то сделай executable_path=None
         executable_args=[],
         enter_password=False,
         stdin=PIPE,
@@ -235,16 +235,15 @@ class ZSH(Bash):
                 pass
         return False
 
-
 class Cmd(AbstractShell):
     executable_path = "cmd.exe"
-    executable_args = ["-c"]
+    executable_args = ["/C"]
     supported_platforms = {"Windows": {}}
-
+    # def cell # TODO: don't WORK on Windows!!!!!!!!
     def get_all_exe(self) -> list:
         return self.whereis("*.exe")
         
-    def whereis(self, command: str) -> list: # TODO: fix freezing
+    def whereis(self, command: str) -> list:
         out = self.cell(["where", command])
         li = out.split("\n")
         li = list(filter(None, li))
