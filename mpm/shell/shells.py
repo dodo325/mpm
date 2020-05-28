@@ -64,6 +64,11 @@ class AbstractShell:
 
         return False
 
+    def whereis(cmd: str) -> list:
+        '''
+        Находит где исполняемый файл команды
+        '''
+        pass
     def is_installed(self) -> bool:
         '''
         Оределяет установленна данная коммандная оболочка и обновляет self.version
@@ -189,10 +194,14 @@ stderr = {stderr}\n\targs = {args}\n\tkwargs = {kwargs}")
         out = auto_decode(out)
         return out
 
-    def whereis(self, command: str):
-        out = self.cell(["whereis", command])
-        out = out.replace("\n", "")
-        return out.split(" ")[1:]
+    def whereis(self, command: str) -> list:
+        try:
+            out = self.cell(["whereis", command])
+            out = out.replace("\n", "")
+            return out.split(" ")[1:]
+        except Exception as e:
+            self.logger.error(f"Not found {command}!", exc_info=True)
+            return []
 
     def is_installed(self) -> bool:
         if self.is_platform_supported():
@@ -219,7 +228,7 @@ stderr = {stderr}\n\targs = {args}\n\tkwargs = {kwargs}")
             out = list(filter(lambda c: c.startswith(perfix), out))
         return out
 
-    def check_command(self, command):
+    def check_command(self, command: str) -> bool:
         return command in self.compgen()
 
 
@@ -245,12 +254,19 @@ class Cmd(AbstractShell):
     # def cell # TODO: don't WORK on Windows!!!!!!!!
     def get_all_exe(self) -> list:
         return self.whereis("*.exe")
-        
+
     def whereis(self, command: str) -> list:
-        out = self.cell(["where", command])
-        li = out.split("\n")
-        li = list(filter(None, li))
-        return li
+        try:
+            out = self.cell(["where", command])
+            li = out.split("\n")
+            li = list(filter(None, li))
+            return li
+        except Exception as e:
+            self.logger.error(f"Not found {command}!", exc_info=True)
+            return []   
+
+    def check_command(self, command: str) -> bool:
+        return self.whereis(command) != []
 
 class PowerShell(Cmd):
     executable_path = "powershell.exe"
