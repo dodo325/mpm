@@ -2,7 +2,7 @@ import sys
 import logging
 from logging.handlers import TimedRotatingFileHandler
 import coloredlogs
-from mpm.core.__init__ import LOGGING_DIR
+from mpm.core.__init__ import LOGGING_DIR, USER_DATA_DIR
 
 FORMATTER_FULL = logging.Formatter(
     "[%(levelname)s](%(asctime)s)LINE: %(lineno)d %(pathname)s - %(name)s %(funcName)s - %(message)s")
@@ -67,6 +67,8 @@ def get_file_handler(file_name, level=logging.DEBUG, formatter=None):
 
 
 def getLogger(logger_name):
+    if not USER_DATA_DIR.is_dir():
+        USER_DATA_DIR.mkdir()
     if not LOGGING_DIR.is_dir():
         LOGGING_DIR.mkdir()
     logging = get_logging()
