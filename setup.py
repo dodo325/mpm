@@ -34,7 +34,7 @@ def main():
           author='Dodo325',
           url='https://github.com/dodo325/mpm',
           #   download_url='github.com/...',
-          license='GNU GPL',
+          license='GPLv3',
           python_requires='>=3.7, <4',
           install_requires=REQUIREMENTS,
           extras_require={
@@ -44,8 +44,14 @@ def main():
               "Environment :: Console",
               "Intended Audience :: Developers",
               'Programming Language :: Python :: 3.7',
+              'Environment :: Console',
+              'Development Status :: 3 - Alpha',
+              'Intended Audience :: End Users/Desktop',
+              'Intended Audience :: System Administrators',
+              "Programming Language :: Python",
               'Programming Language :: Python :: 3.8',
               "Programming Language :: Python :: 3 :: Only",
+              "License :: OSI Approved :: GNU General Public License v3 (GPLv3)",
               'Topic :: Software Development :: Libraries',
               'Topic :: Software Development :: Libraries :: Python Modules',
               'Topic :: Utilities'
