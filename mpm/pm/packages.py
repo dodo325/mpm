@@ -28,9 +28,14 @@ class Package:
         if not self._info:
             self._info = self._get_info()
         return self._info
+    
+    @property
+    def version(self) -> str:
+        return self.info["version"]
 
     def _get_info(self) -> dict:
         return {"package": self.package_name}
+
 
     def __init__(self, package_name, shell=None):
         if shell == None:
@@ -172,29 +177,55 @@ class PipPackage(Package):
 class UniversalePackage:
     """ Universale Package Class 
     Единый интерфейс взаимодействия с пакетными менеджарами. Кушает конфиги из known_packages
+    
+    Пример:
+    >>> pkg = UniversalePackage("pytest")
+    >>> pkg.info
+    >>> pkg.install()
+    >>> pkg.config
+    {'package_managers': {'pip': {}}}
     """
 
     package_name: str
     config = dict()
-    PMs = []
+    pms_classes = [] # TODO: refactor names
+    auto_update_conf = True
     _info = None
+    version = None
     @property
     def info(self) -> dict:
         if not self._info:
             self._info = self.get_info()
         return self._info
 
-    def _get_correct_PMs_names(self, all_pm=False)->list:
+    def is_installed(self) -> bool:
+        info = self.info
+        for pm in self.pm_packages:
+            if pm.is_installed():
+                self.version = pm.version
+                return True
+        return False
+    
+    
+
+    def _get_correct_pms_classes_names(self, all_pm=False)->list:
         pms_names = list(self.config.get("package_managers", {}).keys())
         if pms_names == [] or all_pm:
-            pms_names = [PM.name for PM in self.PMs]
-        if 'apt' in pms_names:
+            pms_names = [PM.name for PM in self.pms_classes]
+        if 'apt' in pms_names and 'apt-get' in pms_names:
             pms_names.remove('apt-get')
         self.logger.debug(f"Out pms_names: {pms_names}")
         return pms_names
+    
+    def update_package_info(self):
+        '''
+        Update self.info and self.pm_packages
+        '''
+        self._info = self.get_info()
+
 
     def get_packages(self, all_pm=False) -> list:
-        pms_names = self._get_correct_PMs_names(all_pm=all_pm)
+        pms_names = self._get_correct_pms_classes_names(all_pm=all_pm)
         self.logger.debug(f"pms_names: {pms_names}")
         pkg_objects = []
         for pkg_class in Package._inheritors():
@@ -203,38 +234,50 @@ class UniversalePackage:
                         pkg_class(self.package_name, shell=self.shell)
                     )
         return pkg_objects
-
+    
     def get_info(self, all_pm=False) -> dict:
         info = dict()
+        self.pm_packages = []
         pm_packages = self.get_packages(all_pm=all_pm)
         self.logger.debug(f"pm_packages: {pm_packages}")
         for pkg in pm_packages:
             try:
                 self.logger.debug(f"Search '{pkg.package_name}' in {pkg.pm.name}")
                 info[pkg.pm.name] = pkg.info
+                self.pm_packages.append(pkg)
+                if self.auto_update_conf:
+                    self.add_package_manager_in_config(pkg.pm.name)
             except PackageDoesNotExist as e:
                 self.logger.warn(
                     f"Package {pkg.package_name} Does Not found in '{pkg.pm.name}' package manager")
         self.logger.debug(f"'{self.package_name}' info: {info}")
         return info
 
+    def add_package_manager_in_config(self, package_manager: str):
+        if "package_managers" not in self.config:
+            self.config["package_managers"] = {package_manager:{}}
+            return
+        if package_manager not in self.config["package_managers"]:
+            self.config["package_managers"][package_manager] = {}
+
     def __init__(self, package_name, 
-            shell=None, PMs: List[PackageManager] = None, 
+            shell=None, pms_classes: List[PackageManager] = None, 
             known_packages: dict() = None,
-            offline=False
+            offline=False,
+            auto_update_conf=True
             ):
         self.package_name = package_name
         self.logger = logger.getChild(self.__class__.__name__)
-
+        self.auto_update_conf = auto_update_conf
         if shell == None:
             self.shell = AutoShell()
         else:
             self.shell = shell
 
-        if not PMs:
-            self.PMs = get_installed_pms(shell=self.shell)
+        if not pms_classes:
+            self.pms_classes = get_installed_pms(shell=self.shell)
         else:
-            self.PMs = PMs
+            self.pms_classes = pms_classes
 
         if not known_packages:
             known_packages = get_known_packages(offline=offline)

@@ -13,6 +13,10 @@ class CommandNotFound(ShellError):
     pass
 
 
+class PackageManagerNotInatalled():
+    """Package Manager Not Inatalled"""
+    pass
+
 class PackageDoesNotExist(ShellError):
     """The Package does not exist"""
     pass
