@@ -8,6 +8,7 @@ from pathlib import Path
 
 from mpm.core.logging import getLogger
 from mpm.utils.string import auto_decode
+from mpm.utils.text_parse import not_nan_split
 from mpm.core.exceptions import CommandNotFound, ShellError
 logger = getLogger(__name__)
 
@@ -265,8 +266,7 @@ class Cmd(AbstractShell):
     def whereis(self, command: str) -> list:
         try:
             out = self.cell(["where", command])
-            li = out.split("\n")
-            li = list(filter(None, li))
+            li = not_nan_split(out)
             return li
         except Exception as e:
             self.logger.error(f"Not found {command}!", exc_info=True)
@@ -283,8 +283,7 @@ class PowerShell(Cmd):
     def whereis(self, command: str) -> list:
         try:
             out = self.cell([f"(get-command {command}).Path"])
-            li = out.split("\n")
-            li = list(filter(None, li))
+            li = not_nan_split(out)
             return li
         except Exception as e:
             self.logger.error(f"Not found {command}!", exc_info=True)
@@ -297,15 +296,10 @@ class PowerShell(Cmd):
         if self.is_platform_supported():
             try:
                 out = self.cell(["Get-Host"])
-                out_lines = out.split("\n")
-                for line in out_lines:
-                    if "Version" in line:
-                        line = line.replace(" ", "")
-                        line = line.replace("Version", "")
-                        line = line.replace(":", "")
-                        line = line.replace("\r", "")
-                        self.version = line
-                        return True
+                data = parse_value_key_table(out, key_lower=True)
+                if version in data:
+                    self.version = data["version"]
+                    return True
             except FileNotFoundError:
                 pass
         return False

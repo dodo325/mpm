@@ -7,7 +7,7 @@ from subprocess import CalledProcessError, STDOUT
 
 from mpm.shell import AutoShell
 from mpm.pm.package_managers import Apt, AptGet, Pip, PackageManager, Conda, NPM, get_installed_pms, NAMES_TO_PACKAGE_MANAGERS
-from mpm.utils.text_parse import is_first_ascii_alpha
+from mpm.utils.text_parse import parse_table_with_columns, parse_value_key_table
 from mpm.core.configs import get_known_packages
 from mpm.utils.string import auto_decode
 from mpm.core.logging import getLogger
@@ -82,22 +82,10 @@ class AptGetPackage(Package):
                 raise PackageDoesNotExist("Package not found: "+ self.package_name)
             raise ShellError("command '{}' return with error (code {}): {}".format(
                 e.cmd, e.returncode, e.output))
-        _TMP_MARK = "<!>"
-        out = out.replace("\n ", _TMP_MARK)
-        lines = out.split("\n")
-        info = dict()
-        for line in lines:
-            if line == "":
-                continue
-            mark = ": "
-            n = line.find(mark)
-            key, value = line[:n], line[n + len(mark):]
-            info[key.lower()] = value.replace(_TMP_MARK, "\n ")
+        info = parse_value_key_table(out, key_lower=True)
         info.pop('w', None)
         info.pop('e', None)
-        info.pop('W', None)
-        info.pop('E', None)
-        info.pop('N', None)
+        info.pop('n', None)
         if info == {}:
             raise PackageDoesNotExist( # FIXME: Не правда! Т.к. show показывает тольок из установленных пакетов
                 "Package not found: " + self.package_name)
@@ -143,18 +131,7 @@ class PipPackage(Package):
                 raise PackageDoesNotExist("Package not found: "+ self.package_name)
             raise ShellError("command '{}' return with error (code {}): {}".format(
                 e.cmd, e.returncode, e.output))
-        _TMP_MARK = "<!>"
-        out = out.replace("\n ", _TMP_MARK)
-        lines = out.split("\n")
-        lines = list(filter(None, lines))
-        info = dict()
-        for line in lines:
-            if line == "":
-                continue
-            mark = ": "
-            n = line.find(mark)
-            key, value = line[:n], line[n + len(mark):]
-            info[key.lower()] = value.replace(_TMP_MARK, "\n ")
+        info = parse_value_key_table(out, key_lower=True)
         return info
 
     def install(self, repository: str = None):

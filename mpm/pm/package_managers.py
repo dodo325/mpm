@@ -4,7 +4,7 @@
 """
 from mpm.shell import AutoShell, AbstractShell
 from typing import List, Tuple
-from mpm.utils.text_parse import is_first_ascii_alpha
+from mpm.utils.string import is_first_ascii_alpha
 from mpm.core.logging import getLogger
 from mpm.core.exceptions import PackageDoesNotExist
 from subprocess import CalledProcessError, STDOUT
@@ -42,6 +42,12 @@ class PackageManager:
                     work.append(child)
         return list(subclasses)
 
+    def search(package_name: str) -> dict:
+        '''
+        Поиск пакета по имени
+        '''
+        raise NoneType()
+
     def is_installed(self) -> bool:
         return self.shell.check_command(self.name)
 
@@ -57,6 +63,10 @@ class Snap(PackageManager):
         li = [s.replace("\n", "") for s in li]
         self.logger.info(f"Detect {len(li)} packages")
         return li
+    
+    def search(package_name: str) -> dict:
+        pass 
+        
 
 class NPM(PackageManager):
     """ Node js package manager """

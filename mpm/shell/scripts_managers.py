@@ -4,7 +4,6 @@
 '''
 from shell import AutoShell
 from typing import List, Tuple
-from text_parse import is_first_ascii_alpha
 from mpm.shell import AutoShell, Bash
 from mpm.core.logging import getLogger
 logger = getLogger(__name__)
