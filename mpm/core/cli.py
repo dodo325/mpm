@@ -48,12 +48,7 @@ def install(package_name, pm_name, known_packages_json, all_flag, offline):  # i
         shell=shell,
         pms_classes=PMs
     )
-    package.update_package_info()
-    if package.is_installed():
-        logger.success("Package already installed")
-        return
-    
-    #
+    package.install()
 
 
 @main.command()

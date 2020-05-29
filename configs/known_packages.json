@@ -1,5 +1,6 @@
 {
     "pytest": {"package_managers":{"pip":{}}},
+    "urwid": {"package_managers":{"pip":{}}},
     "dbus": {"package_managers":{"apt-get":{}}},
     "gnome-shell-extension-installer": {
         "package_managers":{
@@ -69,13 +70,18 @@
     },
     "google-chrome": {"package_managers":{"apt":{"package_name": "google-chrome-stable"}}},
     "nodejs": {"package_managers":{"apt":{}}},
-    "npm": {"package_managers":{"apt":{"dependence":["nodejs"]}}},
+    "npm": {
+        "package_managers":{"apt":{}},
+        "dependence":["nodejs"]
+    },
     "synergy": {"package_managers":{"apt":{}}},
     "telegram": {
         "package_managers":{
             "snap": {},
             "apt": {
-                "repository": "ppa:atareao/telegram"
+                "install":{
+                    "repository": "ppa:atareao/telegram"
+                }
             }
         }
     },
@@ -83,6 +89,7 @@
         "package_managers":{
             "snap":{
                 "install":{
+                    "repository": "ppa:atareao/telegram",
                     "args": ["--classi"]
                 }
             }

@@ -99,7 +99,7 @@ class AptGetPackage(Package):
         info.pop('E', None)
         info.pop('N', None)
         if info == {}:
-            raise PackageDoesNotExist(
+            raise PackageDoesNotExist( # FIXME: Не правда! Т.к. show показывает тольок из установленных пакетов
                 "Package not found: " + self.package_name)
         return info
 
@@ -202,6 +202,7 @@ class UniversalePackage:
         info = self.info
         for pm in self.pm_packages:
             if pm.is_installed():
+                self.pm = pm
                 self.version = pm.version
                 return True
         return False
@@ -221,6 +222,7 @@ class UniversalePackage:
         '''
         Update self.info and self.pm_packages
         '''
+        # is_installed()
         self._info = self.get_info()
 
 
@@ -228,10 +230,15 @@ class UniversalePackage:
         pms_names = self._get_correct_pms_classes_names(all_pm=all_pm)
         self.logger.debug(f"pms_names: {pms_names}")
         pkg_objects = []
+        config_menegers = self.config.get("package_managers", {})
         for pkg_class in Package._inheritors():
             if pkg_class.pm_class.name in pms_names:
+                pm_config = config_menegers.get(pkg_class.pm_class.name, {})
                 pkg_objects.append(
-                        pkg_class(self.package_name, shell=self.shell)
+                        pkg_class(
+                            pm_config.get("package_name", self.package_name),
+                            shell=self.shell
+                        )
                     )
         return pkg_objects
     
@@ -286,3 +293,41 @@ class UniversalePackage:
         if package_name in known_packages:
             logger.info(f"Package '{package_name}' found in known_packages")
             self.config = known_packages[package_name]
+
+    def ask_user_select_pm(self) -> "pm_package":
+        # if len(self.pm_packages) == 1:
+        #      return self.pm_packages[0]
+
+        pm_package_data = {
+            i: {"name": pkg.pm.name, "pm_package": pkg} for i, pkg in enumerate(self.pm_packages)
+        }
+        print("Package Managers:")
+        for x, y in pm_package_data.items():
+            print(x, ':', pm_package_data[x]['name'])
+
+        while True:
+            print("\nSelect a package manager:")
+            d_val = int(input())
+
+            if d_val in pm_package_data.keys():
+                d_val = int(d_val)
+                print("\nYou have chosen {0}".format(
+                    pm_package_data[d_val]['name']))
+                return pm_package_data[d_val]["pm_package"]
+            else:
+                print('\nYou chosen wrong!')
+
+        
+    def install(self, auto=False):
+        self.update_package_info()
+        if self.is_installed():
+            logger.success("Package already installed")
+            return
+
+        package_managers_config = self.config["package_managers"]
+
+        pkg = self.ask_user_select_pm()
+        pkg_config = package_managers_config.get(pkg.pm.name, {})
+        install_config = pkg_config.get("install", {})
+        pkg.install(**install_config)
+       

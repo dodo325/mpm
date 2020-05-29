@@ -33,7 +33,9 @@
             "plugin_name" : "[plugin_name]",
             "plugin_id": "[plugin_id]",
             "install":{
-                "args": ["[arg1]", "[arg2]", "[...]"]
+                "[package_manager_name]": {
+                    "template_package_name": "[template_package_name]"
+                },
             }
         }
     },
