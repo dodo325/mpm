@@ -4,15 +4,15 @@ Global MPM exception and warning classes.
 
 
 class ShellError(Exception):
-    """The requested model field does not exist"""
+    """ Shell Error """
     pass
 
 
 class CommandNotFound(ShellError):
-    """The requested model field does not exist"""
+    """The Command Not Found"""
     pass
 
 
 class PackageDoesNotExist(ShellError):
-    """The requested model field does not exist"""
+    """The Package does not exist"""
     pass

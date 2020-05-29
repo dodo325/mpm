@@ -218,9 +218,13 @@ stderr = {stderr}\n\targs = {args}\n\tkwargs = {kwargs}")
                 pass
         return False
 
+    _compgen_out = None
     def compgen(self, perfix: str = None,) -> list:
         command = "compgen -abcdefgjksuv"
-        out = self.cell(command, shell=False).splitlines()
+        out = self._compgen_out
+        if not out:
+            out = self.cell(command, shell=False).splitlines()
+            self._compgen_out = out
         if perfix != None:
             out = list(filter(lambda c: c.startswith(perfix), out))
         return out

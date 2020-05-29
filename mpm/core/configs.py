@@ -34,25 +34,35 @@ def get_remote_known_packages():
 def init_user_configs_dir():
     if not USER_DATA_DIR.is_dir():
         USER_DATA_DIR.mkdir()
+        logger.debug(f"Created USER_DATA_DIR: {USER_DATA_DIR}")
     if not USER_CONFIGS_DIR.is_dir():
         shutil.copytree(CONFIGS_DIR, USER_CONFIGS_DIR, copy_function=shutil.copy)
+        logger.debug(f"Created USER_DATA_DIR: {USER_CONFIGS_DIR}")
     if not USER_SCRIPTS_DIR.is_dir():
         shutil.copytree(SCRIPTS_DIR, USER_SCRIPTS_DIR, copy_function=shutil.copy)
+        logger.debug(f"Created USER_DATA_DIR: {USER_SCRIPTS_DIR}")
 
-def get_known_packages():
+
+def get_known_packages(offline = False):
     init_user_configs_dir()
-    try:
-        known_packages = get_remote_known_packages()
-    except urllib.request.HTTPError as e:
-        logger.error(
-            f"HTTPError: code = {e.code}, url = {e.url}", exc_info=True)
-        known_packages_file = CONFIGS_DIR / "known_packages.json"
-        with known_packages_file.open() as sf:
-                known_packages = json.load(sf)
 
+    known_packages_file = CONFIGS_DIR / "known_packages.json"
+    logger.debug(f"Reading : {known_packages_file}")
+    with known_packages_file.open() as sf:
+                known_packages = json.load(sf)
+                
+    if not offline:
+        try:
+            known_packages = get_remote_known_packages()
+        except urllib.request.HTTPError as e:
+            logger.error(
+                f"HTTPError: code = {e.code}, url = {e.url}", exc_info=True)
+            
     user_known_packages_file = USER_CONFIGS_DIR / "known_packages.json"
     if user_known_packages_file.is_file():
+        logger.debug(f"Reading : {user_known_packages_file}")
         with user_known_packages_file.open() as sf:
             user_known_packages = json.load(sf)
         known_packages.update(user_known_packages)
+    logger.debug(f"In known_packages {len(known_packages)} packages")
     return known_packages

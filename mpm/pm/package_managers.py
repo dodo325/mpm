@@ -101,6 +101,23 @@ class AptGet(PackageManager):
     """ Apt Package """
 
     name = "apt-get"
+    # def _install_software_properties_common():
+
+    def check_repository(self, repository: str) -> bool:
+        if not shell.check_command("add-apt-repository"):
+            self.logger.error("Not found add-apt-repository!!!")
+            # self._install_software_properties_common()
+
+    def add_repository(self, repository: str):
+        self.logger.info(f"Add repository {repository}")
+        if not shell.check_command("add-apt-repository"):
+            self.logger.error("Not found add-apt-repository!!!")
+            # self._install_software_properties_common()
+        if check_repository(repository):
+            self.logger.success("Repository already add")
+
+    def remove_repository(self, repository: str):
+        pass # TODO: поиск и удаление регистри
 
     def get_all_packages(self) -> List[str]:
         li = self.shell.cell(['dpkg -l | cut -d " " -f 3 | grep ""']).split("\n")
@@ -126,5 +143,15 @@ def get_installed_pms(shell: AbstractShell = None) -> List[PackageManager]:
         obj = cls(shell=shell)
         if obj.is_installed():
             pms_list.append(cls)
-    logger.debug(f"Output: {pms_list}")
+    pm_names = [pm.name for pm in pms_list]
+    logger.info(f"Installed packege managers: {pm_names}")
     return pms_list
+
+
+NAMES_TO_PACKAGE_MANAGERS = {
+    cls.name: cls for cls in PackageManager._inheritors()
+}
+PACKAGE_MANAGERS_TO_NAMES = {
+    cls: cls.name for cls in PackageManager._inheritors()
+}
+PACKAGE_MANAGERS_NAMES = list(NAMES_TO_PACKAGE_MANAGERS.keys())

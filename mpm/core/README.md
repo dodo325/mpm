@@ -5,7 +5,7 @@
 ## Алгоритмы работы некоторых комманд:
 
 * loging files: $HOME/.mpm/logs/*.log
-### Подготовка known_packages
+### Подготовка known_packages [+]
 1. Парситим settings.json, перезаписываем его в соответствии с $HOME/.mpm/configs/settings.json
 2. Из known_packages_url получаем known_packages, если возникла ошибка, то смотрим локальный known_packages
 3. перезаписываем known_packages в соответствии с $HOME/.mpm/configs/known_packages.json

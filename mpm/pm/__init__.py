@@ -1,9 +1,4 @@
 __version__ = '0.1'
 
-from mpm.pm.package_managers import Apt, AptGet, Pip, get_installed_pms, PackageManager, Snap
-from mpm.pm.packages import AptPackage, PipPackage
-
-NAMES_TO_PACKAGE_MANAGERS = {
-    cls.name:cls for cls in PackageManager._inheritors()
-}
-PACKAGE_MANAGERS_NAMES = list(NAMES_TO_PACKAGE_MANAGERS.keys())
+from mpm.pm.package_managers import Apt, AptGet, Pip, get_installed_pms, PackageManager, Snap, NAMES_TO_PACKAGE_MANAGERS, PACKAGE_MANAGERS_TO_NAMES, PACKAGE_MANAGERS_NAMES
+from mpm.pm.packages import AptPackage, PipPackage, UniversalePackage, Package

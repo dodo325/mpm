@@ -6,8 +6,9 @@ from typing import List, Tuple
 from subprocess import CalledProcessError, STDOUT
 
 from mpm.shell import AutoShell
-from mpm.pm.package_managers import Apt, AptGet, Pip
+from mpm.pm.package_managers import Apt, AptGet, Pip, PackageManager, Conda, NPM, get_installed_pms, NAMES_TO_PACKAGE_MANAGERS
 from mpm.utils.text_parse import is_first_ascii_alpha
+from mpm.core.configs import get_known_packages
 from mpm.utils.string import auto_decode
 from mpm.core.logging import getLogger
 from mpm.core.exceptions import PackageDoesNotExist, ShellError
@@ -17,7 +18,7 @@ class Package:
     """ Package Class """
 
     package_name: str
-    pm_class: "PackageManager" = None
+    pm_class: PackageManager = None
     pm = None
 
     _info = None
@@ -40,9 +41,7 @@ class Package:
 
         self.pm = self.pm_class(shell=self.shell)
 
-        self.logger = getLogger(
-            f"{_LOG_PERFIX}{self.__class__.__name__.lower()}"
-        )
+        self.logger = logger.getChild(self.__class__.__name__)
 
     def __str__(self):
         return f"{self.package_name}"
@@ -53,6 +52,17 @@ class Package:
     def is_installed(self) -> bool:
         return self.package_name in self.pm.get_all_packages()
 
+    @classmethod
+    def _inheritors(cls) -> list:
+        subclasses = set()
+        work = [cls]
+        while work:
+            parent = work.pop()
+            for child in parent.__subclasses__():
+                if child not in subclasses:
+                    subclasses.add(child)
+                    work.append(child)
+        return list(subclasses)
 
 class AptGetPackage(Package):
     """ AptGet Package """
@@ -78,25 +88,21 @@ class AptGetPackage(Package):
             n = line.find(mark)
             key, value = line[:n], line[n + len(mark):]
             info[key.lower()] = value.replace(_TMP_MARK, "\n ")
+        info.pop('w', None)
+        info.pop('e', None)
+        info.pop('W', None)
+        info.pop('E', None)
+        info.pop('N', None)
+        if info == {}:
+            raise PackageDoesNotExist(
+                "Package not found: " + self.package_name)
         return info
 
-    # def _install_software_properties_common():
-    def check_repository(self, repository: str) -> bool:
-        if not shell.check_command("add-apt-repository"):
-            self.logger.error("Not found add-apt-repository!!!")
-            # self._install_software_properties_common()
 
-    def add_repository(self, repository: str):
-        self.logger.info(f"Add repository {repository}")
-        if not shell.check_command("add-apt-repository"):
-            self.logger.error("Not found add-apt-repository!!!")
-            # self._install_software_properties_common()
-        if check_repository(repository):
-            self.logger.success("Repository already add")
 
     def install(self, enter_password: bool = False, repository: str = None):
         if repository != None:
-            self.add_repository(repository)
+            self.pm.add_repository(repository)
 
         if self.is_installed():
             self.logger.success("Package already installed")
@@ -115,7 +121,6 @@ class AptGetPackage(Package):
 
 class AptPackage(AptGetPackage):
     """ Apt Package """
-
     pm_class = Apt
 
 
@@ -170,26 +175,71 @@ class UniversalePackage:
     """
 
     package_name: str
+    config = dict()
+    PMs = []
     _info = None
-
     @property
     def info(self) -> dict:
         if not self._info:
-            self._info = self._get_info()
+            self._info = self.get_info()
         return self._info
 
-    def _get_info(self) -> dict:
-        return {"package": self.package_name}
+    def _get_correct_PMs_names(self, all_pm=False)->list:
+        pms_names = list(self.config.get("package_managers", {}).keys())
+        if pms_names == [] or all_pm:
+            pms_names = [PM.name for PM in self.PMs]
+        if 'apt' in pms_names:
+            pms_names.remove('apt-get')
+        self.logger.debug(f"Out pms_names: {pms_names}")
+        return pms_names
 
-    def __init__(self, package_name, shell=None):
+    def get_packages(self, all_pm=False) -> list:
+        pms_names = self._get_correct_PMs_names(all_pm=all_pm)
+        self.logger.debug(f"pms_names: {pms_names}")
+        pkg_objects = []
+        for pkg_class in Package._inheritors():
+            if pkg_class.pm_class.name in pms_names:
+                pkg_objects.append(
+                        pkg_class(self.package_name, shell=self.shell)
+                    )
+        return pkg_objects
+
+    def get_info(self, all_pm=False) -> dict:
+        info = dict()
+        pm_packages = self.get_packages(all_pm=all_pm)
+        self.logger.debug(f"pm_packages: {pm_packages}")
+        for pkg in pm_packages:
+            try:
+                self.logger.debug(f"Search '{pkg.package_name}' in {pkg.pm.name}")
+                info[pkg.pm.name] = pkg.info
+            except PackageDoesNotExist as e:
+                self.logger.warn(
+                    f"Package {pkg.package_name} Does Not found in '{pkg.pm.name}' package manager")
+        self.logger.debug(f"'{self.package_name}' info: {info}")
+        return info
+
+    def __init__(self, package_name, 
+            shell=None, PMs: List[PackageManager] = None, 
+            known_packages: dict() = None,
+            offline=False
+            ):
+        self.package_name = package_name
+        self.logger = logger.getChild(self.__class__.__name__)
+
         if shell == None:
             self.shell = AutoShell()
         else:
             self.shell = shell
-        self.package_name = package_name
 
-        self.pm = self.pm_class(shell=self.shell)
+        if not PMs:
+            self.PMs = get_installed_pms(shell=self.shell)
+        else:
+            self.PMs = PMs
 
-        self.logger = getLogger(
-            f"{_LOG_PERFIX}{self.__class__.__name__.lower()}"
-        )
+        if not known_packages:
+            known_packages = get_known_packages(offline=offline)
+
+        
+        if package_name in known_packages:
+            logger.info(f"Package '{package_name}' found in known_packages")
+            self.config = known_packages[package_name]
