@@ -7,7 +7,7 @@ def remove_multiple_spaces(string: str) -> str:
 
 
 def not_nan_split(string: str, delimiter="\n") -> list:
-    li = out.split(delimiter)
+    li = string.split(delimiter)
     return list(filter(None, li))
 
 def parse_value_key_table(string: str, delimiter=":", remove_useless_space=True, multiline_spase=True, key_lower=False) -> dict:
