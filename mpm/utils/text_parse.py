@@ -78,7 +78,7 @@ def parse_value_key_table(string: str, delimiter=":", remove_useless_space=True,
     return data
 
 
-def parse_table_with_columns(string: str, name_column_num=0, key_lower=False) -> dict:
+def parse_table_with_columns(string: str, delimiter=None, name_column_num=0, key_lower=False) -> dict:
     '''
     Parse ASCII tables!
     Example:
@@ -132,6 +132,8 @@ def parse_table_with_columns(string: str, name_column_num=0, key_lower=False) ->
     'издатель': 'ramboxapp*',
     'версия': '1.3.1'}}
     '''
+    if delimiter:
+        string = string.replace(delimiter, "") # TODO: something...
     li = not_nan_split(string)
     head = li[0]
     head_list = []

@@ -6,6 +6,7 @@ from mpm.shell import AutoShell, AbstractShell
 from typing import List, Tuple
 from mpm.utils.string import is_first_ascii_alpha
 from mpm.core.logging import getLogger
+from mpm.utils.text_parse import parse_table_with_columns, parse_value_key_table, not_nan_split
 from mpm.core.exceptions import PackageDoesNotExist
 from subprocess import CalledProcessError, STDOUT
 import re
@@ -42,7 +43,7 @@ class PackageManager:
                     work.append(child)
         return list(subclasses)
 
-    def search(package_name: str) -> dict:
+    def search(self, package_name: str) -> dict:
         '''
         Поиск пакета по имени
         '''
@@ -64,9 +65,10 @@ class Snap(PackageManager):
         self.logger.info(f"Detect {len(li)} packages")
         return li
     
-    def search(package_name: str) -> dict:
-        pass 
-        
+    def search(self, package_name: str) -> dict:
+        out = self.shell.cell(
+            ['LANG=en_US.UTF-8;', 'snap', 'find', package_name])
+        return parse_table_with_columns(out, key_lower=True)
 
 class NPM(PackageManager):
     """ Node js package manager """
@@ -80,6 +82,9 @@ class NPM(PackageManager):
         self.logger.info(f"Detect {len(li)} packages")
         return li
 
+    def search(self, package_name: str) -> dict:
+        out = self.shell.cell(['npm', 'search', package_name])
+        return parse_table_with_columns(out, key_lower=True, delimiter="|")
 
 class Pip(PackageManager):
     """ Python Package Manager """
@@ -91,6 +96,19 @@ class Pip(PackageManager):
         self.logger.info(f"Detect {len(li)} packages")
         return li
 
+    def search(self, package_name: str) -> dict:
+        out = self.shell.cell(['pip', 'search', package_name])
+        li = not_nan_split(out)
+        data = {}
+        for line in li:
+            version = re.search(r"\((.*?)\)", line).group(1)
+            name = line[:line.find("(")].strip()
+            description = line[line.rfind("-")+1:].strip()
+            data[name] = {
+                'version': version,
+                'description': description
+                }
+        return data
 
 class Conda(PackageManager):
     """ Anaconda Python Package Manager """
@@ -107,20 +125,41 @@ class Conda(PackageManager):
         self.logger.info(f"Detect {len(li)} packages")
         return li
 
+    def search(self, package_name: str) -> dict:
+        out = self.shell.cell(["conda", "search", package_name, "--json"])
+        data = json.loads(out)
+        out_data = {}
+        for builds_list in data.values():
+            last_build = builds_list[-1]
+            name = last_build.pop('name')
+            out_data[name] = last_build
+        return out_data
+
 class AptGet(PackageManager):
     """ Apt Package """
 
     name = "apt-get"
     # def _install_software_properties_common():
 
+    def _remove_warnings(self, consol_output: str, error= False) -> str:
+        out = ""
+        perfix_list = ['W', 'N']
+        if error:
+            perfix_list.append('E')
+        for line in consol_output.splitlines():
+            if not line.startswith(tuple(perfix_list)):
+                out += line + '\n'
+        return out
+
+        
     def check_repository(self, repository: str) -> bool:
-        if not shell.check_command("add-apt-repository"):
+        if not self.shell.check_command("add-apt-repository"):
             self.logger.error("Not found add-apt-repository!!!")
             # self._install_software_properties_common()
 
     def add_repository(self, repository: str):
         self.logger.info(f"Add repository {repository}")
-        if not shell.check_command("add-apt-repository"):
+        if not self.shell.check_command("add-apt-repository"):
             self.logger.error("Not found add-apt-repository!!!")
             # self._install_software_properties_common()
         if check_repository(repository):
@@ -134,14 +173,26 @@ class AptGet(PackageManager):
         li = list(filter(is_first_ascii_alpha, li))
         self.logger.info(f"Detect {len(li)} packages")
         return li
-
+    
     def update(self, enter_password=False):
         self.shell.sudo_cell([self.name, "update"], enter_password=enter_password)
 
-
+    def search(self, package_name: str) -> dict:
+        out = self.shell.cell(["apt-cache", "search", package_name])
+        out = self._remove_warnings(out)
+        if out == '':
+            return {}
+        data = {}
+        for line in not_nan_split(out):
+            delimiter = " - "
+            n = line.find(delimiter)
+            name = line[:n]
+            description = line[n+len(delimiter):]
+            data[name] = {"description": description}
+        return data
+        
 class Apt(AptGet):
     """ Apt Package """
-
     name = "apt"
 
 

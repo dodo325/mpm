@@ -82,10 +82,9 @@ class AptGetPackage(Package):
                 raise PackageDoesNotExist("Package not found: "+ self.package_name)
             raise ShellError("command '{}' return with error (code {}): {}".format(
                 e.cmd, e.returncode, e.output))
+        out = self.pm._remove_warnings(out)
         info = parse_value_key_table(out, key_lower=True)
-        info.pop('w', None)
-        info.pop('e', None)
-        info.pop('n', None)
+        logger.warn
         if info == {}:
             raise PackageDoesNotExist( # FIXME: Не правда! Т.к. show показывает тольок из установленных пакетов
                 "Package not found: " + self.package_name)
