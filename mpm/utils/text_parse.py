@@ -76,7 +76,9 @@ def parse_value_key_table(string: str, delimiter=":", remove_useless_space=True,
                 value = value.replace(_TMP_MARK, "\n ")
             data[key] = value
     return data
-def parse_table_with_columns(string: str) -> List[dict]:
+
+
+def parse_table_with_columns(string: str, name_column_num=0, key_lower=False) -> dict:
     '''
     Parse ASCII tables!
     Example:
@@ -88,48 +90,73 @@ def parse_table_with_columns(string: str) -> List[dict]:
     monento            1.2.8                      ladnysoft               -           Cross-platform app for tracking personal finances with encrypted data syncing.
     ramboxpro          1.3.1                      ramboxapp*              -           Rambox Pro
     >>> parse_table_with_columns(table)
-    [{'Описание': 'Official desktop client for the Telegram messenger',
+    {'telegram-desktop': {'Описание': 'Official desktop client for the Telegram messenger',
     'Примечание': '-',
     'Издатель': 'telegram.desktop',
-    'Версия': '2.1.7',
-    'Название': 'telegram-desktop'},
-    {'Описание': 'Social Screen Interaction',
+    'Версия': '2.1.7'},
+    'smartscreen': {'Описание': 'Social Screen Interaction',
     'Примечание': '-',
     'Издатель': 'ypcloud',
-    'Версия': '1.0.1',
-    'Название': 'smartscreen'},
-    {'Описание': 'Command-line interface for Telegram. Uses the readline interface.',
+    'Версия': '1.0.1'},
+    'telegram-cli': {'Описание': 'Command-line interface for Telegram. Uses the readline interface.',
     'Примечание': '-',
     'Издатель': 'marius-quabeck',
-    'Версия': '1.4.5',
-    'Название': 'telegram-cli'},
-    {'Описание': 'Cross-platform app for tracking personal finances with encrypted data syncing.',
+    'Версия': '1.4.5'},
+    'monento': {'Описание': 'Cross-platform app for tracking personal finances with encrypted data syncing.',
     'Примечание': '-',
     'Издатель': 'ladnysoft',
-    'Версия': '1.2.8',
-    'Название': 'monento'},
-    {'Описание': 'Rambox Pro',
+    'Версия': '1.2.8'},
+    'ramboxpro': {'Описание': 'Rambox Pro',
     'Примечание': '-',
     'Издатель': 'ramboxapp*',
-    'Версия': '1.3.1',
-    'Название': 'ramboxpro'}]
+    'Версия': '1.3.1'}}
+    >>> parse_table_with_columns(t, key_lower=True)
+    {'telegram-desktop': {'описание': 'Official desktop client for the Telegram messenger',
+    'примечание': '-',
+    'издатель': 'telegram.desktop',
+    'версия': '2.1.7'},
+    'smartscreen': {'описание': 'Social Screen Interaction',
+    'примечание': '-',
+    'издатель': 'ypcloud',
+    'версия': '1.0.1'},
+    'telegram-cli': {'описание': 'Command-line interface for Telegram. Uses the readline interface.',
+    'примечание': '-',
+    'издатель': 'marius-quabeck',
+    'версия': '1.4.5'},
+    'monento': {'описание': 'Cross-platform app for tracking personal finances with encrypted data syncing.',
+    'примечание': '-',
+    'издатель': 'ladnysoft',
+    'версия': '1.2.8'},
+    'ramboxpro': {'описание': 'Rambox Pro',
+    'примечание': '-',
+    'издатель': 'ramboxapp*',
+    'версия': '1.3.1'}}
     '''
     li = not_nan_split(string)
     head = li[0]
     head_list = []
     for m in re.finditer("(\w+)", head):
+        key = head[m.start(0): m.end(0)]
+        if key_lower:
+            key = key.lower()
         head_list.append(
-            (m.start(0), head[m.start(0): m.end(0)])
+            (m.start(0), key)
         )
+    name_key = head_list[name_column_num][1]
     head_list.reverse()
-    data = []
+    data = {}
+    
     for line in li[1:]:
         line_data = {}
-        for i, name in head_list:
-            val = line[i::]
+        name = ''
+        for start, key in head_list:
+            val = line[start::]
             val = remove_multiple_spaces(val)
             val = val.strip()
-            line_data[name] = val
-            line = line[:i]
-        data.append(line_data)
+            line = line[:start]
+            if key != name_key:
+                line_data[key] = val
+            else:
+                name = val
+        data[name] = line_data
     return data
