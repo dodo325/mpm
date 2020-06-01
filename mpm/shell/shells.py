@@ -90,7 +90,7 @@ class AbstractShell:
         return False
 
     def sudo_cell(self, command: list, enter_password=False, *args, **kwargs) -> str:
-        raise NoneType()
+        raise NotImplementedError()
 
     def cell(
         self,

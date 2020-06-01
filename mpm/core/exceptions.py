@@ -20,3 +20,8 @@ class PackageManagerNotInatalled():
 class PackageDoesNotExist(ShellError):
     """The Package does not exist"""
     pass
+
+
+class PackageDoesNotInatalled(ShellError):
+    """The Package does not Inatalled"""
+    pass
