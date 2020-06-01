@@ -10,6 +10,7 @@ from mpm.utils.text_parse import parse_table_with_columns, parse_value_key_table
 from mpm.core.exceptions import PackageDoesNotExist
 from subprocess import CalledProcessError, STDOUT
 import re
+import json
 logger = getLogger(__name__)
 
 class PackageManager:
@@ -47,7 +48,7 @@ class PackageManager:
         '''
         Поиск пакета по имени
         '''
-        raise NoneType()
+        raise NotImplementedError()
 
     def is_installed(self) -> bool:
         return self.shell.check_command(self.name)
@@ -97,17 +98,48 @@ class Pip(PackageManager):
         return li
 
     def search(self, package_name: str) -> dict:
+        '''
+        numpy (1.18.4)                            - NumPy is the fundamental package
+                                                    for array computing with Python.
+          INSTALLED: 1.18.1
+          LATEST:    1.18.4
+        numpy-cloud (0.0.5)                       - Numpy in the cloud
+        numpy-ext (0.9.2)                         - numpy extension
+        numpy-alignments (0.0.2)                  - Numpy Alignments
+        numpy-utils (0.1.6)                       - NumPy utilities.
+        numpy-demo (1.23.0)                       - NumPy-demo is a test package and
+                                                    is a clone of numpy.
+        numpy-sugar (1.5.0)                       - Missing NumPy functionalities
+        numpy-turtle (0.2)                        - Turtle graphics with NumPy
+        numpy-linreg (0.1.0)                      - Linear Regression with numpy only.
+        root-numpy (4.8.0)                        - The interface between ROOT and
+                                                    NumPy
+        mapchete-numpy (0.1)                      - Mapchete NumPy read/write
+                                                    extension
+        numpy-nn (0.2.6)                          - Numpy NN is a Deep Neural Network
+                                                    Package which is built on base
+                                                    Numpy operations. This project is
+                                                    under development and any
+                                                    contributions are welcome.
+
+        '''
         out = self.shell.cell(['pip', 'search', package_name])
         li = not_nan_split(out)
         data = {}
         for line in li:
+            if line.startswith(" "):
+                key, val = line.split(":")
+                key, val = key.strip(), val.strip()
+                key, val = key.lower(), val.lower()
+                data[name][key] = val
+                continue
             version = re.search(r"\((.*?)\)", line).group(1)
             name = line[:line.find("(")].strip()
             description = line[line.rfind("-")+1:].strip()
             data[name] = {
                 'version': version,
                 'description': description
-                }
+            }
         return data
 
 class Conda(PackageManager):
