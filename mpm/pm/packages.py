@@ -5,6 +5,7 @@
 """
 from typing import List, Tuple
 from subprocess import CalledProcessError, STDOUT
+import json
 
 from mpm.shell import AutoShell, AbstractShell
 from mpm.pm.package_managers import Snap, Apt, AptGet, Pip, PackageManager, Conda, NPM, get_installed_pms, NAMES_TO_PACKAGE_MANAGERS
@@ -216,7 +217,7 @@ class NPMPackage(Package):
         return info
 
     def show(self) -> dict:
-        out = self.shell.cell(["npm", "view", package_name, '--json'])
+        out = self.shell.cell(["npm", "view", self.package_name, '--json'])
         data = json.loads(out)
         data['version'] = data['versions'][-1]
         data.pop('name')
@@ -229,3 +230,134 @@ class CondaPackage(Package):
     def get_info(self) -> dict:
         return self.get_search_info()
 
+
+class UniversalePackage:
+    """ Universale Package Class 
+    Единый интерфейс взаимодействия с пакетными менеджарами. Кушает конфиги из known_packages
+    
+    Пример:
+    >>> pkg = UniversalePackage("pytest")
+    >>> pkg.info
+    >>> pkg.install()
+    >>> pkg.config
+    {'package_managers': {'pip': {}}}
+    """
+
+    package_name: str
+    config = dict()
+    pms_classes: List[PackageManager] = []
+    auto_update_conf = True
+    _info = None
+    pm_packages: List[Package] = [] # список валидных пакетных менеджеров для данного пакета
+
+    @property
+    def info(self) -> dict:
+        if not self._info:
+            self._info = self.get_info()
+        return self._info
+
+    def is_installed(self) -> bool:
+        '''
+        Установленн ли пакет в системе
+        '''
+        for pkg in self.pm_packages:
+            if pkg.is_installed():
+                self.logger.debug(
+                    "Package {self.package_name} installed in {pkg.pm.name} package manager")
+                return True
+        return False
+        
+    def update_package_info(self):
+        '''
+        Update self.info
+        '''
+        self._info = self.get_info()
+
+    def __init__(self, package_name,
+                 shell=None, pms_classes: List[PackageManager] = None,
+                 known_packages: dict() = None,
+                 offline=False,
+                 auto_update_conf=True
+                 ):
+        self.package_name = package_name
+        self.logger = logger.getChild(self.__class__.__name__)
+        self.auto_update_conf = auto_update_conf
+        if shell == None:
+            self.shell = AutoShell()
+        else:
+            self.shell = shell
+
+        if not pms_classes:
+            self.pms_classes = get_installed_pms(shell=self.shell)
+        else:
+            self.pms_classes = pms_classes
+
+        if not known_packages:
+            known_packages = get_known_packages(offline=offline)
+
+        if package_name in known_packages:
+            logger.info(f"Package '{package_name}' found in known_packages")
+            self.config = known_packages[package_name]
+        
+        self.update_package_info()
+
+    def _get_correct_pms_classes_names(self, all_pm=False) -> List[str]:
+        pms_names = list(self.config.get("package_managers", {}).keys())
+        if pms_names == [] or all_pm:
+            pms_names = [PM.name for PM in self.pms_classes]
+        if 'apt' in pms_names and 'apt-get' in pms_names:
+            pms_names.remove('apt-get')
+        self.logger.debug(f"Out pms_names: {pms_names}")
+        return pms_names
+
+    def get_packages(self, all_pm=False) -> List[Package]:
+        '''
+        Из  self.pms_classes или self.config получаем объекты packages
+        '''
+        pms_names = self._get_correct_pms_classes_names(all_pm=all_pm)
+        self.logger.debug(f"pms_names: {pms_names}")
+        pkg_objects = []
+        config_menegers = self.config.get("package_managers", {})
+        for pkg_class in Package._inheritors():
+            if pkg_class.pm_class.name in pms_names:
+                pm_config = config_menegers.get(pkg_class.pm_class.name, {})
+                pkg_objects.append(
+                    pkg_class(
+                        pm_config.get("package_name", self.package_name),
+                        shell=self.shell
+                    )
+                )
+        return pkg_objects
+
+    def add_package_manager_in_config(self, package_manager: str):
+        '''
+        Добавить новый пакетный менеджер в self.config
+        '''
+        if "package_managers" not in self.config:
+            self.config["package_managers"] = {package_manager: {}}
+            return
+        if package_manager not in self.config["package_managers"]:
+            self.config["package_managers"][package_manager] = {}
+
+    def get_info(self, all_pm=False) -> dict:
+        '''
+        Получаем всю информацию о пакете
+        Попутно обновляем self.pm_packages и self.config
+        '''
+        info = dict()
+        self.pm_packages = []
+        pm_packages = self.get_packages(all_pm=all_pm)
+        self.logger.debug(f"pm_packages: {pm_packages}")
+        for pkg in pm_packages:
+            try:
+                self.logger.debug(
+                    f"Search '{pkg.package_name}' in {pkg.pm.name}")
+                info[pkg.pm.name] = pkg.info
+                self.pm_packages.append(pkg)
+                if self.auto_update_conf:
+                    self.add_package_manager_in_config(pkg.pm.name)
+            except PackageDoesNotExist as e:
+                self.logger.warn(
+                    f"Package {pkg.package_name} Does Not found in '{pkg.pm.name}' package manager")
+        self.logger.debug(f"'{self.package_name}' info: {info}")
+        return info
