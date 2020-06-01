@@ -58,6 +58,14 @@ class Package:
         return self.package_name in self.pm.get_all_packages()
 
     @classmethod
+    def get_package_by_pm_name(cls, pm_name: str) -> "Package":
+        '''
+        Возвращает коасс пакнта по названию пакетного менеджнра
+        '''
+        for pkg_class in cls._inheritors():
+            if pkg_class.pm_class.name == pm_name:
+                return pkg_class
+    @classmethod
     def _inheritors(cls) -> list:
         '''
         Возвращает всех наследников данного класса
