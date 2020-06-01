@@ -1,7 +1,7 @@
 import click
 import sys
 import json
-from mpm.pm import UniversalePackage, NAMES_TO_PACKAGE_MANAGERS, PACKAGE_MANAGERS_NAMES, get_installed_pms
+from mpm.pm import Package, UniversalePackage, NAMES_TO_PACKAGE_MANAGERS, PACKAGE_MANAGERS_NAMES, get_installed_pms
 from mpm.core.logging import getLogger
 from mpm.core.exceptions import PackageManagerNotInatalled
 from mpm.shell import AutoShell
@@ -58,7 +58,7 @@ def install(package_name, pm_name, known_packages_json, all_flag, offline):  # i
 # TODO: parse URL
 @click.option("-k", "--known-packages-json", type=click.Path(exists=True), help="known_packages.json file")
 @click.option('-pm', '--package-manager',
-              'PM_NAMES', MULTIPLE=TRUE,
+              'pm_names', multiple=True,
               type=click.Choice(PACKAGE_MANAGERS_NAMES, case_sensitive=False))  # Возможен мультивызов, например: -pm apt -pm pip
 def info(package_name, pm_names, known_packages_json, all_flag, offline):
     '''
@@ -109,14 +109,23 @@ def remove(package_name, pm_name):
 @main.command()
 @click.argument('package_name')
 @click.option('-pm', '--package-manager',
-              'pm_name',
-              type=click.Choice(PACKAGE_MANAGERS_NAMES, case_sensitive=False))
-def search(package_name, pm_name):
+              'pm_names', multiple=True,
+              type=click.Choice(PACKAGE_MANAGERS_NAMES, case_sensitive=False))  # Возможен мультивызов, например: -pm apt -pm pip
+def search(package_name, pm_names):
     '''
     Найти пакет
     '''
-    logger.debug(f"package_name = {package_name}, pm_name = {pm_name}")
-    click.echo('Syncing')
+    logger.debug(f"package_name = {package_name}, pm_names = {pm_names}")
+    shell = AutoShell()
+    PMs = get_installed_pms(shell=shell)
+    if len(pm_names) > 0:
+        pm_fliter = lambda PM: PM.name in pm_names
+        PMs = list(filter(pm_fliter, PMs))
+        logger.debug(f"PMs after filtering: {PMs}")
+    data = {}
+    for pm in PMs:
+        data[pm.name] = pm(shell=shell).search(package_name)
+    print_info(data)
 
 @main.command()
 @click.argument('package_name')
