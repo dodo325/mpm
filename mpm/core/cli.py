@@ -10,7 +10,7 @@ logger = getLogger(__name__)
 
 def print_info(info: dict()):
     for pm_name, data in info.items():
-        click.echo(f"\t{pm_name}:", color='green')
+        click.echo(f"\n\t{pm_name}:", color='green')
         for key, val in data.items():
             click.echo(f"- {key}: {val}", color='green')
 @click.group()
@@ -58,9 +58,9 @@ def install(package_name, pm_name, known_packages_json, all_flag, offline):  # i
 # TODO: parse URL
 @click.option("-k", "--known-packages-json", type=click.Path(exists=True), help="known_packages.json file")
 @click.option('-pm', '--package-manager',
-              'pm_names', multiple=True,
+              'PM_NAMES', MULTIPLE=TRUE,
               type=click.Choice(PACKAGE_MANAGERS_NAMES, case_sensitive=False))  # Возможен мультивызов, например: -pm apt -pm pip
-def show(package_name, pm_names, known_packages_json, all_flag, offline):
+def info(package_name, pm_names, known_packages_json, all_flag, offline):
     '''
     Показать дополнительные данные о пакете
     ''' 

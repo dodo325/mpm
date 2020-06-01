@@ -99,6 +99,7 @@ class Pip(PackageManager):
 
     def search(self, package_name: str) -> dict:
         '''
+        RAW output:
         numpy (1.18.4)                            - NumPy is the fundamental package
                                                     for array computing with Python.
           INSTALLED: 1.18.1
@@ -107,23 +108,13 @@ class Pip(PackageManager):
         numpy-ext (0.9.2)                         - numpy extension
         numpy-alignments (0.0.2)                  - Numpy Alignments
         numpy-utils (0.1.6)                       - NumPy utilities.
-        numpy-demo (1.23.0)                       - NumPy-demo is a test package and
-                                                    is a clone of numpy.
-        numpy-sugar (1.5.0)                       - Missing NumPy functionalities
-        numpy-turtle (0.2)                        - Turtle graphics with NumPy
-        numpy-linreg (0.1.0)                      - Linear Regression with numpy only.
-        root-numpy (4.8.0)                        - The interface between ROOT and
-                                                    NumPy
-        mapchete-numpy (0.1)                      - Mapchete NumPy read/write
-                                                    extension
-        numpy-nn (0.2.6)                          - Numpy NN is a Deep Neural Network
-                                                    Package which is built on base
-                                                    Numpy operations. This project is
-                                                    under development and any
-                                                    contributions are welcome.
-
         '''
-        out = self.shell.cell(['pip', 'search', package_name])
+        try:
+            out = self.shell.cell(['pip', 'search', package_name])
+        except CalledProcessError as e:
+            self.logger.error(
+                f"Nothing found for {package_name}!", exc_info=True)
+            return {}
         li = not_nan_split(out)
         data = {}
         for line in li:
@@ -158,7 +149,12 @@ class Conda(PackageManager):
         return li
 
     def search(self, package_name: str) -> dict:
-        out = self.shell.cell(["conda", "search", package_name, "--json"])
+        try:
+            out = self.shell.cell(["conda", "search", package_name, "--json"])
+        except CalledProcessError as e:
+            self.logger.error(
+                f"Nothing found for {package_name}!", exc_info=True)
+            return {}
         data = json.loads(out)
         out_data = {}
         for builds_list in data.values():

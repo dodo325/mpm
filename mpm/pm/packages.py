@@ -333,6 +333,7 @@ class UniversalePackage:
         '''
         Добавить новый пакетный менеджер в self.config
         '''
+        self.logger.info(f"Detected in {package_manager}!")
         if "package_managers" not in self.config:
             self.config["package_managers"] = {package_manager: {}}
             return
