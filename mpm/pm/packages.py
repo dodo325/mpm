@@ -167,13 +167,10 @@ class PipPackage(Package):
     """ Python PIP Package """
     pm_class = Pip
 
-    def install(self, repository: str = None):
+    def install(self):
         if self.is_installed():
             self.logger.success("Package already installed")
             return
-
-        if repository != None:
-            self.add_repository(repository)
 
         self.logger.info(f"Installing {self.package_name} ({self.info})...")
         self.shell.cell([self.pm.name, "install", self.package_name])
@@ -181,6 +178,17 @@ class PipPackage(Package):
         if self.is_installed():
             self.logger.success("Package installed!")
     
+    def remove(self):
+        if not self.is_installed():
+            self.logger.info("Package not installed")
+            return
+
+        self.logger.info(f"Removing {self.package_name} ({self.info})...")
+        self.shell.cell([self.pm.name, "uninstall", "-y", self.package_name])
+
+        if not self.is_installed():
+            self.logger.success("Package removed!")
+
     def show(self) -> dict:
         try:
             out = self.shell.cell(
@@ -204,6 +212,23 @@ class SnapPackage(Package):
         info.update(data)
         return info
 
+    def install(self, argument: str = None):
+        '''
+        Этот метод не работает в Jupyter. Иногда надо указывать argument="--classic"
+        '''
+        if self.is_installed():
+            self.logger.success("Package already installed")
+            return
+
+        self.logger.info(f"Installing {self.package_name} ({self.info})...")
+        cmd = [self.pm.name, "install", self.package_name]
+        if argument:
+            cmd.append(argument)
+        self.shell.cell(cmd)
+
+        if self.is_installed():
+            self.logger.success("Package installed!")
+
     def show(self) -> dict:
         try:
             out = self.shell.cell(
@@ -223,6 +248,27 @@ class NPMPackage(Package):
         data = self.show()
         info.update(data)
         return info
+
+    def is_installed(self) -> bool:
+        '''
+        Возвращает установлен ли данный пакет
+        '''
+        # TODO: должен проверять нет ли поблизости node_modules и данного пакнта
+        return self.package_name in self.pm.get_all_packages()
+
+    def install(self, argument: str = None): # TODO: он в текущую папку устанавлевает!
+        if self.is_installed():
+            self.logger.success("Package already installed")
+            return
+
+        self.logger.info(f"Installing {self.package_name} ({self.info})...")
+        cmd = [self.pm.name, "install", self.package_name]
+        if argument:
+            cmd.append(argument)
+        self.shell.cell(cmd)
+
+        if self.is_installed():
+            self.logger.success("Package installed!")
 
     def show(self) -> dict:
         out = self.shell.cell(["npm", "view", self.package_name, '--json'])
@@ -370,3 +416,44 @@ class UniversalePackage:
                     f"Package {pkg.package_name} Does Not found in '{pkg.pm.name}' package manager")
         self.logger.debug(f"'{self.package_name}' info: {info}")
         return info
+
+    def ask_user_select_pm(self) -> "pm_package":
+        """
+        Просит пользователя выбрать один из пакетных метнджеров
+        """
+        if len(self.pm_packages) == 1:
+                return self.pm_packages[0]
+
+        pm_package_data = {
+            i: {"name": pkg.pm.name, "pm_package": pkg} for i, pkg in enumerate(self.pm_packages)
+        }
+        print("Package Managers:")
+        for x, y in pm_package_data.items():
+            print(x, ':', pm_package_data[x]['name'])
+
+        while True:
+            print("\nSelect a package manager:")
+            d_val = int(input())
+
+            if d_val in pm_package_data.keys():
+                d_val = int(d_val)
+                print("\nYou have chosen {0}".format(
+                    pm_package_data[d_val]['name']))
+                return pm_package_data[d_val]["pm_package"]
+            else:
+                self.logger.warn("You chosen wrong!")
+
+    def install(self, auto=False):
+        self.update_package_info()
+        if self.is_installed():
+            logger.success("Package already installed")
+            return
+
+        package_managers_config = self.config["package_managers"]
+
+        pkg = self.ask_user_select_pm()
+        if self.auto_update_conf:
+            self.add_package_manager_in_config(pkg.pm.name)   
+        pkg_config = package_managers_config.get(pkg.pm.name, {})
+        install_config = pkg_config.get("install", {})
+        pkg.install(**install_config)

@@ -5,6 +5,8 @@ import platform
 def auto_decode(text: bytes) -> str:
     if type(text) == str:
         return text
+    if text == None:
+        return ""
     os = platform.system()
     if os == "Windows":
         return text.decode("cp1251")
