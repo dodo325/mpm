@@ -10,13 +10,15 @@ from mpm.core.logging import getLogger
 from mpm.utils.string import auto_decode
 from mpm.utils.text_parse import not_nan_split
 from mpm.core.exceptions import CommandNotFound, ShellError
+
 logger = getLogger(__name__)
 
 
 class AbstractShell:
-    '''
+    """
     Абстрактный Класс для работы с коммандными строками  
-    '''
+    """
+
     executable_path = ""
     executable_args = []
     version = ""
@@ -28,9 +30,9 @@ class AbstractShell:
 
     @classmethod
     def _inheritors(cls) -> list:
-        '''
+        """
         return all subclasses
-        '''
+        """
         subclasses = set()
         work = [cls]
         while work:
@@ -42,15 +44,15 @@ class AbstractShell:
         return list(subclasses)
 
     def get_home(self) -> str:
-        '''
+        """
         Pls use Path.home()
-        '''
+        """
         return str(Path.home())
-    
+
     def pwd(self) -> str:
-        '''
+        """
         Pls use Path.cwd()
-        '''
+        """
         return str(Path.cwd())
 
     def is_platform_supported(self) -> bool:
@@ -67,14 +69,15 @@ class AbstractShell:
         return False
 
     def whereis(cmd: str) -> list:
-        '''
+        """
         Находит где исполняемый файл команды
-        '''
+        """
         pass
+
     def is_installed(self) -> bool:
-        '''
+        """
         Оределяет установленна данная коммандная оболочка и обновляет self.version
-        '''
+        """
         return self.is_platform_supported()
 
     def check_command(self, command) -> bool:
@@ -106,7 +109,8 @@ class AbstractShell:
         self.logger.debug(
             f"Args:\n\traw command = {command}\n\tshell = {shell}\n\t\
 executable_path = {executable_path}\n\texecutable_args={executable_args}\n\t\
-stderr = {stderr}\n\targs = {args}\n\tkwargs = {kwargs}")
+stderr = {stderr}\n\targs = {args}\n\tkwargs = {kwargs}"
+        )
         out_command = command
 
         if executable_path == "":
@@ -123,8 +127,7 @@ stderr = {stderr}\n\targs = {args}\n\tkwargs = {kwargs}")
             out_command.append(command)
 
         self.logger.debug(f"Try call command: {out_command}")
-        out = check_output(out_command, shell=shell, stderr=stderr,
-                     ** kwargs)
+        out = check_output(out_command, shell=shell, stderr=stderr, **kwargs)
         out = auto_decode(out)
         if debug:
             self.logger.debug(f"Output: {out}")
@@ -140,12 +143,11 @@ class Bash(AbstractShell):
     supported_platforms = {"Linux": {}}
     __sudo_password = None
 
-
     def sudo_cell(
         self,
         command: list,
         shell=False,
-        executable_path="", # если надо, чтобы команда вообще не использовала это, то сделай executable_path=None
+        executable_path="",  # если надо, чтобы команда вообще не использовала это, то сделай executable_path=None
         executable_args=[],
         enter_password=False,
         stdin=PIPE,
@@ -157,7 +159,8 @@ class Bash(AbstractShell):
         self.logger.debug(
             f"Args:\n\traw command = {command}\n\tshell = {shell}\n\t\
 executable_path = {executable_path}\n\texecutable_args={executable_args}\n\t\
-stderr = {stderr}\n\targs = {args}\n\tkwargs = {kwargs}")
+stderr = {stderr}\n\targs = {args}\n\tkwargs = {kwargs}"
+        )
 
         if self.is_sudo_mode():
             return self.cell(command, *args, **kwargs)
@@ -192,7 +195,9 @@ stderr = {stderr}\n\targs = {args}\n\tkwargs = {kwargs}")
             )
             out = p.communicate(self.__sudo_password + "\n")[1]
         else:
-            out =  check_output(out_command, stdin=stdin, stderr=stderr, shell=shell, **kwargs)
+            out = check_output(
+                out_command, stdin=stdin, stderr=stderr, shell=shell, **kwargs
+            )
         if debug:
             self.logger.debug(f"Output: {out}")
         out = auto_decode(out)
@@ -220,6 +225,7 @@ stderr = {stderr}\n\targs = {args}\n\tkwargs = {kwargs}")
         return False
 
     _compgen_out = None
+
     def compgen(self, perfix: str = None,) -> list:
         command = "compgen -abcdefgjksuv"
         out = self._compgen_out
@@ -247,13 +253,14 @@ class ZSH(Bash):
         if self.is_platform_supported():
             try:
                 out = self.cell(["zsh", "--version"])
-                out = out.replace("\n", "") 
+                out = out.replace("\n", "")
                 self.version = out
                 self.logger.info(f"installed! ver: {out}")
                 return True
             except FileNotFoundError:
                 pass
         return False
+
 
 class Cmd(AbstractShell):
     executable_path = "cmd.exe"
@@ -270,10 +277,11 @@ class Cmd(AbstractShell):
             return li
         except Exception as e:
             self.logger.error(f"Not found {command}!", exc_info=True)
-            return []   
+            return []
 
     def check_command(self, command: str) -> bool:
         return self.whereis(command) != []
+
 
 class PowerShell(Cmd):
     executable_path = "powershell.exe"
@@ -290,9 +298,9 @@ class PowerShell(Cmd):
             return []
 
     def is_installed(self) -> bool:
-        f'''
+        f"""
         Check is {self.name} installed and update {self.name}.version
-        '''
+        """
         if self.is_platform_supported():
             try:
                 out = self.cell(["Get-Host"])
@@ -306,9 +314,9 @@ class PowerShell(Cmd):
 
 
 def get_installed_shells() -> List[AbstractShell]:
-    '''
+    """
     Return all installed shells
-    '''
+    """
     shells_list = []
     for cls in AbstractShell._inheritors():
         obj = cls()
@@ -318,11 +326,11 @@ def get_installed_shells() -> List[AbstractShell]:
 
 
 def AutoShell(name=None, *args, **kwargs) -> AbstractShell:
-    '''
+    """
     Returns one of the installed shells
 
     Or by 'name'
-    '''
+    """
     for cls in AbstractShell._inheritors():
         obj = cls(*args, **kwargs)
         if name != None:

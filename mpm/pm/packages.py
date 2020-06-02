@@ -8,12 +8,23 @@ from subprocess import CalledProcessError, STDOUT
 import json
 
 from mpm.shell import AutoShell, AbstractShell
-from mpm.pm.package_managers import Snap, Apt, AptGet, Pip, PackageManager, Conda, NPM, get_installed_pms, NAMES_TO_PACKAGE_MANAGERS
+from mpm.pm.package_managers import (
+    Snap,
+    Apt,
+    AptGet,
+    Pip,
+    PackageManager,
+    Conda,
+    NPM,
+    get_installed_pms,
+    NAMES_TO_PACKAGE_MANAGERS,
+)
 from mpm.utils.text_parse import parse_table_with_columns, parse_value_key_table
 from mpm.core.configs import get_known_packages
 from mpm.utils.string import auto_decode
 from mpm.core.logging import getLogger
 from mpm.core.exceptions import PackageDoesNotExist, ShellError, PackageDoesNotInatalled
+
 logger = getLogger(__name__)
 
 
@@ -25,6 +36,7 @@ class Package:
     pm = None
 
     _info = None
+
     @property
     def info(self) -> dict:
         if not self._info:
@@ -46,30 +58,31 @@ class Package:
         return f"{self.package_name}"
 
     def is_pm_installed(self) -> bool:
-        '''
+        """
         Возвращает установлен ли данный пакетный менеджер
-        '''
+        """
         return self.pm.is_installed()
 
     def is_installed(self) -> bool:
-        '''
+        """
         Возвращает установлен ли данный пакет
-        '''
+        """
         return self.package_name in self.pm.get_all_packages()
 
     @classmethod
     def get_package_by_pm_name(cls, pm_name: str) -> "Package":
-        '''
+        """
         Возвращает коасс пакнта по названию пакетного менеджнра
-        '''
+        """
         for pkg_class in cls._inheritors():
             if pkg_class.pm_class.name == pm_name:
                 return pkg_class
+
     @classmethod
     def _inheritors(cls) -> list:
-        '''
+        """
         Возвращает всех наследников данного класса
-        '''
+        """
         subclasses = set()
         work = [cls]
         while work:
@@ -81,32 +94,31 @@ class Package:
         return list(subclasses)
 
     def install(self):
-        '''
+        """
         Install package
-        '''
+        """
         raise NotImplementedError()
-    
+
     def get_search_info(self) -> dict:
-        '''
+        """
         Позволяет получить информацию полученную из pm.search, а так же проверить пакет на существование
-        '''
+        """
         data_search = self.pm.search(self.package_name)
         data = data_search.get(self.package_name, None)
         if data == None:
-            raise PackageDoesNotExist(
-                "Package not found: " + self.package_name)
+            raise PackageDoesNotExist("Package not found: " + self.package_name)
         return data
 
     def show(self) -> dict:
-        '''
+        """
         Позволяет получить информацию об установленном пакете 
-        '''
+        """
         raise NotImplementedError()
 
     def get_info(self) -> dict:
-        '''
+        """
         Показывает всю информацию о пакете
-        '''
+        """
         info = self.get_search_info()
         if self.is_installed():
             data = self.show()
@@ -114,29 +126,34 @@ class Package:
         return info
 
     def update_package_info(self):
-        '''
+        """
         Update self.info
-        '''
+        """
         self._info = self.get_info()
 
 
 class AptGetPackage(Package):
     """ AptGet Package """
+
     pm_class = AptGet
+
     def show(self) -> dict:
         try:
             out = self.shell.cell(["apt-cache", "show", self.package_name])
         except CalledProcessError as e:
-            if 'E: ' in e.output.decode("utf-8"):
+            if "E: " in e.output.decode("utf-8"):
                 raise PackageDoesNotInatalled(
-                    "Package not install: " + self.package_name)
-            raise ShellError("command '{}' return with error (code {}): {}".format(
-                e.cmd, e.returncode, e.output))
+                    "Package not install: " + self.package_name
+                )
+            raise ShellError(
+                "command '{}' return with error (code {}): {}".format(
+                    e.cmd, e.returncode, e.output
+                )
+            )
         out = self.pm._remove_warnings(out)
         info = parse_value_key_table(out, key_lower=True)
         if info == {}:
-            raise PackageDoesNotInatalled(
-                "Package not found: " + self.package_name)
+            raise PackageDoesNotInatalled("Package not found: " + self.package_name)
         return info
 
     def install(self, enter_password: bool = False, repository: str = None):
@@ -156,15 +173,17 @@ class AptGetPackage(Package):
 
         if self.is_installed():
             self.logger.success("Package installed!")
-    
+
 
 class AptPackage(AptGetPackage):
     """ Apt Package """
+
     pm_class = Apt
 
 
 class PipPackage(Package):
     """ Python PIP Package """
+
     pm_class = Pip
 
     def install(self):
@@ -177,7 +196,7 @@ class PipPackage(Package):
 
         if self.is_installed():
             self.logger.success("Package installed!")
-    
+
     def remove(self):
         if not self.is_installed():
             self.logger.info("Package not installed")
@@ -191,19 +210,22 @@ class PipPackage(Package):
 
     def show(self) -> dict:
         try:
-            out = self.shell.cell(
-                ["pip", "show", self.package_name, '-v'])
+            out = self.shell.cell(["pip", "show", self.package_name, "-v"])
         except CalledProcessError as e:
-            if 'not found:' in auto_decode(e.output):
-                raise PackageDoesNotInatalled(
-                    "Package not found: " + self.package_name)
-            raise ShellError("command '{}' return with error (code {}): {}".format(
-                e.cmd, e.returncode, e.output))
+            if "not found:" in auto_decode(e.output):
+                raise PackageDoesNotInatalled("Package not found: " + self.package_name)
+            raise ShellError(
+                "command '{}' return with error (code {}): {}".format(
+                    e.cmd, e.returncode, e.output
+                )
+            )
         info = parse_value_key_table(out, key_lower=True)
         return info
 
+
 class SnapPackage(Package):
     """ Snap Package """
+
     pm_class = Snap
 
     def get_info(self) -> dict:
@@ -213,9 +235,9 @@ class SnapPackage(Package):
         return info
 
     def install(self, argument: str = None):
-        '''
+        """
         Этот метод не работает в Jupyter. Иногда надо указывать argument="--classic"
-        '''
+        """
         if self.is_installed():
             self.logger.success("Package already installed")
             return
@@ -231,16 +253,20 @@ class SnapPackage(Package):
 
     def show(self) -> dict:
         try:
-            out = self.shell.cell(
-                ["snap", "info", self.package_name])
+            out = self.shell.cell(["snap", "info", self.package_name])
         except CalledProcessError as e:
-            raise ShellError("command '{}' return with error (code {}): {}".format(
-                e.cmd, e.returncode, e.output))
+            raise ShellError(
+                "command '{}' return with error (code {}): {}".format(
+                    e.cmd, e.returncode, e.output
+                )
+            )
         info = parse_value_key_table(out, key_lower=True)
         return info
 
+
 class NPMPackage(Package):
     """ NPM Package """
+
     pm_class = NPM
 
     def get_info(self) -> dict:
@@ -250,13 +276,13 @@ class NPMPackage(Package):
         return info
 
     def is_installed(self) -> bool:
-        '''
+        """
         Возвращает установлен ли данный пакет
-        '''
+        """
         # TODO: должен проверять нет ли поблизости node_modules и данного пакнта
         return self.package_name in self.pm.get_all_packages()
 
-    def install(self, argument: str = None): # TODO: он в текущую папку устанавлевает!
+    def install(self, argument: str = None):  # TODO: он в текущую папку устанавлевает!
         if self.is_installed():
             self.logger.success("Package already installed")
             return
@@ -271,14 +297,16 @@ class NPMPackage(Package):
             self.logger.success("Package installed!")
 
     def show(self) -> dict:
-        out = self.shell.cell(["npm", "view", self.package_name, '--json'])
+        out = self.shell.cell(["npm", "view", self.package_name, "--json"])
         data = json.loads(out)
-        data['version'] = data['versions'][-1]
-        data.pop('name')
+        data["version"] = data["versions"][-1]
+        data.pop("name")
         return data
+
 
 class CondaPackage(Package):
     """ Anaconda Package """
+
     pm_class = Conda
 
     def get_info(self) -> dict:
@@ -302,7 +330,9 @@ class UniversalePackage:
     pms_classes: List[PackageManager] = []
     auto_update_conf = True
     _info = None
-    pm_packages: List[Package] = [] # список валидных пакетных менеджеров для данного пакета
+    pm_packages: List[
+        Package
+    ] = []  # список валидных пакетных менеджеров для данного пакета
 
     @property
     def info(self) -> dict:
@@ -311,28 +341,32 @@ class UniversalePackage:
         return self._info
 
     def is_installed(self) -> bool:
-        '''
+        """
         Установленн ли пакет в системе
-        '''
+        """
         for pkg in self.pm_packages:
             if pkg.is_installed():
                 self.logger.debug(
-                    "Package {self.package_name} installed in {pkg.pm.name} package manager")
+                    "Package {self.package_name} installed in {pkg.pm.name} package manager"
+                )
                 return True
         return False
-        
+
     def update_package_info(self):
-        '''
+        """
         Update self.info
-        '''
+        """
         self._info = self.get_info()
 
-    def __init__(self, package_name,
-                 shell=None, pms_classes: List[PackageManager] = None,
-                 known_packages: dict() = None,
-                 offline=False,
-                 auto_update_conf=True
-                 ):
+    def __init__(
+        self,
+        package_name,
+        shell=None,
+        pms_classes: List[PackageManager] = None,
+        known_packages: dict() = None,
+        offline=False,
+        auto_update_conf=True,
+    ):
         self.package_name = package_name
         self.logger = logger.getChild(self.__class__.__name__)
         self.auto_update_conf = auto_update_conf
@@ -352,22 +386,22 @@ class UniversalePackage:
         if package_name in known_packages:
             logger.info(f"Package '{package_name}' found in known_packages")
             self.config = known_packages[package_name]
-        
+
         self.update_package_info()
 
     def _get_correct_pms_classes_names(self, all_pm=False) -> List[str]:
         pms_names = list(self.config.get("package_managers", {}).keys())
         if pms_names == [] or all_pm:
             pms_names = [PM.name for PM in self.pms_classes]
-        if 'apt' in pms_names and 'apt-get' in pms_names:
-            pms_names.remove('apt-get')
+        if "apt" in pms_names and "apt-get" in pms_names:
+            pms_names.remove("apt-get")
         self.logger.debug(f"Out pms_names: {pms_names}")
         return pms_names
 
     def get_packages(self, all_pm=False) -> List[Package]:
-        '''
+        """
         Из  self.pms_classes или self.config получаем объекты packages
-        '''
+        """
         pms_names = self._get_correct_pms_classes_names(all_pm=all_pm)
         self.logger.debug(f"pms_names: {pms_names}")
         pkg_objects = []
@@ -378,15 +412,15 @@ class UniversalePackage:
                 pkg_objects.append(
                     pkg_class(
                         pm_config.get("package_name", self.package_name),
-                        shell=self.shell
+                        shell=self.shell,
                     )
                 )
         return pkg_objects
 
     def add_package_manager_in_config(self, package_manager: str):
-        '''
+        """
         Добавить новый пакетный менеджер в self.config
-        '''
+        """
         self.logger.info(f"Detected in {package_manager}!")
         if "package_managers" not in self.config:
             self.config["package_managers"] = {package_manager: {}}
@@ -395,25 +429,25 @@ class UniversalePackage:
             self.config["package_managers"][package_manager] = {}
 
     def get_info(self, all_pm=False) -> dict:
-        '''
+        """
         Получаем всю информацию о пакете
         Попутно обновляем self.pm_packages и self.config
-        '''
+        """
         info = dict()
         self.pm_packages = []
         pm_packages = self.get_packages(all_pm=all_pm)
         self.logger.debug(f"pm_packages: {pm_packages}")
         for pkg in pm_packages:
             try:
-                self.logger.debug(
-                    f"Search '{pkg.package_name}' in {pkg.pm.name}")
+                self.logger.debug(f"Search '{pkg.package_name}' in {pkg.pm.name}")
                 info[pkg.pm.name] = pkg.info
                 self.pm_packages.append(pkg)
                 if self.auto_update_conf:
                     self.add_package_manager_in_config(pkg.pm.name)
             except PackageDoesNotExist as e:
                 self.logger.warn(
-                    f"Package {pkg.package_name} Does Not found in '{pkg.pm.name}' package manager")
+                    f"Package {pkg.package_name} Does Not found in '{pkg.pm.name}' package manager"
+                )
         self.logger.debug(f"'{self.package_name}' info: {info}")
         return info
 
@@ -422,14 +456,15 @@ class UniversalePackage:
         Просит пользователя выбрать один из пакетных метнджеров
         """
         if len(self.pm_packages) == 1:
-                return self.pm_packages[0]
+            return self.pm_packages[0]
 
         pm_package_data = {
-            i: {"name": pkg.pm.name, "pm_package": pkg} for i, pkg in enumerate(self.pm_packages)
+            i: {"name": pkg.pm.name, "pm_package": pkg}
+            for i, pkg in enumerate(self.pm_packages)
         }
         print("Package Managers:")
         for x, y in pm_package_data.items():
-            print(x, ':', pm_package_data[x]['name'])
+            print(x, ":", pm_package_data[x]["name"])
 
         while True:
             print("\nSelect a package manager:")
@@ -437,8 +472,7 @@ class UniversalePackage:
 
             if d_val in pm_package_data.keys():
                 d_val = int(d_val)
-                print("\nYou have chosen {0}".format(
-                    pm_package_data[d_val]['name']))
+                print("\nYou have chosen {0}".format(pm_package_data[d_val]["name"]))
                 return pm_package_data[d_val]["pm_package"]
             else:
                 self.logger.warn("You chosen wrong!")
@@ -453,7 +487,7 @@ class UniversalePackage:
 
         pkg = self.ask_user_select_pm()
         if self.auto_update_conf:
-            self.add_package_manager_in_config(pkg.pm.name)   
+            self.add_package_manager_in_config(pkg.pm.name)
         pkg_config = package_managers_config.get(pkg.pm.name, {})
         install_config = pkg_config.get("install", {})
         pkg.install(**install_config)

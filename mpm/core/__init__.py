@@ -1,4 +1,4 @@
-__version__ = '0.1'
+__version__ = "0.1"
 
 from mpm.core.exceptions import PackageDoesNotExist
 from pathlib import Path
@@ -14,5 +14,3 @@ USER_CONFIGS_DIR = USER_DATA_DIR / "configs"
 USER_SCRIPTS_DIR = USER_DATA_DIR / "scripts"
 
 LOGGING_DIR = USER_DATA_DIR / "logs"
-
-

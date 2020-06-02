@@ -6,12 +6,18 @@ from mpm.shell import AutoShell, AbstractShell
 from typing import List, Tuple
 from mpm.utils.string import is_first_ascii_alpha
 from mpm.core.logging import getLogger
-from mpm.utils.text_parse import parse_table_with_columns, parse_value_key_table, not_nan_split
+from mpm.utils.text_parse import (
+    parse_table_with_columns,
+    parse_value_key_table,
+    not_nan_split,
+)
 from mpm.core.exceptions import PackageDoesNotExist
 from subprocess import CalledProcessError, STDOUT
 import re
 import json
+
 logger = getLogger(__name__)
+
 
 class PackageManager:
     """ Main Package Manager """
@@ -45,9 +51,9 @@ class PackageManager:
         return list(subclasses)
 
     def search(self, package_name: str) -> dict:
-        '''
+        """
         Поиск пакета по имени
-        '''
+        """
         raise NotImplementedError()
 
     def is_installed(self) -> bool:
@@ -56,27 +62,29 @@ class PackageManager:
 
 class Snap(PackageManager):
     """ Python Package Manager """
+
     name = "snap"
 
     def get_all_packages(self) -> List[str]:
-        out = self.shell.cell(['snap', 'list'])
+        out = self.shell.cell(["snap", "list"])
         rex = r"\n\S+(?=\s)"
         li = re.findall(rex, out)
         li = [s.replace("\n", "") for s in li]
         self.logger.info(f"Detect {len(li)} packages")
         return li
-    
+
     def search(self, package_name: str) -> dict:
-        out = self.shell.cell(
-            ['LANG=en_US.UTF-8;', 'snap', 'find', package_name])
+        out = self.shell.cell(["LANG=en_US.UTF-8;", "snap", "find", package_name])
         return parse_table_with_columns(out, key_lower=True)
+
 
 class NPM(PackageManager):
     """ Node js package manager """
+
     name = "npm"
 
     def get_all_packages(self) -> List[str]:
-        out = self.shell.cell('npm list -g --depth=0')
+        out = self.shell.cell("npm list -g --depth=0")
         rex = r"(?=\s).+(?=@)"
         li = re.findall(rex, out)
         li = [s.replace(" ", "") for s in li]
@@ -84,12 +92,15 @@ class NPM(PackageManager):
         return li
 
     def search(self, package_name: str) -> dict:
-        out = self.shell.cell(['npm', 'search', package_name])
+        out = self.shell.cell(["npm", "search", package_name])
         return parse_table_with_columns(out, key_lower=True, delimiter="|")
+
 
 class Pip(PackageManager):
     """ Python Package Manager """
+
     name = "pip"
+
     def get_all_packages(self) -> List[str]:
         li = self.shell.cell([self.name, "freeze"]).split("\n")
         li = [s[: s.find("==")].lower() for s in li]
@@ -98,7 +109,7 @@ class Pip(PackageManager):
         return li
 
     def search(self, package_name: str) -> dict:
-        '''
+        """
         RAW output:
         numpy (1.18.4)                            - NumPy is the fundamental package
                                                     for array computing with Python.
@@ -108,12 +119,11 @@ class Pip(PackageManager):
         numpy-ext (0.9.2)                         - numpy extension
         numpy-alignments (0.0.2)                  - Numpy Alignments
         numpy-utils (0.1.6)                       - NumPy utilities.
-        '''
+        """
         try:
-            out = self.shell.cell(['pip', 'search', package_name])
+            out = self.shell.cell(["pip", "search", package_name])
         except CalledProcessError as e:
-            self.logger.error(
-                f"Nothing found for {package_name}!", exc_info=True)
+            self.logger.error(f"Nothing found for {package_name}!", exc_info=True)
             return {}
         li = not_nan_split(out)
         data = {}
@@ -125,20 +135,19 @@ class Pip(PackageManager):
                 data[name][key] = val
                 continue
             version = re.search(r"\((.*?)\)", line).group(1)
-            name = line[:line.find("(")].strip()
-            description = line[line.rfind("-")+1:].strip()
-            data[name] = {
-                'version': version,
-                'description': description
-            }
+            name = line[: line.find("(")].strip()
+            description = line[line.rfind("-") + 1 :].strip()
+            data[name] = {"version": version, "description": description}
         return data
+
 
 class Conda(PackageManager):
     """ Anaconda Python Package Manager """
+
     name = "conda"
 
-    def get_all_packages(self, no_pip = True) -> List[str]:
-        cmd = [self.name, 'list']
+    def get_all_packages(self, no_pip=True) -> List[str]:
+        cmd = [self.name, "list"]
         if no_pip:
             cmd.append("--no-pip")
         out = self.shell.cell(cmd)
@@ -152,16 +161,16 @@ class Conda(PackageManager):
         try:
             out = self.shell.cell(["conda", "search", package_name, "--json"])
         except CalledProcessError as e:
-            self.logger.error(
-                f"Nothing found for {package_name}!", exc_info=True)
+            self.logger.error(f"Nothing found for {package_name}!", exc_info=True)
             return {}
         data = json.loads(out)
         out_data = {}
         for builds_list in data.values():
             last_build = builds_list[-1]
-            name = last_build.pop('name')
+            name = last_build.pop("name")
             out_data[name] = last_build
         return out_data
+
 
 class AptGet(PackageManager):
     """ Apt Package """
@@ -169,17 +178,16 @@ class AptGet(PackageManager):
     name = "apt-get"
     # def _install_software_properties_common():
 
-    def _remove_warnings(self, consol_output: str, error= False) -> str:
+    def _remove_warnings(self, consol_output: str, error=False) -> str:
         out = ""
-        perfix_list = ['W', 'N']
+        perfix_list = ["W", "N"]
         if error:
-            perfix_list.append('E')
+            perfix_list.append("E")
         for line in consol_output.splitlines():
             if not line.startswith(tuple(perfix_list)):
-                out += line + '\n'
+                out += line + "\n"
         return out
 
-        
     def check_repository(self, repository: str) -> bool:
         if not self.shell.check_command("add-apt-repository"):
             self.logger.error("Not found add-apt-repository!!!")
@@ -194,33 +202,35 @@ class AptGet(PackageManager):
             self.logger.success("Repository already add")
 
     def remove_repository(self, repository: str):
-        pass # TODO: поиск и удаление регистри
+        pass  # TODO: поиск и удаление регистри
 
     def get_all_packages(self) -> List[str]:
         li = self.shell.cell(['dpkg -l | cut -d " " -f 3 | grep ""']).split("\n")
         li = list(filter(is_first_ascii_alpha, li))
         self.logger.info(f"Detect {len(li)} packages")
         return li
-    
+
     def update(self, enter_password=False):
         self.shell.sudo_cell([self.name, "update"], enter_password=enter_password)
 
     def search(self, package_name: str) -> dict:
         out = self.shell.cell(["apt-cache", "search", package_name])
         out = self._remove_warnings(out)
-        if out == '':
+        if out == "":
             return {}
         data = {}
         for line in not_nan_split(out):
             delimiter = " - "
             n = line.find(delimiter)
             name = line[:n]
-            description = line[n+len(delimiter):]
+            description = line[n + len(delimiter) :]
             data[name] = {"description": description}
         return data
-        
+
+
 class Apt(AptGet):
     """ Apt Package """
+
     name = "apt"
 
 
@@ -237,10 +247,6 @@ def get_installed_pms(shell: AbstractShell = None) -> List[PackageManager]:
     return pms_list
 
 
-NAMES_TO_PACKAGE_MANAGERS = {
-    cls.name: cls for cls in PackageManager._inheritors()
-}
-PACKAGE_MANAGERS_TO_NAMES = {
-    cls: cls.name for cls in PackageManager._inheritors()
-}
+NAMES_TO_PACKAGE_MANAGERS = {cls.name: cls for cls in PackageManager._inheritors()}
+PACKAGE_MANAGERS_TO_NAMES = {cls: cls.name for cls in PackageManager._inheritors()}
 PACKAGE_MANAGERS_NAMES = list(NAMES_TO_PACKAGE_MANAGERS.keys())

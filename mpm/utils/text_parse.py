@@ -1,16 +1,23 @@
-
 import re
 from typing import List
 
+
 def remove_multiple_spaces(string: str) -> str:
-    return re.sub(' +', ' ', string)
+    return re.sub(" +", " ", string)
 
 
 def not_nan_split(string: str, delimiter="\n") -> list:
     li = string.split(delimiter)
     return list(filter(None, li))
 
-def parse_value_key_table(string: str, delimiter=":", remove_useless_space=True, multiline_spase=True, key_lower=False) -> dict:
+
+def parse_value_key_table(
+    string: str,
+    delimiter=":",
+    remove_useless_space=True,
+    multiline_spase=True,
+    key_lower=False,
+) -> dict:
     """
     Parse value key ASCII table
     Example:
@@ -63,23 +70,25 @@ def parse_value_key_table(string: str, delimiter=":", remove_useless_space=True,
     lines = string.split("\n")
     data = dict()
     for line in lines:
-            if line == "":
-                continue
-            n = line.find(delimiter)
-            key, value = line[:n], line[n + len(delimiter):]
-            if remove_useless_space:
-                key = key.strip()
-                value = value.strip()
-            if key_lower:
-                key = key.lower()
-            if multiline_spase:
-                value = value.replace(_TMP_MARK, "\n ")
-            data[key] = value
+        if line == "":
+            continue
+        n = line.find(delimiter)
+        key, value = line[:n], line[n + len(delimiter) :]
+        if remove_useless_space:
+            key = key.strip()
+            value = value.strip()
+        if key_lower:
+            key = key.lower()
+        if multiline_spase:
+            value = value.replace(_TMP_MARK, "\n ")
+        data[key] = value
     return data
 
 
-def parse_table_with_columns(string: str, delimiter=None, name_column_num=0, key_lower=False) -> dict:
-    '''
+def parse_table_with_columns(
+    string: str, delimiter=None, name_column_num=0, key_lower=False
+) -> dict:
+    """
     Parse ASCII tables!
     Example:
     >>> print(table)
@@ -131,26 +140,24 @@ def parse_table_with_columns(string: str, delimiter=None, name_column_num=0, key
     'примечание': '-',
     'издатель': 'ramboxapp*',
     'версия': '1.3.1'}}
-    '''
+    """
     if delimiter:
-        string = string.replace(delimiter, "") # TODO: something...
+        string = string.replace(delimiter, "")  # TODO: something...
     li = not_nan_split(string)
     head = li[0]
     head_list = []
     for m in re.finditer("(\w+)", head):
-        key = head[m.start(0): m.end(0)]
+        key = head[m.start(0) : m.end(0)]
         if key_lower:
             key = key.lower()
-        head_list.append(
-            (m.start(0), key)
-        )
+        head_list.append((m.start(0), key))
     name_key = head_list[name_column_num][1]
     head_list.reverse()
     data = {}
-    
+
     for line in li[1:]:
         line_data = {}
-        name = ''
+        name = ""
         for start, key in head_list:
             val = line[start::]
             val = remove_multiple_spaces(val)

@@ -2,6 +2,7 @@
 # -*- coding: utf-8 -*-
 import platform
 
+
 def auto_decode(text: bytes) -> str:
     if type(text) == str:
         return text
