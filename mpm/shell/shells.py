@@ -306,6 +306,9 @@ class PowerShell(Cmd):
 
 
 def get_installed_shells() -> List[AbstractShell]:
+    '''
+    Return all installed shells
+    '''
     shells_list = []
     for cls in AbstractShell._inheritors():
         obj = cls()
@@ -315,6 +318,11 @@ def get_installed_shells() -> List[AbstractShell]:
 
 
 def AutoShell(name=None, *args, **kwargs) -> AbstractShell:
+    '''
+    Returns one of the installed shells
+
+    Or by 'name'
+    '''
     for cls in AbstractShell._inheritors():
         obj = cls(*args, **kwargs)
         if name != None:
