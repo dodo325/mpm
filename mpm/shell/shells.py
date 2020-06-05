@@ -8,7 +8,7 @@ from pathlib import Path
 
 from mpm.core.logging import getLogger
 from mpm.utils.string import auto_decode
-from mpm.utils.text_parse import not_nan_split
+from mpm.utils.text_parse import not_nan_split, parse_value_key_table
 from mpm.core.exceptions import CommandNotFound, ShellError
 
 logger = getLogger(__name__)
@@ -54,6 +54,21 @@ class AbstractShell:
         Pls use Path.cwd()
         """
         return str(Path.cwd())
+    
+    def get_env():
+        """
+        Environment variables
+        """
+        out = sh.cell("set")
+        data = parse_value_key_table(out, delimiter='=')
+        return data
+    
+    def _cell_filter(self, output: str) -> str:
+        output = output.rstrip('\n')
+        return output
+    
+    def echo(self, cmd: str):
+        return self.cell(['echo', cmd])
 
     def is_platform_supported(self) -> bool:
         if platform.system() in self.supported_platforms:
@@ -133,7 +148,7 @@ stderr = {stderr}\n\targs = {args}\n\tkwargs = {kwargs}"
             self.logger.debug(f"Output: {out}")
         if out.startswith("get-command"):
             raise CommandNotFound(f"Command not found: {command}")
-        return out
+        return self._cell_filter(out)
 
 
 class Bash(AbstractShell):
@@ -201,7 +216,13 @@ stderr = {stderr}\n\targs = {args}\n\tkwargs = {kwargs}"
         if debug:
             self.logger.debug(f"Output: {out}")
         out = auto_decode(out)
-        return out
+        return self._cell_filter(out)
+
+    def get_env():
+        out = sh.cell("set")
+        data = parse_value_key_table(out, delimiter='=')
+        data['PATH'] = data['PATH'].split(':')
+        return data
 
     def whereis(self, command: str) -> list:
         try:
