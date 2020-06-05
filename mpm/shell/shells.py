@@ -55,7 +55,7 @@ class AbstractShell:
         """
         return str(Path.cwd())
     
-    def get_env():
+    def get_env(self) -> dict:
         """
         Environment variables
         """
@@ -218,7 +218,7 @@ stderr = {stderr}\n\targs = {args}\n\tkwargs = {kwargs}"
         out = auto_decode(out)
         return self._cell_filter(out)
 
-    def get_env():
+    def get_env(self) -> dict:
         out = sh.cell("set")
         data = parse_value_key_table(out, delimiter='=')
         data['PATH'] = data['PATH'].split(':')
