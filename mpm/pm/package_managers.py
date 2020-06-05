@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 """ Main Package Manager 
 """
-from mpm.shell import AutoShell, AbstractShell
+from mpm.shell import AutoShell, AbstractShell, Bash
 from typing import List, Tuple
 from mpm.utils.string import is_first_ascii_alpha
 from mpm.core.logging import getLogger
@@ -232,6 +232,32 @@ class Apt(AptGet):
     """ Apt Package """
 
     name = "apt"
+
+# Scripts:
+
+## Bash
+class BashAliasManager(PackageManager):
+    """
+    Класс управления пользовательскими alias
+    """
+    name = "bash-alias"
+
+    def __init__(self, shell: AbstractShell = None):
+        self.logger = logger.getChild(self.__class__.__name__)
+        if shell != None and shell.name == 'bash':
+            self.shell = shell
+        else:
+            self.shell = Bash()
+
+    def is_installed(self) -> bool:
+        return self.shell.is_installed()
+
+
+# class BashScriptFileManager(BashAliasManager):
+#     """
+#     Класс управления пользовательскими скриптовыми файлами
+#     """
+#     name = "bash-script"
 
 
 def get_installed_pms(shell: AbstractShell = None) -> List[PackageManager]:

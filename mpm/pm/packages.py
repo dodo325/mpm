@@ -16,6 +16,7 @@ from mpm.pm.package_managers import (
     PackageManager,
     Conda,
     NPM,
+    BashAliasManager,
     get_installed_pms,
     NAMES_TO_PACKAGE_MANAGERS,
 )
@@ -24,6 +25,7 @@ from mpm.core.configs import get_known_packages
 from mpm.utils.string import auto_decode
 from mpm.core.logging import getLogger
 from mpm.core.exceptions import PackageDoesNotExist, ShellError, PackageDoesNotInatalled
+from mpm.scripts.bash import BashScriptFile
 
 logger = getLogger(__name__)
 
@@ -312,7 +314,67 @@ class CondaPackage(Package):
     def get_info(self) -> dict:
         return self.get_search_info()
 
+# Bash
+class BashAlias(Package):
+    '''
+    Пользовательский alias. Устанавливается в .zshrc .bashrc или в файлы, которые указал пользователь
+    '''
+    pm_class = BashAliasManager
+    profiles: List['str'] = [
+        "$HOME/.zshrc",
+        "$HOME/.bashrc"
+    ]
+    profiles_scripts: List[BashScriptFile] = []
 
+    def init_profiles(self, profiles: List['str'] = None):
+        if profiles:
+            self.profiles = profiles
+
+        for path in self.profiles:
+            try:
+                self.profiles_scripts.append(
+                    BashScriptFile(path, shell=self.shell)
+                )
+            except FileExistsError as e:
+                self.logger.warn(e)
+
+    def __init__(self, package_name: str, shell: AbstractShell = None, profiles: List[str] = None):
+        super().__init__(package_name=package_name, shell=shell)
+        self.init_profiles(profiles=profiles)
+
+    def is_installed(self) -> bool:
+        self.update_package_info()
+        return self.info != {}
+
+    def install(self, cmd: str, profiles: List['str'] = None):
+        """
+        Устанавливает Alias во все файлы из profiles
+        """
+        if profiles:
+            self.init_profiles(profiles=profiles)
+        for script in self.profiles_scripts:
+            script.add_alias(self.package_name, cmd)
+        
+        
+    def get_info(self) -> dict:
+        """
+        Показывает всю информацию о alias
+
+        Пример:
+        >>> alias.get_info()
+        {'/home/dodo/.zshrc': {'cmd': 'git'}, '/home/dodo/.bashrc': {'cmd': 'git'}}
+        """
+        info = {}
+        for script in self.profiles_scripts:
+            aliases = script.get_alias()
+            if self.package_name in aliases:
+                info[str(script.file)] = {
+                    "cmd": aliases[self.package_name]
+                }
+        return info
+        
+
+# UniversalePackage
 class UniversalePackage:
     """ Universale Package Class 
     Единый интерфейс взаимодействия с пакетными менеджарами. Кушает конфиги из known_packages
@@ -413,6 +475,7 @@ class UniversalePackage:
                     pkg_class(
                         pm_config.get("package_name", self.package_name),
                         shell=self.shell,
+                        # TODO: доп параметры
                     )
                 )
         return pkg_objects
