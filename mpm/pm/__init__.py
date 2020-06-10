@@ -1,5 +1,3 @@
-__version__ = "0.1"
-
 from mpm.pm.package_managers import (
     Apt,
     AptGet,

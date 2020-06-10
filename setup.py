@@ -3,7 +3,7 @@
 """
 Main Package Manager.
 Author: Dodo325
-GitLab: https://github.com/dodo325/
+GitHub: https://github.com/dodo325/
 """
 from glob import glob
 from setuptools import setup, find_packages
@@ -23,16 +23,20 @@ def get_all_files(base_dir: str) -> list:
 REQUIREMENTS = ["click>=7.0", "colorama", "coloredlogs"]
 
 
+def read(fname):
+    try:
+        return open(os.path.join(os.path.dirname(__file__), fname)).read()
+    except IOError:
+        return ''
+
 def main():
     setup(
         name="mpm",
         version=mpm.__version__,
         description=sys.modules[__name__].__doc__,
-        long_description=open("README.md").read(),
-        long_description_content_type="text/markdown",
+        # long_description=read("README"),
         author="Dodo325",
         url="https://github.com/dodo325/mpm",
-        #   download_url='github.com/...',
         license="GPLv3",
         python_requires=">=3.7, <4",
         install_requires=REQUIREMENTS,
