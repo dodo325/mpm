@@ -46,7 +46,7 @@ def get_remote_known_packages():
 
 def update_user_known_package(package_name: str, config: dict(), pretty=True):
     logger.info(f"Update user known package. Package {package_name}")
-    logger.debug("\n\tconfig = {config}\n\tpretty = {pretty}")
+    logger.debug(f"\n\tconfig = {config}\n\tpretty = {pretty}")
 
     with open(user_known_packages_file, "r") as jsonFile:
         data = json.load(jsonFile)
