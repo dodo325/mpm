@@ -326,7 +326,7 @@ class PowerShell(Cmd):
             try:
                 out = self.cell(["Get-Host"])
                 data = parse_value_key_table(out, key_lower=True)
-                if version in data:
+                if "version" in data:
                     self.version = data["version"]
                     return True
             except FileNotFoundError:
