@@ -314,31 +314,30 @@ class CondaPackage(Package):
     def get_info(self) -> dict:
         return self.get_search_info()
 
+
 # Bash
 class BashAlias(Package):
-    '''
+    """
     Пользовательский alias. Устанавливается в .zshrc .bashrc или в файлы, которые указал пользователь
-    '''
+    """
+
     pm_class = BashAliasManager
-    profiles: List['str'] = [
-        "$HOME/.zshrc",
-        "$HOME/.bashrc"
-    ]
+    profiles: List["str"] = ["$HOME/.zshrc", "$HOME/.bashrc"]
     profiles_scripts: List[BashScriptFile] = []
 
-    def init_profiles(self, profiles: List['str'] = None):
+    def init_profiles(self, profiles: List["str"] = None):
         if profiles:
             self.profiles = profiles
 
         for path in self.profiles:
             try:
-                self.profiles_scripts.append(
-                    BashScriptFile(path, shell=self.shell)
-                )
+                self.profiles_scripts.append(BashScriptFile(path, shell=self.shell))
             except FileExistsError as e:
                 self.logger.warn(e)
 
-    def __init__(self, package_name: str, shell: AbstractShell = None, profiles: List[str] = None):
+    def __init__(
+        self, package_name: str, shell: AbstractShell = None, profiles: List[str] = None
+    ):
         super().__init__(package_name=package_name, shell=shell)
         self.init_profiles(profiles=profiles)
 
@@ -346,7 +345,7 @@ class BashAlias(Package):
         self.update_package_info()
         return self.info != {}
 
-    def install(self, cmd: str, profiles: List['str'] = None):
+    def install(self, cmd: str, profiles: List["str"] = None):
         """
         Устанавливает Alias во все файлы из profiles
         """
@@ -354,8 +353,7 @@ class BashAlias(Package):
             self.init_profiles(profiles=profiles)
         for script in self.profiles_scripts:
             script.add_alias(self.package_name, cmd)
-        
-        
+
     def get_info(self) -> dict:
         """
         Показывает всю информацию о alias
@@ -368,11 +366,9 @@ class BashAlias(Package):
         for script in self.profiles_scripts:
             aliases = script.get_alias()
             if self.package_name in aliases:
-                info[str(script.file)] = {
-                    "cmd": aliases[self.package_name]
-                }
+                info[str(script.file)] = {"cmd": aliases[self.package_name]}
         return info
-        
+
 
 # UniversalePackage
 class UniversalePackage:

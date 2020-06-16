@@ -54,21 +54,21 @@ class AbstractShell:
         Pls use Path.cwd()
         """
         return str(Path.cwd())
-    
+
     def get_env(self) -> dict:
         """
         Environment variables
         """
         out = self.cell("set")
-        data = parse_value_key_table(out, delimiter='=')
+        data = parse_value_key_table(out, delimiter="=")
         return data
-    
+
     def _cell_filter(self, output: str) -> str:
-        output = output.rstrip('\n')
+        output = output.rstrip("\n")
         return output
-    
+
     def echo(self, cmd: str):
-        return self.cell(['echo', cmd])
+        return self.cell(["echo", cmd])
 
     def is_platform_supported(self) -> bool:
         if platform.system() in self.supported_platforms:
@@ -220,8 +220,8 @@ stderr = {stderr}\n\targs = {args}\n\tkwargs = {kwargs}"
 
     def get_env(self) -> dict:
         out = self.cell("set")
-        data = parse_value_key_table(out, delimiter='=')
-        data['PATH'] = data['PATH'].split(':')
+        data = parse_value_key_table(out, delimiter="=")
+        data["PATH"] = data["PATH"].split(":")
         return data
 
     def whereis(self, command: str) -> list:

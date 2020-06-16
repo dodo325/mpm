@@ -14,7 +14,7 @@ def auto_decode(text: bytes) -> str:
             return text.decode("cp1251")
         except UnicodeDecodeError as e:
             return text.decode("utf-8")
-        
+
     else:
         return text.decode("utf-8")
 

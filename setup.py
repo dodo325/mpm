@@ -1,11 +1,10 @@
-# -*- coding: utf-8 -*-
 #!/usr/bin/env python
+# -*- coding: utf-8 -*-
 """
 Main Package Manager.
 Author: Dodo325
 GitHub: https://github.com/dodo325/
 """
-from glob import glob
 from setuptools import setup, find_packages
 import sys
 import mpm
@@ -27,7 +26,8 @@ def read(fname):
     try:
         return open(os.path.join(os.path.dirname(__file__), fname)).read()
     except IOError:
-        return ''
+        return ""
+
 
 def main():
     setup(

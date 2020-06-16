@@ -233,6 +233,7 @@ class Apt(AptGet):
 
     name = "apt"
 
+
 # Scripts:
 
 ## Bash
@@ -240,11 +241,12 @@ class BashAliasManager(PackageManager):
     """
     Класс управления пользовательскими alias
     """
+
     name = "bash-alias"
 
     def __init__(self, shell: AbstractShell = None):
         self.logger = logger.getChild(self.__class__.__name__)
-        if shell != None and shell.name == 'bash':
+        if shell != None and shell.name == "bash":
             self.shell = shell
         else:
             self.shell = Bash()

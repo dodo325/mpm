@@ -1,4 +1,4 @@
-from shell import (
+from mpm.shell import (
     AutoShell,
     Bash,
     ZSH,

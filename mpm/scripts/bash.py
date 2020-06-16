@@ -8,17 +8,19 @@ from typing import List, Tuple
 from mpm.core.logging import getLogger
 from pathlib import Path
 from mpm.utils.text_parse import not_nan_split
+
 logger = getLogger(__name__)
 
-class BashScriptFile():
-    '''
+
+class BashScriptFile:
+    """
     Bash скрипт файл
-    '''
-    
-    content = ''
+    """
+
+    content = ""
 
     def _filter_comments(self, lines: list) -> list:
-        return list(filter(lambda s: not s.lstrip().startswith('#'), lines))
+        return list(filter(lambda s: not s.lstrip().startswith("#"), lines))
 
     def get_alias(self) -> dict:
         """
@@ -35,12 +37,12 @@ class BashScriptFile():
         'pipver': "pip freeze | grep' "}
         """
         li = self.get_lines()
-        li = list(filter(lambda s: s.startswith('alias '), li))
+        li = list(filter(lambda s: s.startswith("alias "), li))
         alias_data = {}
         for alias in li:
             alias = alias.replace("alias ", "")
-            name = alias[:alias.index("=")]
-            cmd = alias[alias.index("=")+1:]
+            name = alias[: alias.index("=")]
+            cmd = alias[alias.index("=") + 1 :]
             if cmd.startswith('"') or cmd.startswith("'"):
                 cmd = cmd[1:]
             if cmd.endswith('"') or cmd.endswith("'"):
@@ -52,7 +54,6 @@ class BashScriptFile():
         li = not_nan_split(self.content)
         return self._filter_comments(li)
 
-
     def __init__(self, path: str, shell: AbstractShell = None):
         self.logger = logger.getChild(self.__class__.__name__)
         if shell == None:
@@ -62,18 +63,18 @@ class BashScriptFile():
 
         file = Path(self.shell.echo(path))
         if file.is_file():
-            out = file.open().read().rstrip('\n')
+            out = file.open().read().rstrip("\n")
             self.content = out
             self.file = file
         else:
             raise FileExistsError(f"Not found {path}")
-    
+
     def add_data_in_file(self, data):
         with self.file.open("a") as file_object:
             file_object.write(data)
-    
+
     def add_alias(self, name: str, cmd: str):
         if name in self.get_alias():
             self.logger.info(f"Alias {name} already in {str(self.file)}!")
             return
-        self.add_data_in_file(f"\nalias {name}=\"{cmd}\"\n")
+        self.add_data_in_file(f'\nalias {name}="{cmd}"\n')

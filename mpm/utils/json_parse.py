@@ -7,5 +7,3 @@ def multiget(d: dict, keys: List[str], default):
         if val != default:
             return val
     return default
-
-
