@@ -1,18 +1,21 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 import platform
+from mpm.core.logging import getLogger
 
+logger = getLogger(__name__)
 
 def auto_decode(text: bytes) -> str:
     if type(text) == str:
         return text
-    if text == None:
+    if text is None:
         return ""
     os = platform.system()
     if os == "Windows":
         try:
             return text.decode("cp1251")
-        except UnicodeDecodeError as e:
+        except UnicodeDecodeError:
+            logger.warning("Can't use cp1251!", exc_info=True)
             return text.decode("utf-8")
 
     else:
