@@ -40,7 +40,7 @@ def main():
         license="GPLv3",
         python_requires=">=3.7, <4",
         install_requires=REQUIREMENTS,
-        extras_require={"test": ["pytest"]},
+        extras_require={"test": ["pytest", "pytest-subprocess"]},
         classifiers=[
             "Environment :: Console",
             "Intended Audience :: Developers",
