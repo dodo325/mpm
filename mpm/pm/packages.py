@@ -141,7 +141,7 @@ class AptGetPackage(Package):
 
     def show(self) -> dict:
         try:
-            out = self.shell.cell(["apt-cache", "show", self.package_name])
+            out = self.shell.call(["apt-cache", "show", self.package_name])
         except CalledProcessError as e:
             if "E: " in e.output.decode("utf-8"):
                 raise PackageDoesNotInatalled(
@@ -168,7 +168,7 @@ class AptGetPackage(Package):
 
         self.logger.info(f"Installing {self.package_name} ({self.info})...")
         self.pm.update(enter_password=enter_password)
-        self.shell.sudo_cell(
+        self.shell.sudo_call(
             [self.pm.name, "install", "-y", self.package_name],
             enter_password=enter_password,
         )
@@ -194,7 +194,7 @@ class PipPackage(Package):
             return
 
         self.logger.info(f"Installing {self.package_name} ({self.info})...")
-        self.shell.cell([self.pm.name, "install", self.package_name])
+        self.shell.call([self.pm.name, "install", self.package_name])
 
         if self.is_installed():
             self.logger.success("Package installed!")
@@ -205,14 +205,14 @@ class PipPackage(Package):
             return
 
         self.logger.info(f"Removing {self.package_name} ({self.info})...")
-        self.shell.cell([self.pm.name, "uninstall", "-y", self.package_name])
+        self.shell.call([self.pm.name, "uninstall", "-y", self.package_name])
 
         if not self.is_installed():
             self.logger.success("Package removed!")
 
     def show(self) -> dict:
         try:
-            out = self.shell.cell(["pip", "show", self.package_name, "-v"])
+            out = self.shell.call(["pip", "show", self.package_name, "-v"])
         except CalledProcessError as e:
             if "not found:" in auto_decode(e.output):
                 raise PackageDoesNotInatalled("Package not found: " + self.package_name)
@@ -248,14 +248,14 @@ class SnapPackage(Package):
         cmd = [self.pm.name, "install", self.package_name]
         if argument:
             cmd.append(argument)
-        self.shell.cell(cmd)
+        self.shell.call(cmd)
 
         if self.is_installed():
             self.logger.success("Package installed!")
 
     def show(self) -> dict:
         try:
-            out = self.shell.cell(["snap", "info", self.package_name])
+            out = self.shell.call(["snap", "info", self.package_name])
         except CalledProcessError as e:
             raise ShellError(
                 "command '{}' return with error (code {}): {}".format(
@@ -293,13 +293,13 @@ class NPMPackage(Package):
         cmd = [self.pm.name, "install", self.package_name]
         if argument:
             cmd.append(argument)
-        self.shell.cell(cmd)
+        self.shell.call(cmd)
 
         if self.is_installed():
             self.logger.success("Package installed!")
 
     def show(self) -> dict:
-        out = self.shell.cell(["npm", "view", self.package_name, "--json"])
+        out = self.shell.call(["npm", "view", self.package_name, "--json"])
         data = json.loads(out)
         data["version"] = data["versions"][-1]
         data.pop("name")
@@ -409,7 +409,7 @@ class UniversalePackage:
                 )
                 return True
         return False
-
+        
     def update_package_info(self):
         """
         Update self.info

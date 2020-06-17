@@ -59,16 +59,16 @@ class AbstractShell:
         """
         Environment variables
         """
-        out = self.cell("set")
+        out = self.call("set")
         data = parse_value_key_table(out, delimiter="=")
         return data
 
-    def _cell_filter(self, output: str) -> str:
+    def _call_filter(self, output: str) -> str:
         output = output.rstrip("\n")
         return output
 
     def echo(self, cmd: str):
-        return self.cell(["echo", cmd])
+        return self.call(["echo", cmd])
 
     def is_platform_supported(self) -> bool:
         if platform.system() in self.supported_platforms:
@@ -87,7 +87,7 @@ class AbstractShell:
         """
         Находит где исполняемый файл команды
         """
-        pass
+        raise NotImplementedError()
 
     def is_installed(self) -> bool:
         """
@@ -107,10 +107,10 @@ class AbstractShell:
     def is_sudo_mode(self) -> bool:
         return False
 
-    def sudo_cell(self, command: list, enter_password=False, *args, **kwargs) -> str:
+    def sudo_call(self, command: list, enter_password=False, *args, **kwargs) -> str:
         raise NotImplementedError()
 
-    def cell(
+    def call(
         self,
         command: list,
         shell=False,
@@ -148,7 +148,7 @@ stderr = {stderr}\n\targs = {args}\n\tkwargs = {kwargs}"
             self.logger.debug(f"Output: {out}")
         if out.startswith("get-command"):
             raise CommandNotFound(f"Command not found: {command}")
-        return self._cell_filter(out)
+        return self._call_filter(out)
 
 
 class Bash(AbstractShell):
@@ -158,7 +158,7 @@ class Bash(AbstractShell):
     supported_platforms = {"Linux": {}}
     __sudo_password = None
 
-    def sudo_cell(
+    def sudo_call(
         self,
         command: list,
         shell=False,
@@ -178,7 +178,7 @@ stderr = {stderr}\n\targs = {args}\n\tkwargs = {kwargs}"
         )
 
         if self.is_sudo_mode():
-            return self.cell(command, *args, **kwargs)
+            return self.call(command, *args, **kwargs)
 
         if executable_path == "":
             executable_path = self.executable_path
@@ -216,17 +216,17 @@ stderr = {stderr}\n\targs = {args}\n\tkwargs = {kwargs}"
         if debug:
             self.logger.debug(f"Output: {out}")
         out = auto_decode(out)
-        return self._cell_filter(out)
+        return self._call_filter(out)
 
     def get_env(self) -> dict:
-        out = self.cell("set")
+        out = self.call("set")
         data = parse_value_key_table(out, delimiter="=")
         data["PATH"] = data["PATH"].split(":")
         return data
 
     def whereis(self, command: str) -> list:
         try:
-            out = self.cell(["whereis", command])
+            out = self.call(["whereis", command])
             out = out.replace("\n", "")
             return out.split(" ")[1:]
         except Exception as e:
@@ -236,7 +236,7 @@ stderr = {stderr}\n\targs = {args}\n\tkwargs = {kwargs}"
     def is_installed(self) -> bool:
         if self.is_platform_supported():
             try:
-                out = self.cell(["bash", "--version"])
+                out = self.call(["bash", "--version"])
                 result = re.search(r"\d.+\n", out).group(0)[:-1]
                 self.version = result
                 self.logger.info(f"installed! ver: {result}")
@@ -251,14 +251,14 @@ stderr = {stderr}\n\targs = {args}\n\tkwargs = {kwargs}"
         command = "compgen -abcdefgjksuv"
         out = self._compgen_out
         if not out:
-            out = self.cell(command, shell=False).splitlines()
+            out = self.call(command, shell=False).splitlines()
             self._compgen_out = out
         if perfix != None:
             out = list(filter(lambda c: c.startswith(perfix), out))
         return out
 
     def alias_list(self, perfix: str = None) -> list:  # TODO: load user profile!
-        out = self.cell("alias", shell=True).splitlines()
+        out = self.call("alias", shell=True).splitlines()
         if perfix != None:
             out = list(filter(lambda c: c.startswith(perfix), out))
         return out
@@ -273,7 +273,7 @@ class ZSH(Bash):
     def is_installed(self) -> bool:
         if self.is_platform_supported():
             try:
-                out = self.cell(["zsh", "--version"])
+                out = self.call(["zsh", "--version"])
                 out = out.replace("\n", "")
                 self.version = out
                 self.logger.info(f"installed! ver: {out}")
@@ -287,13 +287,13 @@ class Cmd(AbstractShell):
     executable_path = "cmd.exe"
     executable_args = ["/C"]
     supported_platforms = {"Windows": {}}
-    # def cell # TODO: don't WORK on Windows!!!!!!!!
+    # def call # TODO: don't WORK on Windows!!!!!!!!
     def get_all_exe(self) -> list:
         return self.whereis("*.exe")
 
     def whereis(self, command: str) -> list:
         try:
-            out = self.cell(["where", command])
+            out = self.call(["where", command])
             li = not_nan_split(out)
             return li
         except Exception as e:
@@ -311,7 +311,7 @@ class PowerShell(Cmd):
 
     def whereis(self, command: str) -> list:
         try:
-            out = self.cell([f"(get-command {command}).Path"])
+            out = self.call([f"(get-command {command}).Path"])
             li = not_nan_split(out)
             return li
         except Exception as e:
@@ -324,7 +324,7 @@ class PowerShell(Cmd):
         """
         if self.is_platform_supported():
             try:
-                out = self.cell(["Get-Host"])
+                out = self.call(["Get-Host"])
                 data = parse_value_key_table(out, key_lower=True)
                 if "version" in data:
                     self.version = data["version"]

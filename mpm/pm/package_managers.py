@@ -66,7 +66,7 @@ class Snap(PackageManager):
     name = "snap"
 
     def get_all_packages(self) -> List[str]:
-        out = self.shell.cell(["snap", "list"])
+        out = self.shell.call(["snap", "list"])
         rex = r"\n\S+(?=\s)"
         li = re.findall(rex, out)
         li = [s.replace("\n", "") for s in li]
@@ -74,7 +74,7 @@ class Snap(PackageManager):
         return li
 
     def search(self, package_name: str) -> dict:
-        out = self.shell.cell(["LANG=en_US.UTF-8;", "snap", "find", package_name])
+        out = self.shell.call(["LANG=en_US.UTF-8;", "snap", "find", package_name])
         return parse_table_with_columns(out, key_lower=True)
 
 
@@ -84,7 +84,7 @@ class NPM(PackageManager):
     name = "npm"
 
     def get_all_packages(self) -> List[str]:
-        out = self.shell.cell("npm list -g --depth=0")
+        out = self.shell.call("npm list -g --depth=0")
         rex = r"(?=\s).+(?=@)"
         li = re.findall(rex, out)
         li = [s.replace(" ", "") for s in li]
@@ -92,7 +92,7 @@ class NPM(PackageManager):
         return li
 
     def search(self, package_name: str) -> dict:
-        out = self.shell.cell(["npm", "search", package_name])
+        out = self.shell.call(["npm", "search", package_name])
         return parse_table_with_columns(out, key_lower=True, delimiter="|")
 
 
@@ -102,7 +102,7 @@ class Pip(PackageManager):
     name = "pip"
 
     def get_all_packages(self) -> List[str]:
-        li = self.shell.cell([self.name, "freeze"]).split("\n")
+        li = self.shell.call([self.name, "freeze"]).split("\n")
         li = [s[: s.find("==")].lower() for s in li]
         li = list(filter(None, li))
         self.logger.info(f"Detect {len(li)} packages")
@@ -121,7 +121,7 @@ class Pip(PackageManager):
         numpy-utils (0.1.6)                       - NumPy utilities.
         """
         try:
-            out = self.shell.cell(["pip", "search", package_name])
+            out = self.shell.call(["pip", "search", package_name])
         except CalledProcessError as e:
             self.logger.error(f"Nothing found for {package_name}!", exc_info=True)
             return {}
@@ -150,7 +150,7 @@ class Conda(PackageManager):
         cmd = [self.name, "list"]
         if no_pip:
             cmd.append("--no-pip")
-        out = self.shell.cell(cmd)
+        out = self.shell.call(cmd)
         rex = r"\n[^#]\S+(?=\s)"
         li = re.findall(rex, out)
         li = [s.replace("\n", "") for s in li]
@@ -159,7 +159,7 @@ class Conda(PackageManager):
 
     def search(self, package_name: str) -> dict:
         try:
-            out = self.shell.cell(["conda", "search", package_name, "--json"])
+            out = self.shell.call(["conda", "search", package_name, "--json"])
         except CalledProcessError as e:
             self.logger.error(f"Nothing found for {package_name}!", exc_info=True)
             return {}
@@ -205,16 +205,16 @@ class AptGet(PackageManager):
         pass  # TODO: поиск и удаление регистри
 
     def get_all_packages(self) -> List[str]:
-        li = self.shell.cell(['dpkg -l | cut -d " " -f 3 | grep ""']).split("\n")
+        li = self.shell.call(['dpkg -l | cut -d " " -f 3 | grep ""']).split("\n")
         li = list(filter(is_first_ascii_alpha, li))
         self.logger.info(f"Detect {len(li)} packages")
         return li
 
     def update(self, enter_password=False):
-        self.shell.sudo_cell([self.name, "update"], enter_password=enter_password)
+        self.shell.sudo_call([self.name, "update"], enter_password=enter_password)
 
     def search(self, package_name: str) -> dict:
-        out = self.shell.cell(["apt-cache", "search", package_name])
+        out = self.shell.call(["apt-cache", "search", package_name])
         out = self._remove_warnings(out)
         if out == "":
             return {}
