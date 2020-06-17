@@ -40,15 +40,18 @@ class PackageManager:
 
     @classmethod
     def _inheritors(cls) -> list:
-        subclasses = set()
+        """
+        return all subclasses
+        """
+        subclasses = []
         work = [cls]
         while work:
             parent = work.pop()
             for child in parent.__subclasses__():
                 if child not in subclasses:
-                    subclasses.add(child)
+                    subclasses.append(child)
                     work.append(child)
-        return list(subclasses)
+        return subclasses
 
     def search(self, package_name: str) -> dict:
         """

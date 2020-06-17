@@ -33,15 +33,15 @@ class AbstractShell:
         """
         return all subclasses
         """
-        subclasses = set()
+        subclasses = []
         work = [cls]
         while work:
             parent = work.pop()
             for child in parent.__subclasses__():
                 if child not in subclasses:
-                    subclasses.add(child)
+                    subclasses.append(child)
                     work.append(child)
-        return list(subclasses)
+        return subclasses
 
     def get_home(self) -> str:
         """
