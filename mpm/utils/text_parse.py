@@ -74,6 +74,7 @@ def parse_value_key_table(
             continue
         n = line.find(delimiter)
         key, value = line[:n], line[n + len(delimiter) :]
+        value = value.strip("\n")
         if remove_useless_space:
             key = key.strip()
             value = value.strip()
@@ -157,7 +158,7 @@ def parse_table_with_columns(
 
     for line in li[1:]:
         line_data = {}
-        name = ""
+        name = ''
         for start, key in head_list:
             val = line[start::]
             val = remove_multiple_spaces(val)
@@ -167,5 +168,7 @@ def parse_table_with_columns(
                 line_data[key] = val
             else:
                 name = val
+        if name == '':
+            continue
         data[name] = line_data
     return data
