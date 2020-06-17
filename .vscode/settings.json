@@ -13,5 +13,7 @@
     "python.testing.unittestEnabled": false,
     "python.testing.nosetestsEnabled": false,
     "python.testing.pytestEnabled": true,
-    "python.pythonPath": "D:\\SDK\\Anaconda3\\python.exe"
+    "python.pythonPath": "/home/dodo/anaconda3/bin/python",
+    "python.linting.flake8Enabled": true,
+    "python.linting.enabled": true
 }

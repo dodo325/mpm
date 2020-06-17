@@ -1,0 +1,290 @@
+'!'=0
+'#'=0
+'$'=9219
+'*'=(  )
+-=569JNRXZghikms
+0=zsh
+'?'=1
+@=(  )
+APT=apt
+ARGC=0
+BG
+CDPATH=''
+CLUTTER_IM_MODULE=ibus
+COLORTERM=truecolor
+COLUMNS=211
+CONDA_DEFAULT_ENV=base
+CONDA_EXE=/home/user/anaconda3/bin/conda
+CONDA_INTERNAL_OLDPATH=/home/user/anaconda3/condabin:/home/user/.local/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games:/snap/bin
+CONDA_PREFIX=/home/user/anaconda3
+CONDA_PROMPT_MODIFIER='(base) '
+CONDA_PYTHON_EXE=/home/user/anaconda3/bin/python
+CONDA_SHLVL=1
+CPUTYPE=x86_64
+DBUS_SESSION_BUS_ADDRESS='unix:path=/run/user/1000/bus'
+DEFAULTS_PATH=/usr/share/gconf/ubuntu.default.path
+DESKTOP_SESSION=ubuntu
+DISABLE_AUTO_TITLE=true
+DISPLAY=:0
+EGID=1000
+EUID=1000
+FG
+FIGNORE=''
+FPATH=/home/user/.oh-my-zsh/plugins/command-not-found:/home/user/.oh-my-zsh/plugins/urltools:/home/user/.oh-my-zsh/plugins/tmux:/home/user/.oh-my-zsh/plugins/web-search:/home/user/.oh-my-zsh/custom/plugins/zsh-syntax-highlighting:/home/user/.oh-my-zsh/plugins/history:/home/user/.oh-my-zsh/plugins/themes:/home/user/.oh-my-zsh/plugins/ubuntu:/home/user/.oh-my-zsh/plugins/virtualenv:/home/user/.oh-my-zsh/plugins/pylint:/home/user/.oh-my-zsh/plugins/vscode:/home/user/.oh-my-zsh/plugins/git-auto-fetch:/home/user/.oh-my-zsh/plugins/alias-finder:/home/user/.oh-my-zsh/plugins/docker-compose:/home/user/.oh-my-zsh/plugins/docker:/home/user/.oh-my-zsh/plugins/sudo:/home/user/.oh-my-zsh/plugins/pylint:/home/user/.oh-my-zsh/plugins/pyenv:/home/user/.oh-my-zsh/plugins/pep8:/home/user/.oh-my-zsh/plugins/python:/home/user/.oh-my-zsh/plugins/pip:/home/user/.oh-my-zsh/plugins/cp:/home/user/.oh-my-zsh/plugins/django:/home/user/.oh-my-zsh/plugins/debian:/home/user/.oh-my-zsh/plugins/git:/home/user/.oh-my-zsh/functions:/home/user/.oh-my-zsh/completions:/usr/local/share/zsh/site-functions:/usr/share/zsh/vendor-functions:/usr/share/zsh/vendor-completions:/usr/share/zsh/functions/Calendar:/usr/share/zsh/functions/Chpwd:/usr/share/zsh/functions/Completion:/usr/share/zsh/functions/Completion/AIX:/usr/share/zsh/functions/Completion/BSD:/usr/share/zsh/functions/Completion/Base:/usr/share/zsh/functions/Completion/Cygwin:/usr/share/zsh/functions/Completion/Darwin:/usr/share/zsh/functions/Completion/Debian:/usr/share/zsh/functions/Completion/Linux:/usr/share/zsh/functions/Completion/Mandriva:/usr/share/zsh/functions/Completion/Redhat:/usr/share/zsh/functions/Completion/Solaris:/usr/share/zsh/functions/Completion/Unix:/usr/share/zsh/functions/Completion/X:/usr/share/zsh/functions/Completion/Zsh:/usr/share/zsh/functions/Completion/openSUSE:/usr/share/zsh/functions/Exceptions:/usr/share/zsh/functions/MIME:/usr/share/zsh/functions/Math:/usr/share/zsh/functions/Misc:/usr/share/zsh/functions/Newuser:/usr/share/zsh/functions/Prompts:/usr/share/zsh/functions/TCP:/usr/share/zsh/functions/VCS_Info:/usr/share/zsh/functions/VCS_Info/Backends:/usr/share/zsh/functions/Zftp:/usr/share/zsh/functions/Zle
+FUNCNEST=500
+FX
+GDMSESSION=ubuntu
+GID=1000
+GIT_AUTO_FETCH_INTERVAL=1200
+GJS_DEBUG_OUTPUT=stderr
+GJS_DEBUG_TOPICS='JS ERROR;JS LOG'
+GNOME_DESKTOP_SESSION_ID=this-is-deprecated
+GNOME_SHELL_SESSION_MODE=ubuntu
+GNOME_TERMINAL_SCREEN=/org/gnome/Terminal/screen/052e2e14_c17a_4fa9_b0c4_515c2de0ba25
+GNOME_TERMINAL_SERVICE=:1.93
+GPG_AGENT_INFO=/run/user/1000/gnupg/S.gpg-agent:0:1
+GTK_IM_MODULE=ibus
+GTK_MODULES=gail:atk-bridge
+HISTCHARS='!^#'
+HISTCMD=8280
+HISTFILE=/home/user/.zsh_history
+HISTSIZE=50000
+HOME=/home/user
+HOST=user-5570
+IFS=$' \t\n\C-@'
+IM_CONFIG_PHASE=1
+INVOCATION_ID=ea7c58b204d34cd1954294c662bf304c
+JOURNAL_STREAM=9:61724
+KEYBOARD_HACK=''
+KEYTIMEOUT=40
+LANG=ru_RU.UTF-8
+LESS=-R
+LINENO=8
+LINES=55
+LISTMAX=100
+LOGCHECK=60
+LOGNAME=user
+LSCOLORS=Gxfxcxdxbxegedabagacad
+LS_COLORS='rs=0:di=01;34:ln=01;36:mh=00:pi=40;33:so=01;35:do=01;35:bd=40;33;01:cd=40;33;01:or=40;31;01:mi=00:su=37;41:sg=30;43:ca=30;41:tw=30;42:ow=34;42:st=37;44:ex=01;32:*.tar=01;31:*.tgz=01;31:*.arc=01;31:*.arj=01;31:*.taz=01;31:*.lha=01;31:*.lz4=01;31:*.lzh=01;31:*.lzma=01;31:*.tlz=01;31:*.txz=01;31:*.tzo=01;31:*.t7z=01;31:*.zip=01;31:*.z=01;31:*.dz=01;31:*.gz=01;31:*.lrz=01;31:*.lz=01;31:*.lzo=01;31:*.xz=01;31:*.zst=01;31:*.tzst=01;31:*.bz2=01;31:*.bz=01;31:*.tbz=01;31:*.tbz2=01;31:*.tz=01;31:*.deb=01;31:*.rpm=01;31:*.jar=01;31:*.war=01;31:*.ear=01;31:*.sar=01;31:*.rar=01;31:*.alz=01;31:*.ace=01;31:*.zoo=01;31:*.cpio=01;31:*.7z=01;31:*.rz=01;31:*.cab=01;31:*.wim=01;31:*.swm=01;31:*.dwm=01;31:*.esd=01;31:*.jpg=01;35:*.jpeg=01;35:*.mjpg=01;35:*.mjpeg=01;35:*.gif=01;35:*.bmp=01;35:*.pbm=01;35:*.pgm=01;35:*.ppm=01;35:*.tga=01;35:*.xbm=01;35:*.xpm=01;35:*.tif=01;35:*.tiff=01;35:*.png=01;35:*.svg=01;35:*.svgz=01;35:*.mng=01;35:*.pcx=01;35:*.mov=01;35:*.mpg=01;35:*.mpeg=01;35:*.m2v=01;35:*.mkv=01;35:*.webm=01;35:*.ogm=01;35:*.mp4=01;35:*.m4v=01;35:*.mp4v=01;35:*.vob=01;35:*.qt=01;35:*.nuv=01;35:*.wmv=01;35:*.asf=01;35:*.rm=01;35:*.rmvb=01;35:*.flc=01;35:*.avi=01;35:*.fli=01;35:*.flv=01;35:*.gl=01;35:*.dl=01;35:*.xcf=01;35:*.xwd=01;35:*.yuv=01;35:*.cgm=01;35:*.emf=01;35:*.ogv=01;35:*.ogx=01;35:*.aac=00;36:*.au=00;36:*.flac=00;36:*.m4a=00;36:*.mid=00;36:*.midi=00;36:*.mka=00;36:*.mp3=00;36:*.mpc=00;36:*.ogg=00;36:*.ra=00;36:*.wav=00;36:*.oga=00;36:*.opus=00;36:*.spx=00;36:*.xspf=00;36:'
+MACHTYPE=x86_64
+MAILCHECK=60
+MAILPATH=''
+MANAGERPID=5401
+MANDATORY_PATH=/usr/share/gconf/ubuntu.mandatory.path
+MANPATH=''
+MODULE_PATH=/usr/lib/x86_64-linux-gnu/zsh/5.8
+NO_PROXY=localhost,127.0.0.0/8,::1
+NULLCMD=cat
+OLDPWD=/home/user
+OPTARG=''
+OPTIND=1
+OSTYPE=linux-gnu
+PAGER=less
+PATH=/home/user/anaconda3/bin:/home/user/anaconda3/condabin:/home/user/.local/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games:/snap/bin
+POWERLEVEL9K_ANACONDA_BACKGROUND=green
+POWERLEVEL9K_LEFT_PROMPT_ELEMENTS=( context dir vcs )
+POWERLEVEL9K_PROMPT_ON_NEWLINE=true
+POWERLEVEL9K_RIGHT_PROMPT_ELEMENTS=( status root_indicator background_jobs history time anaconda virtualenv pyenv )
+PPID=9203
+PROMPT=$'(base) %(?:%{\C-[[01;32m%}➜ :%{\C-[[01;31m%}➜ ) %{$fg[cyan]%}%c%{$reset_color%} $(git_prompt_info)'
+PROMPT2='%_> '
+PROMPT3='?# '
+PROMPT4='+%N:%i> '
+PS1=$'(base) %(?:%{\C-[[01;32m%}➜ :%{\C-[[01;31m%}➜ ) %{$fg[cyan]%}%c%{$reset_color%} $(git_prompt_info)'
+PS2='%_> '
+PS3='?# '
+PS4='+%N:%i> '
+PSVAR=''
+PWD=/home/user/Документы/mpm
+QT4_IM_MODULE=ibus
+QT_ACCESSIBILITY=1
+QT_IM_MODULE=ibus
+RANDOM=27564
+READNULLCMD=/usr/bin/pager
+SAVEHIST=10000
+SCREEN_NO=''
+SECONDS=499
+SESSION_MANAGER=local/user-5570:@/tmp/.ICE-unix/5760,unix/user-5570:/tmp/.ICE-unix/5760
+SHELL=/usr/bin/zsh
+SHLVL=1
+SHORT_HOST=user-5570
+SPROMPT='zsh: correct '\''%R'\'' to '\''%r'\'' [nyae]? '
+SSH_AGENT_PID=5650
+SSH_AUTH_SOCK=/run/user/1000/keyring/ssh
+SYSP=/home/user/anaconda3
+TERM=xterm-256color
+TIMEFMT='%J  %U user %S system %P cpu %*E total'
+TMPPREFIX=/tmp/zsh
+TRY_BLOCK_ERROR=-1
+TRY_BLOCK_INTERRUPT=-1
+TTY=/dev/pts/0
+TTYIDLE=0
+UID=1000
+USER=user
+USERNAME=user
+VENDOR=ubuntu
+VIRTUAL_ENV_DISABLE_PROMPT=1
+VSCODE=code
+VTE_VERSION=6001
+WATCH=''
+WATCHFMT='%n has %a %l from %m.'
+WINDOWPATH=2
+WORDCHARS=''
+XAUTHORITY=/run/user/1000/gdm/Xauthority
+XDG_CONFIG_DIRS=/etc/xdg/xdg-ubuntu:/etc/xdg
+XDG_CURRENT_DESKTOP=ubuntu:GNOME
+XDG_DATA_DIRS=/usr/share/ubuntu:/usr/local/share/:/usr/share/:/var/lib/snapd/desktop
+XDG_MENU_PREFIX=gnome-
+XDG_RUNTIME_DIR=/run/user/1000
+XDG_SESSION_CLASS=user
+XDG_SESSION_DESKTOP=ubuntu
+XDG_SESSION_TYPE=x11
+XMODIFIERS='@im=ibus'
+ZSH=/home/user/.oh-my-zsh
+ZSH_ARGZERO=zsh
+ZSH_CACHE_DIR=/home/user/.oh-my-zsh/cache
+ZSH_COMPDUMP=/home/user/.zcompdump-user-5570-5.8
+ZSH_CUSTOM=/home/user/.oh-my-zsh/custom
+ZSH_EVAL_CONTEXT=toplevel
+ZSH_HIGHLIGHT_DIRS_BLACKLIST=(  )
+ZSH_HIGHLIGHT_HIGHLIGHTERS=( main )
+ZSH_HIGHLIGHT_PATTERNS=( )
+ZSH_HIGHLIGHT_REGEXP=( )
+ZSH_HIGHLIGHT_REVISION=HEAD
+ZSH_HIGHLIGHT_STYLES=( [arg0]='fg=green' [assign]=none [autodirectory]='fg=green,underline' [back-dollar-quoted-argument]='fg=cyan' [back-double-quoted-argument]='fg=cyan' [back-quoted-argument]=none [back-quoted-argument-delimiter]='fg=magenta' [bracket-error]='fg=red,bold' [bracket-level-1]='fg=blue,bold' [bracket-level-2]='fg=green,bold' [bracket-level-3]='fg=magenta,bold' [bracket-level-4]='fg=yellow,bold' [bracket-level-5]='fg=cyan,bold' [command-substitution]=none [command-substitution-delimiter]='fg=magenta' [commandseparator]=none [comment]='fg=black,bold' [cursor]=standout [cursor-matchingbracket]=standout [default]=none [dollar-double-quoted-argument]='fg=cyan' [dollar-quoted-argument]='fg=yellow' [double-hyphen-option]=none [double-quoted-argument]='fg=yellow' [global-alias]='fg=cyan' [globbing]='fg=blue' [history-expansion]='fg=blue' [line]='' [named-fd]=none [numeric-fd]=none [path]=underline [path_pathseparator]='' [path_prefix_pathseparator]='' [precommand]='fg=green,underline' [process-substitution]=none [process-substitution-delimiter]='fg=magenta' [rc-quote]='fg=cyan' [redirection]='fg=yellow' [reserved-word]='fg=yellow' [root]=standout [single-hyphen-option]=none [single-quoted-argument]='fg=yellow' [suffix-alias]='fg=green,underline' [unknown-token]='fg=red,bold' )
+ZSH_HIGHLIGHT_VERSION=0.7.2-dev
+ZSH_NAME=zsh
+ZSH_PATCHLEVEL=ubuntu/5.8-3ubuntu1
+ZSH_PIP_CACHE_FILE=/home/user/.pip/zsh-cache
+ZSH_PIP_INDEXES=( https://pypi.org/simple/ )
+ZSH_SUBSHELL=0
+ZSH_THEME=robbyrussell
+ZSH_THEME_GIT_PROMPT_CLEAN=$'%{\C-[[34m%})'
+ZSH_THEME_GIT_PROMPT_DIRTY=$'%{\C-[[34m%}) %{\C-[[33m%}✗'
+ZSH_THEME_GIT_PROMPT_PREFIX=$'%{\C-[[01;34m%}git:(%{\C-[[31m%}'
+ZSH_THEME_GIT_PROMPT_SUFFIX=$'%{\C-[[00m%} '
+ZSH_THEME_RUBY_PROMPT_PREFIX='('
+ZSH_THEME_RUBY_PROMPT_SUFFIX=')'
+ZSH_THEME_RVM_PROMPT_OPTIONS='i v g'
+ZSH_THEME_TERM_TAB_TITLE_IDLE='%15<..<%~%<<'
+ZSH_THEME_TERM_TITLE_IDLE='%n@%m: %~'
+ZSH_TMUX_AUTOCONNECT=true
+ZSH_TMUX_AUTOQUIT=false
+ZSH_TMUX_AUTOSTART=false
+ZSH_TMUX_AUTOSTART_ONCE=true
+ZSH_TMUX_CONFIG=/home/user/.tmux.conf
+ZSH_TMUX_FIXTERM=true
+ZSH_TMUX_FIXTERM_WITHOUT_256COLOR=screen
+ZSH_TMUX_FIXTERM_WITH_256COLOR=screen-256color
+ZSH_TMUX_ITERM2=false
+ZSH_TMUX_TERM=screen-256color
+ZSH_TMUX_UNICODE=false
+ZSH_VERSION=5.8
+_=set
+_CE_CONDA=''
+_CE_M=''
+_ZSH_HIGHLIGHT_PRIOR_BUFFER=''
+_ZSH_HIGHLIGHT_PRIOR_CURSOR=0
+_ZSH_TMUX_FIXED_CONFIG=/home/user/.oh-my-zsh/plugins/tmux/tmux.only.conf
+__savecursor=0
+__searching=up-line-or-beginning-search
+_comp_assocs=( '' )
+_comp_dumpfile=/home/user/.zcompdump-user-5570-5.8
+_comp_options
+_comp_setup
+_compautos
+_comps
+_lastcomp
+_patcomps
+_postpatcomps
+_services
+_zsh_highlight__highlighter_main_cache=( '0 3 fg=green' )
+_zsh_highlight_main__command_type_cache=( [s]=none [se]=none [set]=builtin )
+aliases
+apt_pref=apt
+apt_upgr=upgrade
+argv=(  )
+bg
+bg_bold
+bg_no_bold
+bold_color
+builtins
+cdpath=(  )
+color=( [00]=none [01]=bold [02]=faint [03]=standout [04]=underline [05]=blink [07]=reverse [08]=conceal [22]=normal [23]=no-standout [24]=no-underline [25]=no-blink [27]=no-reverse [28]=no-conceal [30]=black [31]=red [32]=green [33]=yellow [34]=blue [35]=magenta [36]=cyan [37]=white [39]=default [40]=bg-black [41]=bg-red [42]=bg-green [43]=bg-yellow [44]=bg-blue [45]=bg-magenta [46]=bg-cyan [47]=bg-white [49]=bg-default [bg-black]=40 [bg-blue]=44 [bg-cyan]=46 [bg-default]=49 [bg-green]=42 [bg-grey]=40 [bg-magenta]=45 [bg-red]=41 [bg-white]=47 [bg-yellow]=43 [black]=30 [blink]=05 [blue]=34 [bold]=01 [conceal]=08 [cyan]=36 [default]=39 [faint]=02 [fg-black]=30 [fg-blue]=34 [fg-cyan]=36 [fg-default]=39 [fg-green]=32 [fg-grey]=30 [fg-magenta]=35 [fg-red]=31 [fg-white]=37 [fg-yellow]=33 [green]=32 [grey]=30 [magenta]=35 [no-blink]=25 [no-conceal]=28 [no-reverse]=27 [no-standout]=23 [no-underline]=24 [none]=00 [normal]=22 [red]=31 [reverse]=07 [standout]=03 [underline]=04 [white]=37 [yellow]=33 )
+colour=( [00]=none [01]=bold [02]=faint [03]=standout [04]=underline [05]=blink [07]=reverse [08]=conceal [22]=normal [23]=no-standout [24]=no-underline [25]=no-blink [27]=no-reverse [28]=no-conceal [30]=black [31]=red [32]=green [33]=yellow [34]=blue [35]=magenta [36]=cyan [37]=white [39]=default [40]=bg-black [41]=bg-red [42]=bg-green [43]=bg-yellow [44]=bg-blue [45]=bg-magenta [46]=bg-cyan [47]=bg-white [49]=bg-default [bg-black]=40 [bg-blue]=44 [bg-cyan]=46 [bg-default]=49 [bg-green]=42 [bg-grey]=40 [bg-magenta]=45 [bg-red]=41 [bg-white]=47 [bg-yellow]=43 [black]=30 [blink]=05 [blue]=34 [bold]=01 [conceal]=08 [cyan]=36 [default]=39 [faint]=02 [fg-black]=30 [fg-blue]=34 [fg-cyan]=36 [fg-default]=39 [fg-green]=32 [fg-grey]=30 [fg-magenta]=35 [fg-red]=31 [fg-white]=37 [fg-yellow]=33 [green]=32 [grey]=30 [magenta]=35 [no-blink]=25 [no-conceal]=28 [no-reverse]=27 [no-standout]=23 [no-underline]=24 [none]=00 [normal]=22 [red]=31 [reverse]=07 [standout]=03 [underline]=04 [white]=37 [yellow]=33 )
+commands
+comppostfuncs=(  )
+compprefuncs=(  )
+custom_config_file=/home/user/.oh-my-zsh/custom/lib/theme-and-appearance.zsh
+d=/usr/share/zsh/functions/Zle
+db_args=( '--database=-[Nominates a database. Defaults to the "default" database.]' )
+debian_missing_features=(  )
+dirstack
+dis_aliases
+dis_builtins
+dis_functions
+dis_functions_source
+dis_galiases
+dis_patchars
+dis_reswords
+dis_saliases
+fg
+fg_bold
+fg_no_bold
+fignore=(  )
+fpath=( /home/user/.oh-my-zsh/plugins/command-not-found /home/user/.oh-my-zsh/plugins/urltools /home/user/.oh-my-zsh/plugins/tmux /home/user/.oh-my-zsh/plugins/web-search /home/user/.oh-my-zsh/custom/plugins/zsh-syntax-highlighting /home/user/.oh-my-zsh/plugins/history /home/user/.oh-my-zsh/plugins/themes /home/user/.oh-my-zsh/plugins/ubuntu /home/user/.oh-my-zsh/plugins/virtualenv /home/user/.oh-my-zsh/plugins/pylint /home/user/.oh-my-zsh/plugins/vscode /home/user/.oh-my-zsh/plugins/git-auto-fetch /home/user/.oh-my-zsh/plugins/alias-finder /home/user/.oh-my-zsh/plugins/docker-compose /home/user/.oh-my-zsh/plugins/docker /home/user/.oh-my-zsh/plugins/sudo /home/user/.oh-my-zsh/plugins/pylint /home/user/.oh-my-zsh/plugins/pyenv /home/user/.oh-my-zsh/plugins/pep8 /home/user/.oh-my-zsh/plugins/python /home/user/.oh-my-zsh/plugins/pip /home/user/.oh-my-zsh/plugins/cp /home/user/.oh-my-zsh/plugins/django /home/user/.oh-my-zsh/plugins/debian /home/user/.oh-my-zsh/plugins/git /home/user/.oh-my-zsh/functions /home/user/.oh-my-zsh/completions /usr/local/share/zsh/site-functions /usr/share/zsh/vendor-functions /usr/share/zsh/vendor-completions /usr/share/zsh/functions/Calendar /usr/share/zsh/functions/Chpwd /usr/share/zsh/functions/Completion /usr/share/zsh/functions/Completion/AIX /usr/share/zsh/functions/Completion/BSD /usr/share/zsh/functions/Completion/Base /usr/share/zsh/functions/Completion/Cygwin /usr/share/zsh/functions/Completion/Darwin /usr/share/zsh/functions/Completion/Debian /usr/share/zsh/functions/Completion/Linux /usr/share/zsh/functions/Completion/Mandriva /usr/share/zsh/functions/Completion/Redhat /usr/share/zsh/functions/Completion/Solaris /usr/share/zsh/functions/Completion/Unix /usr/share/zsh/functions/Completion/X /usr/share/zsh/functions/Completion/Zsh /usr/share/zsh/functions/Completion/openSUSE /usr/share/zsh/functions/Exceptions /usr/share/zsh/functions/MIME /usr/share/zsh/functions/Math /usr/share/zsh/functions/Misc /usr/share/zsh/functions/Newuser /usr/share/zsh/functions/Prompts /usr/share/zsh/functions/TCP /usr/share/zsh/functions/VCS_Info /usr/share/zsh/functions/VCS_Info/Backends /usr/share/zsh/functions/Zftp /usr/share/zsh/functions/Zle )
+funcfiletrace
+funcsourcetrace
+funcstack
+functions
+functions_source
+functrace
+galiases
+histchars='!^#'
+history
+historywords
+jobdirs
+jobstates
+jobtexts
+key=( [BackSpace]=$'\C-?' [Delete]=$'\C-[[3~' [Down]=$'\C-[OB' [End]=$'\C-[OF' [Home]=$'\C-[OH' [Insert]=$'\C-[[2~' [Left]=$'\C-[OD' [PageDown]=$'\C-[[6~' [PageUp]=$'\C-[[5~' [Right]=$'\C-[OC' [Up]=$'\C-[OA' )
+keymaps
+langinfo
+mailpath=(  )
+manpath=(  )
+module_path=( /usr/lib/x86_64-linux-gnu/zsh/5.8 )
+modules
+nameddirs
+no_init_data_args=( '--no-initial-data[Tells Django not to load any initial data after database synchronization.]' )
+no_proxy=localhost,127.0.0.0/8,::1
+noinput_args=( '--noinput[tells Django to NOT prompt the user for input of any kind.]' )
+nul_args=( '--verbosity=-[verbosity level; 0=minimal output, 1=normal output, 2=all output.]:Verbosity:((0\:minimal 1\:normal 2\:all))' '--settings=-[the Python path to a settings module.]:file:_files' '--pythonpath=-[a directory to add to the Python path.]:directory:_directories' '--traceback[print traceback on exception.]' '--no-color[Don'\''t colorize the command output.]' '--version[show program'\''s version number and exit.]' '-h[show this help message and exit.]' '--help[show this help message and exit.]' )
+options
+parameters
+patchars
+path=( /home/user/anaconda3/bin /home/user/anaconda3/condabin /home/user/.local/bin /usr/local/sbin /usr/local/bin /usr/sbin /usr/bin /sbin /bin /usr/games /usr/local/games /snap/bin )
+pipestatus=( 1 )
+plugin=command-not-found
+plugins=( git debian django cp pip python pep8 pyenv pylint sudo docker docker-compose alias-finder git-auto-fetch vscode pylint virtualenv ubuntu themes history zsh-syntax-highlighting web-search tmux urltools command-not-found )
+precmd_functions=( omz_termsupport_precmd _zsh_highlight_main__precmd_hook )
+preexec_functions=( omz_termsupport_preexec preexec_alias-finder _zsh_highlight_preexec_hook )
+prompt=$'(base) %(?:%{\C-[[01;32m%}➜ :%{\C-[[01;31m%}➜ ) %{$fg[cyan]%}%c%{$reset_color%} $(git_prompt_info)'
+psvar=(  )
+rc=0
+reset_color
+reswords
+saliases
+signals=( EXIT HUP INT QUIT ILL TRAP ABRT BUS FPE KILL USR1 SEGV USR2 PIPE ALRM TERM STKFLT CHLD CONT STOP TSTP TTIN TTOU URG XCPU XFSZ VTALRM PROF WINCH POLL PWR SYS ZERR DEBUG )
+start_args=( '--template=-[The path or URL to load the template from.]:directory:_directories' '--extension=-[The file extension(s) to render (default: "py").]' '--name=-[The file name(s) to render.]:file:_files' )
+status=1
+tag_args=( '--tag=-[Run only checks labeled with given tag.]' '--list-tags[List available tags.]' )
+termcap
+terminfo
+use_sudo=1
+userdirs
+usergroups
+watch=(  )
+widgets
+zle_bracketed_paste=( $'\C-[[?2004h' $'\C-[[?2004l' )
+zsh_eval_context=( toplevel )
+zsh_highlight__pat_static_bug=false
+zsh_scheduled_events
