@@ -53,28 +53,6 @@ class TestBash:
             out = f.read()
         return out
 
-    def get_bash_cmd(
-            self,
-            command: list,
-            executable_path="",
-            executable_args=[]) -> list:
-        out_command = command
-
-        if executable_path == "":
-            executable_path = self.sh.executable_path
-
-        if executable_args == []:
-            executable_args = self.sh.executable_args
-
-        if executable_path != "" and executable_path != None:
-            if type(command) == list:
-                command = " ".join(command)
-            out_command = [executable_path]
-            out_command.extend(executable_args)
-            out_command.append(command)
-        return out_command
-
-
     def setup_class(self):
         print("*** setup_class ***")
 
@@ -92,10 +70,19 @@ class TestBash:
     def test_installed(self):
         assert self.sh.is_installed()
     
+    def test_get_full_command(self):
+        assert self.sh.get_full_command(
+            ["bash", "--version"]) == ['/bin/bash', '-c', 'bash --version']
+        assert self.sh.get_full_command(
+            "apt") == ['/bin/bash', '-c', 'apt']
+
+        assert self.sh.get_full_command("apt", executable_path=None) == ["apt"]
+
+
     def test_fake_installed(self, fake_process):
         out = self.read_calls_file("bash_version.txt")
         
-        command = self.get_bash_cmd(["bash", "--version"])
+        command = self.sh.get_full_command(["bash", "--version"])
         print(f"command = {command}")
         fake_process.register_subprocess(
             command, stdout=out.splitlines()
@@ -108,10 +95,10 @@ class TestBash:
 
     def test_fake_whereis(self, fake_process):
         fake_process.register_subprocess(
-            self.get_bash_cmd(["whereis", "apt"]), stdout="apt: /usr/bin/apt /usr/lib/apt /etc/apt /usr/share/man/man8/apt.8.gz"
+            self.sh.get_full_command(["whereis", "apt"]), stdout="apt: /usr/bin/apt /usr/lib/apt /etc/apt /usr/share/man/man8/apt.8.gz"
         )
         fake_process.register_subprocess(
-            self.get_bash_cmd(["whereis", "code"]), stdout="code: /usr/share/code /snap/bin/code /snap/bin/code.url-handler"
+            self.sh.get_full_command(["whereis", "code"]), stdout="code: /usr/share/code /snap/bin/code /snap/bin/code.url-handler"
         )
         assert self.sh.whereis("apt") == [
             '/usr/bin/apt', '/usr/lib/apt', '/etc/apt', '/usr/share/man/man8/apt.8.gz']
@@ -120,7 +107,7 @@ class TestBash:
 
         out = self.read_calls_file("zsh_whereis_python.txt")
         fake_process.register_subprocess(
-            self.get_bash_cmd(["whereis", "python"]), stdout=out.splitlines())
+            self.sh.get_full_command(["whereis", "python"]), stdout=out.splitlines())
         assert self.sh.whereis("python") == [
             '/usr/bin/python3.8', 
             '/usr/bin/python3.7m', 
@@ -148,7 +135,7 @@ class TestBash:
     def test_fake_compgen(self, fake_process):
         out = self.read_calls_file("bash_compgen.txt")
 
-        command = self.get_bash_cmd("compgen -abcdefgjksuv")
+        command = self.sh.get_full_command("compgen -abcdefgjksuv")
         print(f"command = {command}")
         fake_process.register_subprocess(
             command, stdout=out.splitlines()
@@ -172,7 +159,7 @@ class TestBash:
         ])
     def test_check_command(self, fake_process, cmd):
         out = self.read_calls_file("bash_compgen.txt")
-        command = self.get_bash_cmd("compgen -abcdefgjksuv")
+        command = self.sh.get_full_command("compgen -abcdefgjksuv")
         fake_process.register_subprocess(
             command, stdout=out.splitlines()
         )
@@ -181,7 +168,7 @@ class TestBash:
     def test_fake_get_env(self, fake_process):
         out = self.read_calls_file("bash_set.txt")
 
-        command = self.get_bash_cmd(["set"])
+        command = self.sh.get_full_command(["set"])
         print(f"command = {command}")
         fake_process.register_subprocess(
             command, stdout=out.splitlines()

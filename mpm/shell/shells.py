@@ -110,6 +110,36 @@ class AbstractShell:
     def sudo_call(self, command: list, enter_password=False, *args, **kwargs) -> str:
         raise NotImplementedError()
 
+    def get_full_command(
+            self,
+            command: list,
+            executable_path="",
+            executable_args=[]) -> list:
+        """
+        return full command for this Shell
+        Ex:
+        >>> sh = Bash()
+        >>> sh.get_full_command(["bash", "--version"])
+        ['/bin/bash', '-c', 'bash --version']
+        """
+        out_command = command
+
+        if executable_path == "":
+            executable_path = self.executable_path
+
+        if executable_args == []:
+            executable_args = self.executable_args
+
+        if executable_path != "" and executable_path != None:
+            if type(command) == list:
+                command = " ".join(command)
+            out_command = [executable_path]
+            out_command.extend(executable_args)
+            out_command.append(command)
+        if type(out_command) == str:
+            out_command = [out_command]
+        return out_command
+
     def call(
         self,
         command: list,
@@ -126,21 +156,11 @@ class AbstractShell:
 executable_path = {executable_path}\n\texecutable_args={executable_args}\n\t\
 stderr = {stderr}\n\targs = {args}\n\tkwargs = {kwargs}"
         )
-        out_command = command
-
-        if executable_path == "":
-            executable_path = self.executable_path
-
-        if executable_args == []:
-            executable_args = self.executable_args
-
-        if executable_path != "" and executable_path != None:
-            if type(command) == list:
-                command = " ".join(command)
-            out_command = [executable_path]
-            out_command.extend(executable_args)
-            out_command.append(command)
-
+        out_command = self.get_full_command(
+            command,
+            executable_path=executable_path,
+            executable_args=executable_args
+        )
         self.logger.debug(f"Try call command: {out_command}")
         out = check_output(out_command, shell=shell, stderr=stderr, **kwargs)
         out = auto_decode(out)
@@ -180,20 +200,12 @@ stderr = {stderr}\n\targs = {args}\n\tkwargs = {kwargs}"
         if self.is_sudo_mode():
             return self.call(command, *args, **kwargs)
 
-        if executable_path == "":
-            executable_path = self.executable_path
-
-        if executable_args == []:
-            executable_args = self.executable_args
-
         out_command = ["sudo", "--stdin"]
-
-        if executable_path != "" and executable_path != None:
-            if type(command) == list:
-                command = " ".join(command)
-            out_command.append(executable_path)
-            out_command.extend(executable_args)
-            out_command.append(command)
+        out_command.append(self.get_full_command(
+            command,
+            executable_path=executable_path,
+            executable_args=executable_args
+        ))
 
         self.logger.debug(f"Try call command: {out_command}")
         out = None
