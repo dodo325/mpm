@@ -63,15 +63,22 @@ class BashScriptFile:
 
         file = Path(self.shell.echo(path))
         if file.is_file():
-            out = file.open().read().rstrip("\n")
-            self.content = out
             self.file = file
+            self.update()
         else:
             raise FileExistsError(f"Not found {path}")
 
-    def add_data_in_file(self, data):
+    def add_data_in_file(self, data: str):
+        if not data.endswith("\n"):
+            data = data + "\n"
         with self.file.open("a") as file_object:
             file_object.write(data)
+
+    def update(self):
+        """
+        update content
+        """
+        self.content = self.file.open().read().rstrip("\n")
 
     def add_alias(self, name: str, cmd: str):
         if name in self.get_alias():
