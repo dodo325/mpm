@@ -29,6 +29,68 @@ def test_AbstractShell_inheritors():
     assert set(inheritors_list) == set(inheritors_correct), "Не все оболочки найдены"
     assert inheritors_list == inheritors_correct, "Порядок не верен!"
 
+@pytest.mark.parametrize("name", ["bash", "zsh", "powershell", "cmd"])
+def test_AutoShell_by_name(name):
+    assert AutoShell(name).name == name
+
+class TestZSH:
+    sh: ZSH = None
+
+    def read_calls_file(self, name: str) -> str:
+        path = Path(__file__).parent / "callss_output" / name
+        with path.open() as f:
+            out = f.read()
+        return out
+
+    def setup(self):
+        self.sh = ZSH()
+    
+    @pytest.mark.xfail(platform.system() != "Linux", reason="Bash обычно работает только на Linux")
+    def test_installed(self):
+        assert self.sh.is_installed()
+
+    def test_get_full_command(self):
+        assert self.sh.get_full_command(
+            ["bash", "--version"]) == ['/bin/bash', '-c', 'bash --version']
+        assert self.sh.get_full_command(
+            "apt") == ['/bin/bash', '-c', 'apt']
+
+        assert self.sh.get_full_command("apt", executable_path=None) == ["apt"]
+    
+    def test_get_home(self):
+        assert self.sh.get_home() == str(Path.home())
+
+    def test_pwd(self):
+        assert self.sh.pwd() == str(Path.cwd())
+
+    def test_name(self):
+        assert self.sh.name == "zsh"
+
+    @pytest.mark.parametrize("cmd", [
+        "python", "apt", "apt-get", "set", "bash", "nano", "sudo"
+    ])
+    def test_check_command(self, fake_process, cmd):
+        out = self.read_calls_file("bash_compgen.txt")
+        command = self.sh.get_full_command("compgen -abcdefgjksuv")
+        fake_process.register_subprocess(
+            command, stdout=out.splitlines()
+        )
+        assert self.sh.check_command(cmd)
+    def test_fake_installed(self, fake_process):
+        out = "zsh 5.8 (x86_64-ubuntu-linux-gnu)"
+
+        command = self.sh.get_full_command(["zsh", "--version"])
+        print(f"command = {command}")
+        fake_process.register_subprocess(
+            command, stdout=out.splitlines()
+        )
+        fake_process.register_subprocess(
+            ["zsh", "--version"], stdout=out.splitlines()
+        )
+        print("\n**", self.sh.call(["zsh", "--version"], executable_path=None))
+        assert self.sh.is_installed()
+        assert self.sh.version == "zsh 5.8 (x86_64-ubuntu-linux-gnu)"
+
 class TestBash:
     sh: Bash = None
 
@@ -172,3 +234,4 @@ class TestBash:
 
     def test_name(self):
         assert self.sh.name == "bash"
+        
