@@ -5,6 +5,61 @@ import subprocess
 import pytest
 from pathlib import Path
 from mpm.utils.text_parse import not_nan_split, remove_multiple_spaces, parse_value_key_table, parse_table_with_columns
+from mpm.utils.sys_info import is_64bit
+from mpm.utils.string import auto_decode, is_ascii, is_first_alpha, is_first_ascii_alpha
+from mpm.utils.json_parse import multiget
+
+
+def test_multiget():
+    data = {
+        "a": 123,
+        "b": "abc"
+    }
+    assert multiget(data, ['a', 'b', 'c']) == 123
+    assert multiget(data, ['d', 'b', 'c']) == "abc"
+    assert multiget(data, ['d', 'v', 'c']) == None
+    assert multiget(data, ['d', 'v', 'c'], default=321) == 321
+
+def test_is_ascii_1():
+    assert is_ascii("123456789")
+    assert is_ascii("123456789/*-+.0qweryutop[]\asdfghjkl;'zcxvbnm.,\n")
+
+def test_is_ascii_2():
+    assert not is_ascii("фыв123456789")
+    assert not is_ascii("123456789/*-+.0qweryutop[]\asdfghjkl;'zcxvbnm.,\nс")
+
+def test_is_first_alpha_1():
+    assert is_first_alpha("qwe32sa13")
+    assert is_first_alpha("йыфввф123ваы")
+
+def test_is_first_alpha_2():
+    assert not is_first_alpha("1adasfa;")
+    assert not is_first_alpha("123цйуывф")
+    assert not is_first_alpha(" цйуывф")
+    
+
+def test_is_is_first_ascii_alpha_1():
+    assert is_first_ascii_alpha("qweqe123")
+    assert is_first_ascii_alpha("a1323")
+    assert is_first_ascii_alpha("a323ы")
+
+def test_is_is_first_ascii_alpha_2():
+    assert not is_first_ascii_alpha(" qweqe123")
+    assert not is_first_ascii_alpha("1a323")
+    assert not is_first_ascii_alpha("ы123")
+
+def test_auto_decode_utf8():
+    text = "123qweqwasd фыаывпы"
+    assert auto_decode(text.encode("utf-8")) == text
+
+@pytest.mark.xfail(platform.system() != "Windows", reason="requires Windows")
+def test_auto_decode_cp1251():
+    text = "123qweqwasd фыаывпы"
+    assert auto_decode(text.encode("cp1251")) == text
+
+
+def test_is_64():
+    assert is_64bit()
 
 def test_not_nan_split_1():
     a = """asdasa
@@ -95,3 +150,35 @@ ramboxpro          1.3.1                      ramboxapp*              -         
             'Версия': '1.3.1'
             }
         }
+    assert parse_table_with_columns(t1, key_lower=True) == {
+        "monento": {
+            "версия": "1.2.8",
+            "издатель": "ladnysoft",
+            "описание": "Cross-platform app for tracking personal finances with encrypted data syncing.",
+            "примечание": "-"
+        },
+        "ramboxpro": {
+            "версия": "1.3.1",
+            "издатель": "ramboxapp*",
+            "описание": "Rambox Pro",
+            "примечание": "-"
+        },
+        "smartscreen": {
+            "версия": "1.0.1",
+            "издатель": "ypcloud",
+            "описание": "Social Screen Interaction",
+            "примечание": "-"
+        },
+        "telegram-cli": {
+            "версия": "1.4.5",
+            "издатель": "marius-quabeck",
+            "описание": "Command-line interface for Telegram. Uses the readline interface.",
+            "примечание": "-"
+        },
+        "telegram-desktop": {
+            "версия": "2.1.7",
+            "издатель": "telegram.desktop",
+            "описание": "Official desktop client for the Telegram messenger",
+            "примечание": "-"
+        }
+    }
