@@ -227,7 +227,7 @@ stderr = {stderr}\n\targs = {args}\n\tkwargs = {kwargs}"
     def whereis(self, command: str) -> list:
         try:
             out = self.call(["whereis", command])
-            out = out.replace("\n", "")
+            
             return out.split(" ")[1:]
         except Exception as e:
             self.logger.error(f"Not found {command}!", exc_info=True)
@@ -249,13 +249,15 @@ stderr = {stderr}\n\targs = {args}\n\tkwargs = {kwargs}"
 
     def compgen(self, perfix: str = None,) -> list:
         command = "compgen -abcdefgjksuv"
-        out = self._compgen_out
-        if not out:
-            out = self.call(command, shell=False).splitlines()
-            self._compgen_out = out
+        li = self._compgen_out
+        if not li:
+            out = self.call(command, shell=False)
+            out = out.replace("\n", " ")
+            li = not_nan_split(out, delimiter=" ")
+            self._compgen_out = li
         if perfix != None:
-            out = list(filter(lambda c: c.startswith(perfix), out))
-        return out
+            li = list(filter(lambda c: c.startswith(perfix), li))
+        return li
 
     def alias_list(self, perfix: str = None) -> list:  # TODO: load user profile!
         out = self.call("alias", shell=True).splitlines()
