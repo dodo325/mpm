@@ -78,7 +78,6 @@ class TestBash:
 
         assert self.sh.get_full_command("apt", executable_path=None) == ["apt"]
 
-
     def test_fake_installed(self, fake_process):
         out = self.read_calls_file("bash_version.txt")
         
@@ -92,6 +91,7 @@ class TestBash:
         )
         print("\n**", self.sh.call(["bash", "--version"], executable_path = None))
         assert self.sh.is_installed()
+        assert self.sh.version == '5.0.16(1)-release (x86_64-pc-linux-gnu)'
 
     def test_fake_whereis(self, fake_process):
         fake_process.register_subprocess(
