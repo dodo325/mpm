@@ -18,21 +18,6 @@ def test_AutoShell_init():
     sh = AutoShell()
     assert sh.is_installed()
 
-def test_git(fake_process):
-    fake_process.register_subprocess(
-        ["git", "branch"], stdout=["* fake_branch", "  master"]
-    )
-
-    process = subprocess.Popen(
-        ["git", "branch"],
-        stdout=subprocess.PIPE,
-        universal_newlines=True,
-    )
-    out, _ = process.communicate()
-
-    assert process.returncode == 0
-    assert out == "* fake_branch\n  master\n"
-
 def test_AbstractShell_inheritors():
     inheritors_list = AbstractShell._inheritors()
     inheritors_correct = [
