@@ -48,7 +48,7 @@ class TestBash:
     sh: Bash = None
 
     def read_calls_file(self, name: str) -> str:
-        path = Path(__file__).parent / "subprocess_callss" / name
+        path = Path(__file__).parent / "callss_output" / name
         with path.open() as f:
             out = f.read()
         return out
