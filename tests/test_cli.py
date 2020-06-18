@@ -3,6 +3,7 @@ from click.testing import CliRunner
 from mpm.core.cli import info, main
 import pytest
 # @pytest.mark("cli")
+
 @pytest.mark.skip()
 def test_info():
     runner = CliRunner()
