@@ -113,9 +113,9 @@ class TestBash:
     def teardown(self):
         print(" == teardown ==")
 
-    @pytest.mark.xfail(platform.system() != "Linux", reason="Bash обычно работает только на Linux")
-    def test_installed(self):
-        assert self.sh.is_installed()
+    # @pytest.mark.xfail(platform.system() != "Linux", reason="Bash обычно работает только на Linux")
+    # def test_installed(self):
+        # assert self.sh.is_installed()
     
     def test_get_full_command(self):
         assert self.sh.get_full_command(
@@ -234,4 +234,3 @@ class TestBash:
 
     def test_name(self):
         assert self.sh.name == "bash"
-        

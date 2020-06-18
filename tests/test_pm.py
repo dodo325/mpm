@@ -1,6 +1,6 @@
 import pytest
 import sys
-
+import subprocess
 def inc(x):
     return x + 1
 
@@ -31,3 +31,18 @@ def resource_setup(request):
 
 def test_1_that_needs_resource(resource_setup):
     print("test_1_that_needs_resource")
+
+def test_git(fake_process):
+    fake_process.register_subprocess(
+        ["git", "branch"], stdout=["* fake_branch", "  master"]
+    )
+
+    process = subprocess.Popen(
+        ["git", "branch"],
+        stdout=subprocess.PIPE,
+        universal_newlines=True,
+    )
+    out, _ = process.communicate()
+
+    assert process.returncode == 0
+    assert out == "* fake_branch\n  master\n"
