@@ -36,11 +36,13 @@ def get_settings():
         settings.update(user_settings)
     return settings
 
+
 def get_remote_known_packages():
     settings = get_settings()
     url = settings["known_packages_url"]
     response = urllib.request.urlopen(url)
     return json.load(response)
+
 
 def update_user_known_package(package_name: str, config: dict(), pretty=True):
     logger.info(f"Update user known package. Package {package_name}")

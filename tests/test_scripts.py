@@ -5,7 +5,8 @@ import pytest
 from pathlib import Path
 from mpm.utils.text_parse import not_nan_split
 
-# def read_local_script(name: 
+# def read_local_script(name:
+
 
 def test_bash_init():
     f = Path("scripts/bash/which_term.sh")
@@ -15,6 +16,7 @@ def test_bash_init():
     li = script.get_lines()
     assert len(li) == 25
     assert li[1] == "    term=$(ps -p $(ps -p $$ -o ppid=) -o args=);"
+
 
 @pytest.fixture(scope="function")
 def tmp_bash_script(tmp_path):
@@ -30,14 +32,14 @@ alias sshi="ssh -o 'IdentitiesOnly=yes'"
     assert type(p) in Path.__subclasses__()
     return p
 
+
 def test_open_bash_script(tmp_bash_script):
     f = tmp_bash_script
     assert f.is_file()
     script = BashScriptFile(str(f))
-    assert script.get_alias() == {
-        "sshi": "ssh -o 'IdentitiesOnly=yes'"
-    }
+    assert script.get_alias() == {"sshi": "ssh -o 'IdentitiesOnly=yes'"}
     assert len(script.get_lines()) == 2
+
 
 def test_add_data_in_bash_script(tmp_bash_script):
     f = tmp_bash_script
@@ -45,22 +47,24 @@ def test_add_data_in_bash_script(tmp_bash_script):
     script = BashScriptFile(str(f))
     script.add_data_in_file("alias myip='curl ipinfo.io/ip'")
     script.update()
-    assert len(script.get_lines()) == 3 # TODO: auto update
-    with f.open('r') as ff:
+    assert len(script.get_lines()) == 3  # TODO: auto update
+    with f.open("r") as ff:
         for i, l in enumerate(ff):
             pass
         assert i + 1 == 3
+
 
 def test_add_data_in_bash_script(tmp_bash_script):
     f = tmp_bash_script
     assert f.is_file()
     script = BashScriptFile(str(f))
-    script.add_alias("myip", 'curl ipinfo.io/ip')
+    script.add_alias("myip", "curl ipinfo.io/ip")
     script.update()
     assert script.get_alias() == {
-        'myip': 'curl ipinfo.io/ip',
-        "sshi": "ssh -o 'IdentitiesOnly=yes'"
+        "myip": "curl ipinfo.io/ip",
+        "sshi": "ssh -o 'IdentitiesOnly=yes'",
     }
+
 
 def test_filter_comments_in_bash_script(tmp_bash_script):
     script = BashScriptFile(str(tmp_bash_script))

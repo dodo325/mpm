@@ -178,7 +178,7 @@ def search(package_name, pm_names):
         try:
             data[pm.name] = pm(shell=shell).search(package_name)
         except NotImplementedError as e:
-            logger.warn(f"{pm.name} not have search method!")#, exc_info=True)
+            logger.warn(f"{pm.name} not have search method!")  # , exc_info=True)
     print_info(data)
 
 

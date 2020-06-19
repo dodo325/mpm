@@ -5,6 +5,7 @@ from mpm.core.logging import getLogger
 
 logger = getLogger(__name__)
 
+
 def auto_decode(text: bytes) -> str:
     if type(text) == str:
         return text

@@ -409,7 +409,7 @@ class UniversalePackage:
                 )
                 return True
         return False
-        
+
     def update_package_info(self):
         """
         Update self.info

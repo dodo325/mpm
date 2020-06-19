@@ -111,10 +111,8 @@ class AbstractShell:
         raise NotImplementedError()
 
     def get_full_command(
-            self,
-            command: list,
-            executable_path="",
-            executable_args=[]) -> list:
+        self, command: list, executable_path="", executable_args=[]
+    ) -> list:
         """
         return full command for this Shell
         Ex:
@@ -157,9 +155,7 @@ executable_path = {executable_path}\n\texecutable_args={executable_args}\n\t\
 stderr = {stderr}\n\targs = {args}\n\tkwargs = {kwargs}"
         )
         out_command = self.get_full_command(
-            command,
-            executable_path=executable_path,
-            executable_args=executable_args
+            command, executable_path=executable_path, executable_args=executable_args
         )
         self.logger.debug(f"Try call command: {out_command}")
         out = check_output(out_command, shell=shell, stderr=stderr, **kwargs)
@@ -201,11 +197,13 @@ stderr = {stderr}\n\targs = {args}\n\tkwargs = {kwargs}"
             return self.call(command, *args, **kwargs)
 
         out_command = ["sudo", "--stdin"]
-        out_command.append(self.get_full_command(
-            command,
-            executable_path=executable_path,
-            executable_args=executable_args
-        ))
+        out_command.append(
+            self.get_full_command(
+                command,
+                executable_path=executable_path,
+                executable_args=executable_args,
+            )
+        )
 
         self.logger.debug(f"Try call command: {out_command}")
         out = None
@@ -239,7 +237,7 @@ stderr = {stderr}\n\targs = {args}\n\tkwargs = {kwargs}"
     def whereis(self, command: str) -> list:
         try:
             out = self.call(["whereis", command])
-            
+
             return out.split(" ")[1:]
         except Exception as e:
             self.logger.error(f"Not found {command}!", exc_info=True)

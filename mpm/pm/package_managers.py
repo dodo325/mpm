@@ -246,6 +246,7 @@ class BashAliasManager(PackageManager):
     """
 
     name = "bash-alias"
+
     def __init__(self, shell: AbstractShell = None):
         self.logger = logger.getChild(self.__class__.__name__)
         if shell != None and shell.name == "bash":
