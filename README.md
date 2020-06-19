@@ -18,7 +18,7 @@ Main Package Manager - Unites all package managers in themselves!
 ## Install
 ### pip
 ```bash
-    pip install py-mpm
+    pip install mpm-core
 ```
 
 ### Sourse
