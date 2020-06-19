@@ -31,7 +31,7 @@ def read(fname):
 
 def main():
     setup(
-        name="mpm",
+        name="mpm-core",
         version=mpm.__version__,
         description=sys.modules[__name__].__doc__,
         # long_description=read("README"),

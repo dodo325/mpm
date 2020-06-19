@@ -36,13 +36,11 @@ def get_settings():
         settings.update(user_settings)
     return settings
 
-
 def get_remote_known_packages():
     settings = get_settings()
     url = settings["known_packages_url"]
     response = urllib.request.urlopen(url)
     return json.load(response)
-
 
 def update_user_known_package(package_name: str, config: dict(), pretty=True):
     logger.info(f"Update user known package. Package {package_name}")
@@ -80,8 +78,8 @@ def get_known_packages(offline=False):
     if not offline:
         try:
             known_packages = get_remote_known_packages()
-        except urllib.request.HTTPError as e:
-            logger.error(f"HTTPError: code = {e.code}, url = {e.url}", exc_info=True)
+        except (urllib.request.HTTPError, urllib.error.URLError) as e:
+            logger.error(f"Error: code = {e.code}, url = {e.url}", exc_info=True)
 
     if user_known_packages_file.is_file():
         logger.debug(f"Reading : {user_known_packages_file}")

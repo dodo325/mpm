@@ -175,7 +175,10 @@ def search(package_name, pm_names):
         logger.debug(f"PMs after filtering: {PMs}")
     data = {}
     for pm in PMs:
-        data[pm.name] = pm(shell=shell).search(package_name)
+        try:
+            data[pm.name] = pm(shell=shell).search(package_name)
+        except NotImplementedError as e:
+            logger.warn(f"{pm.name} not have search method!")#, exc_info=True)
     print_info(data)
 
 
