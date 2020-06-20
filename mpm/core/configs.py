@@ -26,7 +26,6 @@ settings_file = CONFIGS_DIR / "settings.json"
 
 
 def get_settings():
-
     with settings_file.open() as sf:
         settings = json.load(sf)
 

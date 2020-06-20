@@ -6,22 +6,22 @@ import pytest
 # @pytest.mark("cli")
 
 
-# @pytest.mark.skip()
-def test_info():
-    runner = CliRunner()
-    result = runner.invoke(info, ["pytest"])
-    assert result.exit_code == 0
-    # assert result.output == 'Hello Peter!\n'
+# # @pytest.mark.skip()
+# def test_info():
+#     runner = CliRunner()
+#     result = runner.invoke(info, ["pytest"])
+#     assert result.exit_code == 0
+#     # assert result.output == 'Hello Peter!\n'
 
-def test_search():
-    runner = CliRunner()
-    result = runner.invoke(search, ["pytest"])
-    assert result.exit_code == 0
-    # assert result.output == 'Hello Peter!\n'
+# def test_search():
+#     runner = CliRunner()
+#     result = runner.invoke(search, ["pytest"])
+#     assert result.exit_code == 0
+#     # assert result.output == 'Hello Peter!\n'
 
-# @pytest.mark.skip()
-def test_main():
-    runner = CliRunner()
-    result = runner.invoke(main)
-    assert result.exit_code == 0
-    print(result.output)
+# # @pytest.mark.skip()
+# def test_main():
+#     runner = CliRunner()
+#     result = runner.invoke(main)
+#     assert result.exit_code == 0
+#     print(result.output)
