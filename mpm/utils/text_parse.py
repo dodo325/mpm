@@ -18,7 +18,7 @@ def parse_value_key_table(
     multiline_spase=True,
     key_lower=False,
 ) -> dict:
-    """
+    r"""
     Parse value key ASCII table
     Example:
     >>> print(t1)
