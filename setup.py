@@ -57,7 +57,7 @@ setup_config = {
     ],
     "keywords": ["package-manager"],
     "packages": find_packages(exclude=["tests"]),
-    "entry_points": {"console_scripts": ["mpm: mpm.core.cli:main"]},
+    "entry_points": {"console_scripts": ["mpm=mpm.core.cli:main"]},
     "include_package_data": True,
     "data_files": [
         ("configs", get_all_files("configs/")),
