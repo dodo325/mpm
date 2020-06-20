@@ -10,4 +10,5 @@ echo    # (optional) move to a new line
 if [[ ! $REPLY =~ ^[Yy]$ ]]
 then
     find . -name "dist" -type d -exec rm -r "{}" \;    
+    find . -name "build" -type d -exec rm -r "{}" \;    
 fi

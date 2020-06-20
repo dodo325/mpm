@@ -1,0 +1,6 @@
+include LICENSE
+include README.md
+
+include configs/known_packages.json
+include configs/README.md
+include configs/settings.json
