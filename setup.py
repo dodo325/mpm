@@ -38,7 +38,14 @@ setup_config = {
     "license": "GPLv3",
     "python_requires": ">=3.7, <4",
     "install_requires": REQUIREMENTS,
-    "extras_require": {"test": ["pytest", "pytest-subprocess"]},
+    "extras_require": {
+        "test": [
+            "pytest", 
+            "pytest-subprocess",
+            "pytest-cov",
+            "codecov"
+            ]
+        },
     "classifiers": [
         "Environment :: Console",
         "Intended Audience :: Developers",
