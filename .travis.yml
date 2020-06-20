@@ -13,6 +13,7 @@ before_install:
   - pip install -U pytest
   - pip install pytest-subprocess
   - pip install codecov
+  - pip install coloredlogs
 
 install:
   - pip install ".[test]" . # install package + test dependencies
