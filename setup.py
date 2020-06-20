@@ -66,11 +66,6 @@ setup_config = {
     "packages": find_packages(exclude=["tests"]),
     "entry_points": {"console_scripts": ["mpm=mpm.core.cli:main"]},
     "include_package_data": True,
-    "data_files": [
-        ("configs", get_all_files("configs/")),
-        ("kits", get_all_files("kits/")),
-        ("scripts", get_all_files("scripts/")),
-    ],
     #   project_urls={  # Optional
     #       'Bug Reports': 'https://github.com/pypa/sampleproject/issues',
     #       'Funding': 'https://donate.pypi.org',

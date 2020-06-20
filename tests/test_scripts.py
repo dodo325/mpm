@@ -4,12 +4,13 @@ from mpm.scripts.bash import BashScriptFile
 import pytest
 from pathlib import Path
 from mpm.utils.text_parse import not_nan_split
+from mpm.core import SCRIPTS_DIR
 
 # def read_local_script(name:
 
 
 def test_bash_init():
-    f = Path("scripts/bash/which_term.sh")
+    f = SCRIPTS_DIR / "bash" / "which_term.sh"
     assert f.is_file()
 
     script = BashScriptFile(str(f))

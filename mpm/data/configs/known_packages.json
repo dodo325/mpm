@@ -1,0 +1,138 @@
+{
+    "pytest": {"package_managers":{"pip":{}}},
+    "urwid": {"package_managers":{"pip":{}}},
+    "dbus": {"package_managers":{"apt-get":{}}},
+    "gnome-shell-extension-installer": {
+        "package_managers":{
+            "script":{
+                "file": "https://github.com/brunelli/gnome-shell-extension-installer/raw/master/gnome-shell-extension-installer",
+                "script_name": "gnome-shell-extension-installer",
+                "install": {
+                    "directory": "/usr/bin/"
+                }
+            }
+        },
+        "plugins": {
+            "arc-men": {"plugin_id": 1228},
+            "dash-to-panel": {"plugin_id": 1160}
+        },
+        "plugins_install": {
+            "shell": {
+                "template_cmd": "{package_name} {plugin_id} --yes",
+                "get_all": {
+                    "cmd": "ls /usr/share/gnome-shell/extensions/ -1; ls $HOME/.local/share/gnome-shell/extensions -1",
+                    "parser": {
+                        "new_line": "\n",
+                        "remove_blank": true,
+                        "re_inline": "^.+(?=@)"
+                    }
+                }
+            }
+        },
+        "requirements":{
+            "DE": {
+                "GNOME":{}
+            }
+        },
+        "dependence":[
+            "dbus"
+        ]
+    },
+    "django": {
+        "package_managers":{"pip":{}},
+        "plugins": {
+            "guardian":{},
+            "extensions":{},
+            "cors-headers":{}
+        },
+        "plugins_install": {
+            "pip": {
+                "template_package_name": "django-{plugin_name}"
+            }
+        }
+    },
+    "qbittorrent": {"package_managers":{"apt":{}}},
+    "remmina": {
+        "package_managers":{
+            "apt":{
+                "repository": "ppa:remmina-ppa-team/remmina-next"
+            }
+        },
+        "plugins_install": {
+            "apt": {
+                "template_package_name": "remmina-plugin-{plugin_name}"
+            }
+        },
+        "plugins": {
+            "rdp":{},
+            "secret":{}
+        }
+    },
+    "google-chrome": {"package_managers":{"apt":{"package_name": "google-chrome-stable"}}},
+    "nodejs": {"package_managers":{"apt":{}}},
+    "npm": {
+        "package_managers":{"apt":{}},
+        "dependence":["nodejs"]
+    },
+    "synergy": {"package_managers":{"apt":{}}},
+    "telegram": {
+        "package_managers":{
+            "snap": {},
+            "apt": {
+                "install":{
+                    "repository": "ppa:atareao/telegram"
+                }
+            }
+        }
+    },
+    "discord": {
+        "package_managers":{
+            "snap":{
+                "install":{
+                    "repository": "ppa:atareao/telegram",
+                    "args": ["--classi"]
+                }
+            }
+        }
+    },
+    "zsh": {
+        "package_managers":{
+            "apt":{}
+        }
+    },
+    "oh-my-zsh": {
+        "// хз что с этим делать":"",
+        "dependence":[
+            "zsh"
+        ]
+    },
+    "vscode": {
+        "package_managers":{
+            "snap":{
+                "package_name": "code",
+                "install":{
+                    "args": ["--classi"]
+                }
+            }
+        },
+        "plugins": {
+            "rogalmic.bash-debug":{},
+            "robbowen.synthwave-vscode ":{}
+        },
+        "plugins_install": {
+            "shell": {
+                "template_cmd": "code --install-extension {plugin_name}",
+                "get_all": {
+                    "cmd": "code --list-extensions",
+                    "parser": {
+                        "new_line": "\n",
+                        "remove_blank": true
+                    }
+                }
+            }
+        },
+        "requirements":{
+            "DE":{}
+        }
+    }
+}

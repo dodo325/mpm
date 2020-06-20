@@ -8,7 +8,6 @@ import urllib.request
 import json
 
 from mpm.core import (
-    PACKAGE_DIR,
     USER_DATA_DIR,
     USER_CONFIGS_DIR,
     SCRIPTS_DIR,

@@ -30,6 +30,10 @@ Main Package Manager - Unites all package managers in themselves!
 ```bash
     python setup.py install
 ```
+## Настройки
+Создаются в папке $USER_HOME/.mpm/confgs
+
+В проекте все данные хранятся в [mpm/data/configs](mpm/data/configs/README.md)
 
 ## CLI
 ```bash
