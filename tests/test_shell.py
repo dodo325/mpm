@@ -52,16 +52,23 @@ class TestZSH:
     @pytest.mark.xfail(
         platform.system() != "Linux", reason="Bash обычно работает только на Linux"
     )
-    def test_installed(self):
+    def test_fake_installed(self, fake_process):
+        out = self.read_calls_file("zsh_version.txt")
+
+        command = self.sh.get_full_command(["zsh", "--version"])
+        print(f"command = {command}")
+        fake_process.register_subprocess(command, stdout=out.splitlines())
+        fake_process.register_subprocess(["zsh", "--version"], stdout=out.splitlines())
+        print("\n**", self.sh.call(["zsh", "--version"], executable_path=None))
         assert self.sh.is_installed()
 
     def test_get_full_command(self):
-        assert self.sh.get_full_command(["bash", "--version"]) == [
-            "/bin/bash",
-            "-c",
-            "bash --version",
-        ]
-        assert self.sh.get_full_command("apt") == ["/bin/bash", "-c", "apt"]
+        assert self.sh.get_full_command(
+            ["bash", "--version"]) == [
+                '/bin/zsh', 
+                '-c', 
+                'bash --version']
+        assert self.sh.get_full_command("apt") == ["/bin/zsh", "-c", "apt"]
 
         assert self.sh.get_full_command("apt", executable_path=None) == ["apt"]
 

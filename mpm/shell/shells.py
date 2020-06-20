@@ -281,6 +281,8 @@ stderr = {stderr}\n\targs = {args}\n\tkwargs = {kwargs}"
 
 class ZSH(Bash):
     supported_platforms = {"Linux": {}}
+    executable_path = "/bin/zsh"
+    executable_args = ["-c"]
 
     def is_installed(self) -> bool:
         if self.is_platform_supported():
