@@ -1,3 +1,0 @@
-coloredlogs
-colorama
-click>=7.0

@@ -1,19 +1,24 @@
-![](./logo1_mpm.png)
-Main Package Manager - Unites all package managers in themselves!
+[![Downloads](https://pepy.tech/badge/mpm-core)](https://pepy.tech/project/mpm-core)
+[![Codecov](https://codecov.io/github/dodo325/mpm/coverage.svg?branch=master)](https://codecov.io/github/dodo325/mpm?branch=master)
+[![Build-Status](https://travis-ci.org/dodo325/mpm.svg?branch=master)](https://travis-ci.org/dodo325/mpm)
+[![LICENCE](https://img.shields.io/cran/l/mpm?logo=ddd)](https://github.com/dodo325/mpm/blob/master/LICENSE)
 
-- [Install](#install)
-  - [pip](#pip)
-  - [Sourse](#sourse)
-- [CLI](#cli)
-- [Examples](#examples)
-  - [Install](#install-1)
-  - [Search](#search)
-  - [Info](#info)
-- [API](#api)
-  - [Shell](#shell)
-    - [get_installed_shells](#get_installed_shells)
-    - [AutoShell](#autoshell)
-  - [Package Manager](#package-manager)
+![](./logo1_mpm.png)
+
+Main Package Manager - Unites all package managers in themselves!
+  - [Install](#install)
+    - [pip](#pip)
+    - [Sourse](#sourse)
+  - [CLI](#cli)
+  - [Examples](#examples)
+    - [Install](#install-1)
+    - [Search](#search)
+    - [Info](#info)
+  - [API](#api)
+    - [Shell](#shell)
+      - [get_installed_shells](#get_installed_shells)
+      - [AutoShell](#autoshell)
+    - [Package Manager](#package-manager)
 
 ## Install
 ### pip
