@@ -516,7 +516,7 @@ class UniversalePackage:
                     pm_config = pkg.auto_config()
                     self.add_package_manager_in_config(pkg.pm.name, pm_config=pm_config)
             except PackageDoesNotExist as e:
-                self.logger.warn(
+                self.logger.warning(
                     f"Package {pkg.package_name} Does Not found in '{pkg.pm.name}' package manager"
                 )
         self.logger.debug(f"'{self.package_name}' info: {info}")
@@ -546,7 +546,7 @@ class UniversalePackage:
                 print("\nYou have chosen {0}".format(pm_package_data[d_val]["name"]))
                 return pm_package_data[d_val]["pm_package"]
             else:
-                self.logger.warn("You chosen wrong!")
+                self.logger.warning("You chosen wrong!")
 
     def install(self, auto=False):
         self.update_package_info()

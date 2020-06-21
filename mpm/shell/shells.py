@@ -102,7 +102,7 @@ class AbstractShell:
         self.logger = logger.getChild(self.__class__.__name__)
 
     #         if not self.is_installed():
-    #             self.logger.warn(f"Not Found {self.name}!!")
+    #             self.logger.warning(f"Not Found {self.name}!!")
 
     def is_sudo_mode(self) -> bool:
         return False

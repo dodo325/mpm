@@ -59,12 +59,19 @@ def test_pip_search(fake_process, fake_bash_shell):
 
 def test_BashAliasManager(fake_process, fake_bash_shell):
     sh = fake_bash_shell(fake_process)
+    fake_process.register_subprocess(sh.get_full_command(
+        ["echo $HOME/.bashrc"]), stdout="/home/user/.bashrc")
+    fake_process.register_subprocess(sh.get_full_command(["echo $HOME/.zshrc"]), stdout="/home/user/.zshrc")
     shell = ZSH()
     pm = BashAliasManager(shell=shell)
     assert pm.shell.name == "bash"
 
 def test_BashAliasManager_is_installed(fake_process, fake_bash_shell):
     sh = fake_bash_shell(fake_process)
+    fake_process.register_subprocess(sh.get_full_command(
+        ["echo $HOME/.bashrc"]), stdout="/home/user/.bashrc")
+    fake_process.register_subprocess(sh.get_full_command(
+        ["echo $HOME/.zshrc"]), stdout="/home/user/.zshrc")
     pm = BashAliasManager(shell=sh)
     assert pm.shell.name == "bash"
     assert pm.is_installed()

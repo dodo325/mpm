@@ -269,7 +269,7 @@ class BashAliasManager(PackageManager):
             try:
                 self.profiles_scripts.append(BashScriptFile(path, shell=self.shell))
             except FileExistsError as e:
-                self.logger.warn(e)
+                self.logger.warning(e)
 
     def is_installed(self) -> bool:
         return self.shell.is_installed()

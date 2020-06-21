@@ -59,7 +59,7 @@ def install(
     Установить пакет
     """
     logger.debug(
-        f"Args:\n\tpackage_name = {package_name},\n\pm_name = {pm_name}\n\tall = {all_flag}\n\toffline = {offline}"
+        f"Args:\n\tpackage_name = {package_name},\n\tpm_name = {pm_name}\n\tall = {all_flag}\n\toffline = {offline}"
     )
     known_packages = get_known_packages(offline=offline)
     if known_packages_json:
@@ -184,7 +184,7 @@ def search(package_name, pm_names, quiet):
         try:
             data[pm.name] = pm(shell=shell).search(package_name)
         except NotImplementedError as e:
-            logger.warn(f"{pm.name} not have search method!")  # , exc_info=True)
+            logger.warning(f"{pm.name} not have search method!")  # , exc_info=True)
     print_info(data)
 
 
@@ -218,7 +218,7 @@ def update(package_name, pm_name):
     """
     logger.debug(f"package_name = {package_name}\n\tpm_name = {pm_name}")
     logger.info(f"package_name = {package_name}\n\tpm_name = {pm_name}")
-    logger.warn(f"package_name = {package_name}\n\tpm_name = {pm_name}")
+    logger.warning(f"package_name = {package_name}\n\tpm_name = {pm_name}")
     logger.success(f"package_name = {package_name}\n\tpm_name = {pm_name}")
     logger.error(f"package_name = {package_name}\n\tpm_name = {pm_name}")
     logger.critical(f"package_name = {package_name}\n\tpm_name = {pm_name}")
