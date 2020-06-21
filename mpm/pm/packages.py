@@ -369,6 +369,8 @@ class BashAlias(Package):
             aliases = script.get_alias()
             if self.package_name in aliases:
                 info[str(script.file)] = {"cmd": aliases[self.package_name]}
+        if info == {}:
+             raise PackageDoesNotExist("Alias not found: " + self.package_name)
         return info
 
 
@@ -549,7 +551,8 @@ class UniversalePackage:
 
         pkg = self.ask_user_select_pm()
         if self.auto_update_conf:
-            self.add_package_manager_in_config(pkg.pm.name)
+            pm_config = pkg.auto_config()
+            self.add_package_manager_in_config(pkg.pm.name, pm_config=pm_config)
         pkg_config = package_managers_config.get(pkg.pm.name, {})
         install_config = pkg_config.get("install", {})
         pkg.install(**install_config)
