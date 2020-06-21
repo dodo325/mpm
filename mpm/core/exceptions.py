@@ -15,7 +15,7 @@ class CommandNotFound(ShellError):
     pass
 
 
-class PackageManagerNotInatalled:
+class PackageManagerNotInatalled(Exception):
     """Package Manager Not Inatalled"""
 
     pass

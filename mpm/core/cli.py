@@ -275,12 +275,15 @@ def list_command(pm_names, offline, known_packages_json, all_flag):
             out_list.extend(pm.get_all_packages())
     else:
         for package_name in known_packages.keys():
-            package = UniversalePackage(
-                package_name,
-                shell=shell,
-                pms_classes=PMs,
-                known_packages=known_packages,
-            )
+            try:
+                package = UniversalePackage(
+                    package_name,
+                    shell=shell,
+                    pms_classes=PMs, # не работает как надо!
+                    known_packages=known_packages,
+                )
+            except PackageManagerNotInatalled:
+                continue
             if package.is_installed():
                 ver = package.info.get("version", None)
                 if not ver:

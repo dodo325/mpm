@@ -24,7 +24,7 @@ from mpm.utils.text_parse import parse_table_with_columns, parse_value_key_table
 from mpm.core.configs import get_known_packages
 from mpm.utils.string import auto_decode
 from mpm.core.logging import getLogger
-from mpm.core.exceptions import PackageDoesNotExist, ShellError, PackageDoesNotInatalled
+from mpm.core.exceptions import PackageManagerNotInatalled, PackageDoesNotExist, ShellError, PackageDoesNotInatalled
 from mpm.scripts.bash import BashScriptFile
 
 logger = getLogger(__name__)
@@ -452,9 +452,16 @@ class UniversalePackage:
         self.update_package_info()
 
     def _get_correct_pms_classes_names(self, all_pm=False) -> List[str]:
-        pms_names = list(self.config.get("package_managers", {}).keys())
-        if pms_names == [] or all_pm:
-            pms_names = [PM.name for PM in self.pms_classes]
+        pms_names = []
+        if all_pm:
+            pms_names = [PM.name for PM in get_installed_pms(shell=self.shell)]
+        else:
+            pms_names = set(self.config.get("package_managers", {}).keys())
+            pms_names.intersection_update(set([PM.name for PM in self.pms_classes]))
+            pms_names = list(pms_names)
+        if pms_names == []:
+            raise PackageManagerNotInatalled()
+
         if "apt" in pms_names and "apt-get" in pms_names:
             pms_names.remove("apt-get")
         self.logger.debug(f"Out pms_names: {pms_names}")
