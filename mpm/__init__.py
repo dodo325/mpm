@@ -3,7 +3,7 @@ Author: Dodo325
 GitHub: https://github.com/dodo325/mpm
 """
 import sys
-__version__ = "0.1.1"
+__version__ = "0.1.12"
 
 from mpm.shell import *
 
