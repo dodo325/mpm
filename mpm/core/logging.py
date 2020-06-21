@@ -44,10 +44,9 @@ def get_logging():
 
     logging.Logger.success = success
     return logging
-
+logging = get_logging()
 
 def get_console_handler(level=logging.INFO):
-    logging = get_logging()
     console_handler = logging.StreamHandler()
     # console_handler.addFilter(coloredlogs.HostNameFilter())  # %(hostname)s
     # console_handler.addFilter(coloredlogs.UserNameFilter())  # %(username)s

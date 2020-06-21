@@ -8,7 +8,7 @@ from mpm.pm import (
     PACKAGE_MANAGERS_NAMES,
     get_installed_pms,
 )
-from mpm.core.logging import getLogger
+from mpm.core.logging import getLogger, logging
 from mpm.core.exceptions import PackageManagerNotInatalled
 from mpm.shell import AutoShell
 from mpm.core.configs import get_known_packages, update_user_known_package
@@ -105,10 +105,13 @@ def install(
     multiple=True,
     type=click.Choice(PACKAGE_MANAGERS_NAMES, case_sensitive=False),
 )  # Возможен мультивызов, например: -pm apt -pm pip
-def info(package_name, pm_names, known_packages_json, all_flag, offline):
+@click.option('-q', '--quiet', default=False, is_flag=True, help="Выключить логирование")
+def info(package_name, pm_names, known_packages_json, all_flag, offline, quiet):
     """
     Показать дополнительные данные о пакете
     """
+    if quiet:
+        logging.disable(logging.CRITICAL)
     logger.debug(
         f"Args:\n\tpackage_name = {package_name},\n\tpm_names = {pm_names}\n\tall = {all_flag}\n\toffline = {offline}"
     )
@@ -162,10 +165,13 @@ def remove(package_name, pm_name):
     multiple=True,
     type=click.Choice(PACKAGE_MANAGERS_NAMES, case_sensitive=False),
 )  # Возможен мультивызов, например: -pm apt -pm pip
-def search(package_name, pm_names):
+@click.option('-q', '--quiet', default=False, is_flag=True, help="Выключить логирование")
+def search(package_name, pm_names, quiet):
     """
     Найти пакет
     """
+    if quiet:
+        logging.disable(logging.CRITICAL)
     logger.debug(f"package_name = {package_name}, pm_names = {pm_names}")
     shell = AutoShell()
     PMs = get_installed_pms(shell=shell)
@@ -234,6 +240,7 @@ def update(package_name, pm_name):
     help="Search for information not only in local the known_packages",
 )
 # TODO: parse URL
+@click.option('-q', '--quiet', default=False, is_flag=True)
 @click.option(
     "-k",
     "--known-packages-json",
@@ -247,10 +254,14 @@ def update(package_name, pm_name):
     multiple=True,
     type=click.Choice(PACKAGE_MANAGERS_NAMES, case_sensitive=False),
 )  # Возможен мультивызов, например: -pm apt -pm pip
-def list_command(pm_names, offline, known_packages_json, all_flag):
+@click.option('-q', '--quiet', default=False, is_flag=True, help="Выключить логирование")
+def list_command(pm_names, offline, known_packages_json, all_flag, quiet):
     """
     Список пакетов
     """
+    if quiet:
+        logging.disable(logging.CRITICAL)
+
     logger.debug(
         f"Args:\n\tpm_names = {pm_names}\n\tall_flag = {all_flag}\n\toffline = {offline}\n\tknown_packages_json= {known_packages_json}"
     )
