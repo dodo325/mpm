@@ -458,9 +458,14 @@ class UniversalePackage:
         if all_pm:
             pms_names = [PM.name for PM in get_installed_pms(shell=self.shell)]
         else:
-            pms_names = set(self.config.get("package_managers", {}).keys())
-            pms_names.intersection_update(set([PM.name for PM in self.pms_classes]))
-            pms_names = list(pms_names)
+            pms_names = [PM.name for PM in self.pms_classes]
+            known_pms_names = list(self.config.get("package_managers", {}).keys())
+            logger.debug(
+                f"Vars:\n\tself.pms_classes = {self.pms_classes}\n\ttmp = {pms_names}\n\tknown_pms_names={known_pms_names}")
+            if known_pms_names != []:
+                tmp = set(pms_names)
+                tmp.intersection_update(set(known_pms_names))
+                pms_names = list(tmp)
             
         if pms_names == []:
             raise PackageManagerNotInatalled()
