@@ -95,6 +95,17 @@
             }
         }
     },
+    "sshi": {
+        "package_managers": {
+            "bash-alias": {
+                "cmd": "ssh -o 'IdentitiesOnly=yes'",
+                "profiles": [
+                    "$HOME/.zshrc", 
+                    "$HOME/.bashrc"
+                ]
+            }
+        }
+    },
     "zsh": {
         "package_managers":{
             "apt":{}

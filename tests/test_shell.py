@@ -90,14 +90,16 @@ class TestZSH:
         fake_process.register_subprocess(command, stdout=out.splitlines())
         assert self.sh.check_command(cmd)
 
-    def test_fake_installed(self, fake_process):
+    @pytest.mark.parametrize("debug", [True, False])
+    def test_fake_installed(self, fake_process, debug):
         out = "zsh 5.8 (x86_64-ubuntu-linux-gnu)"
 
         command = self.sh.get_full_command(["zsh", "--version"])
         print(f"command = {command}")
         fake_process.register_subprocess(command, stdout=out.splitlines())
         fake_process.register_subprocess(["zsh", "--version"], stdout=out.splitlines())
-        print("\n**", self.sh.call(["zsh", "--version"], executable_path=None))
+        print("\n**", self.sh.call(["zsh", "--version"],
+                                   executable_path=None, debug=debug))
         assert self.sh.is_installed()
         assert self.sh.version == "zsh 5.8 (x86_64-ubuntu-linux-gnu)"
 

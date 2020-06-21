@@ -12,6 +12,7 @@ from mpm.utils.text_parse import (
     not_nan_split,
 )
 from mpm.core.exceptions import PackageDoesNotExist
+from mpm.scripts.bash import BashScriptFile
 from subprocess import CalledProcessError, STDOUT
 import re
 import json
@@ -126,7 +127,7 @@ class Pip(PackageManager):
         try:
             out = self.shell.call(["pip", "search", package_name])
         except CalledProcessError as e:
-            self.logger.error(f"Nothing found for {package_name}!", exc_info=True)
+            self.logger.error(f"Nothing found for {package_name}!") #, exc_info=True)
             return {}
         li = not_nan_split(out)
         data = {}
@@ -164,7 +165,7 @@ class Conda(PackageManager):
         try:
             out = self.shell.call(["conda", "search", package_name, "--json"])
         except CalledProcessError as e:
-            self.logger.error(f"Nothing found for {package_name}!", exc_info=True)
+            self.logger.error(f"Nothing found for {package_name}!") # , exc_info=True)
             return {}
         data = json.loads(out)
         out_data = {}
@@ -246,18 +247,49 @@ class BashAliasManager(PackageManager):
     """
 
     name = "bash-alias"
+    profiles: List["str"] = ["$HOME/.zshrc", "$HOME/.bashrc"]
+    profiles_scripts: List[BashScriptFile] = []
 
-    def __init__(self, shell: AbstractShell = None):
+    def __init__(self, shell: AbstractShell = None, profiles: List["str"] = None):
         self.logger = logger.getChild(self.__class__.__name__)
         if shell != None and shell.name == "bash":
             self.shell = shell
         else:
             self.shell = Bash()
+        if profiles:
+            self.profiles = profiles
+
+        self.init_profiles()
+
+    def init_profiles(self, profiles: List["str"] = None):
+        if profiles:
+            self.profiles = profiles
+
+        for path in self.profiles:
+            try:
+                self.profiles_scripts.append(BashScriptFile(path, shell=self.shell))
+            except FileExistsError as e:
+                self.logger.warn(e)
 
     def is_installed(self) -> bool:
         return self.shell.is_installed()
+    
+    def get_all_packages(self) -> List[str]:
+        names = set()
+        for script in self.profiles_scripts:
+            aliases = script.get_alias()
+            names.update(aliases.keys())
+        return list(names)
 
-
+    def search(self, package_name: str) -> dict:
+        data = {}
+        self.logger.info(f"Search in {self.profiles}")
+        for script in self.profiles_scripts:
+            aliases: dict = script.get_alias()
+            for aliase_name, aliase in aliases.items():
+                if aliase_name.startswith(package_name):
+                    data[aliase_name] = {"cmd": aliase, "file": str(script.file)}
+        return data
 # class BashScriptFileManager(BashAliasManager):
 #     """
 #     Класс управления пользовательскими скриптовыми файлами

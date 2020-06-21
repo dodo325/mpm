@@ -127,6 +127,12 @@ class Package:
             info.update(data)
         return info
 
+    def auto_config(self) -> dict:
+        """
+        Генерация конфигурации для последующей установки из known_packages
+        """
+        return {}
+
     def update_package_info(self):
         """
         Update self.info
@@ -322,24 +328,13 @@ class BashAlias(Package):
     """
 
     pm_class = BashAliasManager
-    profiles: List["str"] = ["$HOME/.zshrc", "$HOME/.bashrc"]
-    profiles_scripts: List[BashScriptFile] = []
 
-    def init_profiles(self, profiles: List["str"] = None):
-        if profiles:
-            self.profiles = profiles
-
-        for path in self.profiles:
-            try:
-                self.profiles_scripts.append(BashScriptFile(path, shell=self.shell))
-            except FileExistsError as e:
-                self.logger.warn(e)
 
     def __init__(
         self, package_name: str, shell: AbstractShell = None, profiles: List[str] = None
     ):
         super().__init__(package_name=package_name, shell=shell)
-        self.init_profiles(profiles=profiles)
+        self.pm.init_profiles(profiles=profiles)
 
     def is_installed(self) -> bool:
         self.update_package_info()
@@ -350,9 +345,16 @@ class BashAlias(Package):
         Устанавливает Alias во все файлы из profiles
         """
         if profiles:
-            self.init_profiles(profiles=profiles)
-        for script in self.profiles_scripts:
+            self.pm.init_profiles(profiles=profiles)
+        for script in self.pm.profiles_scripts:
             script.add_alias(self.package_name, cmd)
+
+    def auto_config(self) -> dict:
+        return {
+            "profiles": list(self.info.keys()),
+            # TODO: а что делать если команды в различных файлах отличаются?
+            "cmd": next(iter(self.info))
+        }
 
     def get_info(self) -> dict:
         """
@@ -363,7 +365,7 @@ class BashAlias(Package):
         {'/home/dodo/.zshrc': {'cmd': 'git'}, '/home/dodo/.bashrc': {'cmd': 'git'}}
         """
         info = {}
-        for script in self.profiles_scripts:
+        for script in self.pm.profiles_scripts:
             aliases = script.get_alias()
             if self.package_name in aliases:
                 info[str(script.file)] = {"cmd": aliases[self.package_name]}
@@ -476,16 +478,16 @@ class UniversalePackage:
                 )
         return pkg_objects
 
-    def add_package_manager_in_config(self, package_manager: str):
+    def add_package_manager_in_config(self, package_manager: str, pm_config: dict = {}):
         """
         Добавить новый пакетный менеджер в self.config
         """
         self.logger.info(f"Detected in {package_manager}!")
         if "package_managers" not in self.config:
-            self.config["package_managers"] = {package_manager: {}}
+            self.config["package_managers"] = {package_manager: pm_config}
             return
         if package_manager not in self.config["package_managers"]:
-            self.config["package_managers"][package_manager] = {}
+            self.config["package_managers"][package_manager] = pm_config
 
     def get_info(self, all_pm=False) -> dict:
         """
@@ -502,7 +504,8 @@ class UniversalePackage:
                 info[pkg.pm.name] = pkg.info
                 self.pm_packages.append(pkg)
                 if self.auto_update_conf:
-                    self.add_package_manager_in_config(pkg.pm.name)
+                    pm_config = pkg.auto_config()
+                    self.add_package_manager_in_config(pkg.pm.name, pm_config=pm_config)
             except PackageDoesNotExist as e:
                 self.logger.warn(
                     f"Package {pkg.package_name} Does Not found in '{pkg.pm.name}' package manager"
