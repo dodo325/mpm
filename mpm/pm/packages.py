@@ -431,6 +431,8 @@ class UniversalePackage:
     ):
         self.package_name = package_name
         self.logger = logger.getChild(self.__class__.__name__)
+        self.logger.debug(
+            f"Args:\n\tpackage_name = {package_name}\n\tshell = {shell}\n\tpms_classes = {pms_classes}\n\toffline = {offline}\n\tauto_update_conf = {auto_update_conf}\n\tis_known_packages = {known_packages != None}")
         self.auto_update_conf = auto_update_conf
         if shell == None:
             self.shell = AutoShell()
@@ -459,6 +461,7 @@ class UniversalePackage:
             pms_names = set(self.config.get("package_managers", {}).keys())
             pms_names.intersection_update(set([PM.name for PM in self.pms_classes]))
             pms_names = list(pms_names)
+            
         if pms_names == []:
             raise PackageManagerNotInatalled()
 
