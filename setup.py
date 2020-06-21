@@ -19,7 +19,7 @@ def get_all_files(base_dir: str) -> list:
     return files
 
 
-REQUIREMENTS = ["click>=7.0", "colorama", "coloredlogs"]
+REQUIREMENTS = ["click>=7.0", "coloredlogs", "colorama"]
 
 
 def read(fname):
@@ -43,6 +43,7 @@ setup_config = {
             "pytest", 
             "pytest-subprocess",
             "pytest-cov",
+            "coloredlogs",
             "codecov"
             ]
         },

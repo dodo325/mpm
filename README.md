@@ -28,7 +28,7 @@ Main Package Manager - Unites all package managers in themselves!
 
 ### Sourse
 ```bash
-    python setup.py install
+    pip uninstall mpm-core -y && pip install ".[test]"
 ```
 ## Настройки
 Создаются в папке $USER_HOME/.mpm/confgs
