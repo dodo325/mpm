@@ -284,9 +284,9 @@ def list_command(pm_names, offline, known_packages_json, all_flag):
             if package.is_installed():
                 ver = package.info.get("version", None)
                 if not ver:
-                    out_list.append([f"{package_name}"])
+                    out_list.append(f"{package_name}")
                 else:
-                    out_list.append([f"{package_name}@{ver}"])
+                    out_list.append(f"{package_name}@{ver}")
 
     for line in out_list:
         click.echo(f"- {line}")
