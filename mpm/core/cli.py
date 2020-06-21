@@ -12,7 +12,7 @@ from mpm.core.logging import getLogger, logging
 from mpm.core.exceptions import PackageManagerNotInatalled
 from mpm.shell import AutoShell
 from mpm.core.configs import get_known_packages, update_user_known_package
-
+import mpm
 logger = getLogger(__name__)
 
 
@@ -27,6 +27,12 @@ def print_info(info: dict()):
 def main():
     pass
 
+@main.command()
+def version():
+    """
+    Вывести текущую версию MPM
+    """
+    click.echo(mpm.getAbout())
 
 @main.command()
 @click.argument("package_name")
