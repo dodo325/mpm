@@ -2,6 +2,18 @@
     "pytest": {"package_managers":{"pip":{}}},
     "urwid": {"package_managers":{"pip":{}}},
     "dbus": {"package_managers":{"apt-get":{}}},
+    "pipver": {
+        "package_managers": {
+            "bash-alias": {
+                "cmd": "/home/dodo/.zshrc",
+                "profiles": [
+                    "/home/dodo/.zshrc",
+                    "/home/dodo/.bashrc"
+                ]
+            },
+            "pip": {}
+        }
+    },
     "gnome-shell-extension-installer": {
         "package_managers":{
             "script":{
