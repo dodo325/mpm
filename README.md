@@ -1,3 +1,4 @@
+[![PyPI-Status](https://img.shields.io/pypi/v/mpm-core.svg)](https://pypi.python.org/pypi/birch)
 [![Downloads](https://pepy.tech/badge/mpm-core)](https://pepy.tech/project/mpm-core)
 [![Codecov](https://codecov.io/github/dodo325/mpm/coverage.svg?branch=master)](https://codecov.io/github/dodo325/mpm?branch=master)
 [![Build-Status](https://travis-ci.org/dodo325/mpm.svg?branch=master)](https://travis-ci.org/dodo325/mpm)
