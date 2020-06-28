@@ -107,6 +107,26 @@
             }
         }
     },
+    "a": {
+        "dependence":[
+            "b", "a"
+        ]
+    },
+    "b": {
+        "dependence":[
+            "a"
+        ]
+    },
+    "curl": {
+        "package_managers":{
+            "apt":{}
+        }
+    },
+    "git": {
+        "package_managers":{
+            "apt":{}
+        }
+    },
     "zsh": {
         "package_managers":{
             "apt":{}
@@ -115,7 +135,7 @@
     "oh-my-zsh": {
         "// хз что с этим делать":"",
         "dependence":[
-            "zsh"
+            "curl","git", "zsh"
         ]
     },
     "vscode": {

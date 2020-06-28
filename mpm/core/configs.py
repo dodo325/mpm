@@ -14,6 +14,7 @@ from mpm.core import (
     CONFIGS_DIR,
     USER_SCRIPTS_DIR,
 )
+from mpm.utils.json_parse import iterative_topological_sort
 from mpm.core.logging import getLogger
 
 logger = getLogger(__name__)
@@ -88,3 +89,9 @@ def get_known_packages(offline=False):
         known_packages.update(user_known_packages)
     logger.debug(f"In known_packages {len(known_packages)} packages")
     return known_packages
+
+def get_packages_dependences_order(known_packages: dict, package: list):
+    graph = dict()
+    for name, data in known_packages.items():
+        graph[name] = data.get('dependence', [])
+    return iterative_topological_sort(graph, package, reverse=True)

@@ -21,7 +21,7 @@ from mpm.pm.package_managers import (
     NAMES_TO_PACKAGE_MANAGERS,
 )
 from mpm.utils.text_parse import parse_table_with_columns, parse_value_key_table
-from mpm.core.configs import get_known_packages
+from mpm.core.configs import get_known_packages, get_packages_dependences_order
 from mpm.utils.string import auto_decode
 from mpm.core.logging import getLogger
 from mpm.core.exceptions import PackageManagerNotInatalled, PackageDoesNotExist, ShellError, PackageDoesNotInatalled
@@ -391,6 +391,7 @@ class UniversalePackage:
     config = dict()
     pms_classes: List[PackageManager] = []
     auto_update_conf = True
+    dependences_order = []
     _info = None
     pm_packages: List[
         Package
@@ -450,7 +451,12 @@ class UniversalePackage:
         if package_name in known_packages:
             logger.info(f"Package '{package_name}' found in known_packages")
             self.config = known_packages[package_name]
-
+            self.dependences_order = get_packages_dependences_order(
+                known_packages,
+                package_name
+            )
+        else: 
+            self.dependences_order = [package_name]
         self.update_package_info()
 
     def _get_correct_pms_classes_names(self, all_pm=False) -> List[str]:
