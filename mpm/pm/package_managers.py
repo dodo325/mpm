@@ -132,16 +132,21 @@ class Pip(PackageManager):
         li = not_nan_split(out)
         data = {}
         for line in li:
-            if line.startswith(" "):
-                key, val = line.split(":")
-                key, val = key.strip(), val.strip()
-                key, val = key.lower(), val.lower()
-                data[name][key] = val
+            try:
+                if line.startswith(" "):
+                    key, val = line.split(":")
+                    key, val = key.strip(), val.strip()
+                    key, val = key.lower(), val.lower()
+                    data[name][key] = val
+                    continue
+            
+                version = re.search(r"\((.*?)\)", line).group(1)
+                name = line[: line.find("(")].strip()
+                description = line[line.rfind("-") + 1 :].strip()
+                data[name] = {"version": version, "description": description}
+            except (AttributeError, ValueError):
+                self.logger.debug("SearchParseError", exc_info=True)
                 continue
-            version = re.search(r"\((.*?)\)", line).group(1)
-            name = line[: line.find("(")].strip()
-            description = line[line.rfind("-") + 1 :].strip()
-            data[name] = {"version": version, "description": description}
         return data
 
 
