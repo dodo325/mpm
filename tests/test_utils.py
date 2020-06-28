@@ -12,9 +12,32 @@ from mpm.utils.text_parse import (
 )
 from mpm.utils.sys_info import is_64bit
 from mpm.utils.string import auto_decode, is_ascii, is_first_alpha, is_first_ascii_alpha
-from mpm.utils.json_parse import multiget
+from mpm.utils.json_parse import multiget, iterative_topological_sort
 
-
+def test_iterative_topological_sort():
+    graph = {
+        'a': ['b', 'c'],
+        'b': ['d'],
+        'c': ['d'],
+        'd': ['e'],
+        'e': []
+    }
+    assert iterative_topological_sort(graph, 'a', reverse=True, with_self=False) == [
+        'e', 'd', 'c', 'b'
+    ]
+    assert iterative_topological_sort(graph, 'a', reverse=True) == [
+        'e', 'd', 'c', 'b', 'a'
+    ]
+    assert iterative_topological_sort(graph, 'a') == [
+        'a', 'b', 'c', 'd', 'e'
+    ]
+    assert iterative_topological_sort(graph, 'e') == [
+        'e'
+    ]
+    assert iterative_topological_sort(graph, 'c') == [
+        'c', 'd', 'e'
+    ]
+    
 def test_multiget():
     data = {"a": 123, "b": "abc"}
     assert multiget(data, ["a", "b", "c"]) == 123
