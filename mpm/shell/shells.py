@@ -7,7 +7,6 @@ from getpass import getpass
 from pathlib import Path
 
 from mpm.core.logging import getLogger
-from mpm.utils.string import auto_decode
 from mpm.utils.text_parse import not_nan_split, parse_value_key_table
 from mpm.core.exceptions import CommandNotFound, ShellError
 
@@ -105,6 +104,7 @@ class AbstractShell:
     #             self.logger.warning(f"Not Found {self.name}!!")
 
     def is_sudo_mode(self) -> bool:
+
         return False
 
     def sudo_call(self, command: list, enter_password=False, *args, **kwargs) -> str:
@@ -158,8 +158,12 @@ stderr = {stderr}\n\targs = {args}\n\tkwargs = {kwargs}"
             command, executable_path=executable_path, executable_args=executable_args
         )
         self.logger.debug(f"Try call command: {out_command}")
-        out = check_output(out_command, shell=shell, stderr=stderr, **kwargs)
-        out = auto_decode(out)
+        out = check_output(
+            out_command, 
+            shell=shell, 
+            universal_newlines=True, 
+            stderr=stderr, 
+            **kwargs)
         if debug:
             self.logger.debug(f"Output: {out}")
         if out.startswith("get-command"):
@@ -221,11 +225,10 @@ stderr = {stderr}\n\targs = {args}\n\tkwargs = {kwargs}"
             out = p.communicate(self.__sudo_password + "\n")[1]
         else:
             out = check_output(
-                out_command, stdin=stdin, stderr=stderr, shell=shell, **kwargs
+                out_command, universal_newlines=True, stdin=stdin, stderr=stderr, shell=shell, **kwargs
             )
         if debug:
             self.logger.debug(f"Output: {out}")
-        out = auto_decode(out)
         return self._call_filter(out)
 
     def get_env(self) -> dict:
@@ -333,8 +336,8 @@ class PowerShell(Cmd):
             return []
 
     def is_installed(self) -> bool:
-        f"""
-        Check is {self.name} installed and update {self.name}.version
+        """
+        Check is powershell installed and update powershell.version
         """
         if self.is_platform_supported():
             try:

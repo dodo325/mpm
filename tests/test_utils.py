@@ -11,7 +11,7 @@ from mpm.utils.text_parse import (
     parse_table_with_columns,
 )
 from mpm.utils.sys_info import is_64bit
-from mpm.utils.string import auto_decode, is_ascii, is_first_alpha, is_first_ascii_alpha
+from mpm.utils.string import is_ascii, is_first_alpha, is_first_ascii_alpha
 from mpm.utils.json_parse import multiget, iterative_topological_sort
 
 def test_iterative_topological_sort():
@@ -77,17 +77,6 @@ def test_is_is_first_ascii_alpha_2():
     assert not is_first_ascii_alpha(" qweqe123")
     assert not is_first_ascii_alpha("1a323")
     assert not is_first_ascii_alpha("ы123")
-
-
-def test_auto_decode_utf8():
-    text = "123qweqwasd фыаывпы"
-    assert auto_decode(text.encode("utf-8")) == text
-
-
-@pytest.mark.xfail(platform.system() != "Windows", reason="requires Windows")
-def test_auto_decode_cp1251():
-    text = "123qweqwasd фыаывпы"
-    assert auto_decode(text.encode("cp1251")) == text
 
 
 def test_is_64():
