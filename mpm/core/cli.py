@@ -36,11 +36,13 @@ def script():
     """
 
 @script.command(name="list")
-def script_list():
+def script_list():l
     """
     Список найденных скриптов скрипт
     """
-    click.echo("---")
+    scripts = get_scripts()
+    for name, path in scripts.items():
+        click.echo(name)
 
 @script.command()
 @click.argument("script_path") #, help="Path to script or file name in script/ directoriy")
