@@ -260,8 +260,10 @@ stderr = {stderr}\n\targs = {args}\n\tkwargs = {kwargs}"
 
     _compgen_out = None
 
-    def compgen(self, perfix: str = None,) -> list:
+    def compgen(self, perfix: str = None, only_commands: bool = False) -> list:
         command = "compgen -abcdefgjksuv"
+        if only_commands:
+            command = "compgen -c"
         li = self._compgen_out
         if not li:
             out = self.call(command, shell=False)
@@ -278,8 +280,8 @@ stderr = {stderr}\n\targs = {args}\n\tkwargs = {kwargs}"
             out = list(filter(lambda c: c.startswith(perfix), out))
         return out
 
-    def check_command(self, command: str) -> bool:
-        return command in self.compgen()
+    def check_command(self, command: str, only_commands: bool = True) -> bool:
+        return command in self.compgen(only_commands=only_commands)
 
 
 class ZSH(Bash):

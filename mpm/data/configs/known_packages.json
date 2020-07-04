@@ -112,9 +112,16 @@
         }
     },
     "oh-my-zsh": {
-        "// хз что с этим делать":"",
+        "package_managers": {
+            "bash-script": {
+                "install":{
+                    "cmd":"sh -c '$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh) --unattended'"
+                }
+            }
+        },
         "dependence":[
-            "zsh"
+            "zsh",
+            "curl"
         ]
     },
     "vscode": {

@@ -68,7 +68,7 @@ class Snap(PackageManager):
     """ Python Package Manager """
 
     name = "snap"
-
+# snap нфшёл на пустой arch системе!
     def get_all_packages(self) -> List[str]:
         out = self.shell.call(["snap", "list"])
         rex = r"\n\S+(?=\s)"
@@ -106,7 +106,7 @@ class Pip(PackageManager):
     name = "pip"
 
     def get_all_packages(self) -> List[str]:
-        li = self.shell.call([self.name, "freeze"]).split("\n")
+        li = self.shell.call([self.name, "freeze"]).split("\n") #TODO: use "pip list --format=json"
         li = [s[: s.find("==")].lower() for s in li]
         li = list(filter(None, li))
         self.logger.info(f"Detect {len(li)} packages")

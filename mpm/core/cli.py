@@ -27,6 +27,27 @@ def print_info(info: dict()):
 def main():
     pass
 
+@main.group()
+def script():
+    """
+    Работа со скриптами
+    """
+    pass
+
+@script.command(name="list")
+def script_list():
+    """
+    Список найденных скриптов скрипт
+    """
+    click.echo("---")
+
+@script.command()
+def run():
+    """
+    Выполнить скрипт
+    """
+    click.echo("+++")
+
 @main.command()
 def version():
     """

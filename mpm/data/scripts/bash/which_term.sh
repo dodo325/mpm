@@ -26,3 +26,6 @@ which_term(){
     ## package version
     [ $found -eq 0 ] && echo "$term " $(dpkg -l $term | awk '/^ii/{print $3}')    
 }
+if [ "${1}" != "--source-only" ]; then
+    which_term "${@}"
+fi

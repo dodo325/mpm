@@ -1,19 +1,31 @@
 #!/bin/bash
 # Обёртка для вывода логов в терминал
 _time=$(date +"%T.%3N")
-mylog_info() { echo -e "\e[0;40;36m($_time)[*] $@ \e[0m"; }
-mylog_success() { echo -e "\e[1;40;92m($_time)[ok] $@ \e[0m"; }
-mylog_warning() { echo -e "\e[0;40;33m($_time)[warn] $@ \e[0m"; }
-mylog_debug() { echo -e "($_time)[ ] $@"; }
-mylog_error() { echo -e "\e[1;40;91m($_time)[fail] $@ \e[0m"; }
+
+_e="\e[0m"
+_r="\e[1;49;91m"
+_o="\e[1;49;93m"
+_g="\e[1;49;32m"
+_p="\e[0;49;95m"
+
+_lb="\e[0;40;36m"
+_lg="\e[1;40;92m"
+_ly="\e[1;40;93m"
+_lr="\e[1;40;91m"
+_ld="\e[1;40m"
+log_info()    { echo -e "$_lb($_time)[INFO] $@ $_e"; }
+log_success() { echo -e "$_lg($_time)[ OK ] $@ $_e"; }
+log_warning() { echo -e "$_ly($_time)[warn] $@ $_e"; }
+log_debug()   { echo -e "$_ld($_time)[    ] $@ $_e"; }
+log_error()   { echo -e "$_lr($_time)[FAIL] $@ $_e"; }
 
 
 main() {
-    mylog_info "info"
-    mylog_success "success"
-    mylog_warning "warning"
-    mylog_debug "debug"
-    mylog_error "error"
+    log_info "info"
+    log_success "success"
+    log_warning "warning"
+    log_debug "debug"
+    log_error "error"
 }
 
 if [ "${1}" != "--source-only" ]; then

@@ -1,6 +1,6 @@
 #!/bin/bash
 SCRIPTPATH="$( cd "$(dirname "$0")" >/dev/null 2>&1 ; pwd -P )"
-. $SCRIPTPATH/mylog.sh --source-only
+. $SCRIPTPATH/log.sh --source-only
 
 _e="\e[0m"
 _r="\e[1;49;91m"
@@ -36,9 +36,9 @@ print_logo() {
 
 
 main() {
-    mylog_info "Print logo!"
+    log_info "Print logo!"
     print_logo
-    mylog_success "Printed"
+    log_success "Printed"
 }
 
 if [ "${1}" != "--source-only" ]; then
