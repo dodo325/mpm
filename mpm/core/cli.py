@@ -36,7 +36,7 @@ def script():
     """
 
 @script.command(name="list")
-def script_list():l
+def script_list():
     """
     Список найденных скриптов скрипт
     """
