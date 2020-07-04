@@ -11,14 +11,6 @@ import mpm
 import os
 
 
-def get_all_files(base_dir: str) -> list:
-    files = []
-    for r, d, f in os.walk(base_dir):
-        for file in f:
-            files.append(os.path.join(r, file))
-    return files
-
-
 REQUIREMENTS = ["click>=7.0", "coloredlogs", "colorama"]
 
 

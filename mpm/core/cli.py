@@ -11,7 +11,9 @@ from mpm.pm import (
 from mpm.core.logging import getLogger, logging
 from mpm.core.exceptions import PackageManagerNotInatalled
 from mpm.shell import AutoShell
-from mpm.core.configs import get_known_packages, update_user_known_package
+from mpm.scripts import BashScriptFile
+from mpm.core.configs import get_scripts, get_known_packages, update_user_known_package
+from mpm.core import SCRIPTS_DIR, USER_SCRIPTS_DIR
 import mpm
 logger = getLogger(__name__)
 
@@ -32,7 +34,6 @@ def script():
     """
     Работа со скриптами
     """
-    pass
 
 @script.command(name="list")
 def script_list():
@@ -42,11 +43,21 @@ def script_list():
     click.echo("---")
 
 @script.command()
-def run():
+@click.argument("script_path") #, help="Path to script or file name in script/ directoriy")
+def run(script_path):
     """
     Выполнить скрипт
     """
-    click.echo("+++")
+    script = None
+    scripts = get_scripts()
+    if script_path in scripts:
+        script = BashScriptFile(scripts[script_path])
+    else:
+        script = BashScriptFile(script_path)
+    logger.info(scripts)
+    click.echo(
+        script.run()
+    )
 
 @main.command()
 def version():

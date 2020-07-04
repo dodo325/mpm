@@ -1,7 +1,8 @@
 from mpm.core.exceptions import PackageDoesNotExist
 from pathlib import Path
-from mpm import __file__ as mpm__file__
+import os
 
+from mpm import __file__ as mpm__file__
 
 PACKAGE_DIR = Path(mpm__file__).resolve().parent
 PACKAGE_DATA_DIR = PACKAGE_DIR / "data"

@@ -4,7 +4,7 @@
 Данный модуль отвечает за управлетние и парсинг Sh скрипотов
 """
 from mpm.shell import AutoShell, AbstractShell
-from typing import List, Tuple
+from typing import List, Tuple, Optional, Union
 from mpm.core.logging import getLogger
 from pathlib import Path
 from mpm.utils.text_parse import not_nan_split
@@ -16,7 +16,7 @@ class BashScriptFile:
     """
     Bash скрипт файл
     """
-
+    file = None
     content = ""
 
     def _filter_comments(self, lines: list) -> list:
@@ -54,14 +54,22 @@ class BashScriptFile:
         li = not_nan_split(self.content)
         return self._filter_comments(li)
 
-    def __init__(self, path: str, shell: AbstractShell = None):
+    def run(self, shell_mode=False):
+        self.logger.debug(f"run {str(self.file)}")
+        return self.shell.call(["bash", str(self.file)], shell=shell_mode)
+
+    def __init__(self, path: Union[str, Path], shell: AbstractShell = None):
         self.logger = logger.getChild(self.__class__.__name__)
         if shell == None:
             self.shell = AutoShell()
         else:
             self.shell = shell
 
-        file = Path(self.shell.echo(path))
+        if type(path) in Path.__subclasses__():
+            file = path
+        elif type(path) == str:
+            file = Path(self.shell.echo(path))
+            
         if file.is_file():
             self.file = file
             self.update()

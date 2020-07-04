@@ -1,6 +1,6 @@
 #!/bin/bash
 SCRIPTPATH="$( cd "$(dirname "$0")" >/dev/null 2>&1 ; pwd -P )"
-. $SCRIPTPATH/log.sh --source-only
+. $SCRIPTPATH/mylog.sh --source-only
 
 _e="\e[0m"
 _r="\e[1;49;91m"

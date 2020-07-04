@@ -6,7 +6,6 @@ import shutil
 from pathlib import Path
 import urllib.request
 import json
-
 from mpm.core import (
     USER_DATA_DIR,
     USER_CONFIGS_DIR,
@@ -25,6 +24,16 @@ user_settings_file = USER_CONFIGS_DIR / "settings.json"
 settings_file = CONFIGS_DIR / "settings.json"
 
 
+def get_scripts() -> dict:
+    scripts = {}
+    paths = list(SCRIPTS_DIR.glob("**/*"))
+    paths.extend(list(USER_SCRIPTS_DIR.glob("**/*")))
+    for known_script_path in paths:
+        if known_script_path.is_file():
+            name = str(known_script_path)
+            name = name[name.find("scripts/") + len("scripts/"):]
+            scripts[name] = known_script_path
+    return scripts
 def get_settings():
     with settings_file.open() as sf:
         settings = json.load(sf)
