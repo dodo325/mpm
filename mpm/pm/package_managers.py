@@ -78,7 +78,11 @@ class Snap(PackageManager):
         return li
 
     def search(self, package_name: str) -> dict:
-        out = self.shell.call(["LANG=en_US.UTF-8;", "snap", "find", package_name])
+        try:
+            out = self.shell.call(["LANG=en_US.UTF-8;", "snap", "find", package_name])
+        except CalledProcessError as e:
+            self.logger.error(f"Nothing found for {package_name}!")
+            return {}
         return parse_table_with_columns(out, key_lower=True)
 
 
@@ -89,6 +93,7 @@ class NPM(PackageManager):
 
     def get_all_packages(self) -> List[str]:
         out = self.shell.call("npm list -g --depth=0")
+        # npm list -g --depth=0 --json
         rex = r"(?=\s).+(?=@)"
         li = re.findall(rex, out)
         li = [s.replace(" ", "") for s in li]
