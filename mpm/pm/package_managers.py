@@ -96,7 +96,11 @@ class NPM(PackageManager):
         return li
 
     def search(self, package_name: str) -> dict:
-        out = self.shell.call(["npm", "search", package_name])
+        try:
+            out = self.shell.call(["npm", "search", package_name])
+        except CalledProcessError:
+            self.logger.error(f"Nothing found for {package_name}!")
+            return {}
         return parse_table_with_columns(out, key_lower=True, delimiter="|")
 
 
@@ -223,7 +227,11 @@ class AptGet(PackageManager):
         self.shell.sudo_call([self.name, "update"], enter_password=enter_password)
 
     def search(self, package_name: str) -> dict:
-        out = self.shell.call(["apt-cache", "search", package_name])
+        try:
+            out = self.shell.call(["apt-cache", "search", package_name])
+        except CalledProcessError as e:
+            self.logger.error(f"Nothing found for {package_name}!")
+            return {}
         out = self._remove_warnings(out)
         if out == "":
             return {}
