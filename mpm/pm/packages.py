@@ -20,7 +20,7 @@ from mpm.pm.package_managers import (
     get_installed_pms,
     NAMES_TO_PACKAGE_MANAGERS,
 )
-from mpm.utils.text_parse import parse_table_with_columns, parse_value_key_table
+from mpm.utils.text_parse import parse_table_with_columns, parse_value_key_table, not_nan_split
 from mpm.core.configs import get_known_packages, get_packages_dependences_order
 from mpm.utils.string import auto_decode
 from mpm.core.logging import getLogger
@@ -305,7 +305,20 @@ class NPMPackage(Package):
             self.logger.success("Package installed!")
 
     def show(self) -> dict:
-        out = self.shell.call(["npm", "view", self.package_name, "--json"])
+        try:
+            out = self.shell.call(["npm", "view", self.package_name, "--json"])
+        except CalledProcessError as e:
+            raise ShellError(
+                "command '{}' return with error (code {}): {}".format(
+                    e.cmd, e.returncode, e.output
+                )
+            )
+        # out = out[out.find("{\n"):]
+        out_2 = ""
+        for line in not_nan_split(out):
+            if not line.startswith("npm"):
+                out_2 += line + "\n"
+        out = out_2
         data = json.loads(out)
         data["version"] = data["versions"][-1]
         data.pop("name")
