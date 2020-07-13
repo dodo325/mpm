@@ -2,6 +2,7 @@
     "pytest": {"package_managers":{"pip":{}}},
     "urwid": {"package_managers":{"pip":{}}},
     "dbus": {"package_managers":{"apt-get":{}}},
+    
     "pipver": {
         "package_managers": {
             "bash-alias": {
@@ -12,6 +13,11 @@
                 ]
             },
             "pip": {}
+        }
+    },
+    "TauonMusicBox":{
+        "snap":{
+            "package_name": "tauon"
         }
     },
     "gnome-shell-extension-installer": {
