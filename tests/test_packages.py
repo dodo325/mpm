@@ -1,5 +1,5 @@
 import pytest
-from mpm.pm.packages import PipPackage
+from mpm.pm.packages import PipPackage, NPMPackage
 
 
 def test_pip_pkg_is_installed(fake_process, fake_bash_shell):
@@ -10,6 +10,14 @@ def test_pip_pkg_is_installed(fake_process, fake_bash_shell):
     assert pkg.is_installed()
     assert pkg.is_pm_installed()
 
+def test_npm_pkg_show(fake_process, fake_bash_shell):
+    sh = fake_bash_shell(
+        fake_process, extend_list=[
+            (["npm", "view", "mpm", "--json"], "mpm_view_mpm.txt"), ]
+    )
+    pkg = NPMPackage("npm", shell=sh)
+    d = pkg.show()
+    assert type(d) == dict
 
 def test_pip_info(fake_process, fake_bash_shell):
     sh = fake_bash_shell(

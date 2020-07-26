@@ -89,7 +89,10 @@ def get_known_packages(offline=False):
         try:
             known_packages = get_remote_known_packages()
         except (urllib.request.HTTPError, urllib.error.URLError) as e:
-            logger.error(f"Error: code = {e.code}, url = {e.url}", exc_info=True)
+            if type(e) == urllib.request.HTTPError:
+                logger.error(f"Error: code = {e.code}, url = {e.url}", exc_info=True)
+            else:
+                logger.error(f"Error!", exc_info=True)
 
     if user_known_packages_file.is_file():
         logger.debug(f"Reading : {user_known_packages_file}")

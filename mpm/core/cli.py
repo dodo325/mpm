@@ -43,7 +43,8 @@ def script_list():
     scripts = get_scripts()
     for name, path in scripts.items():
         click.echo(name)
-
+ 
+ 
 @script.command()
 @click.argument("script_path") #, help="Path to script or file name in script/ directoriy")
 def run(script_path):
