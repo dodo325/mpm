@@ -277,7 +277,8 @@ class BashAliasManager(PackageManager):
         if profiles:
             self.profiles = profiles
 
-        self.init_profiles()
+        if self.is_installed():
+            self.init_profiles()
 
     def init_profiles(self, profiles: List["str"] = None):
         if profiles:
