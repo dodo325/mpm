@@ -161,7 +161,7 @@ stderr = {stderr}\n\targs = {args}\n\tkwargs = {kwargs}"
         out = check_output(
             out_command, 
             shell=shell, 
-            universal_newlines=True, 
+            universal_newlines=True,  #TODO: better make: .encode("utf8")
             stderr=stderr, 
             **kwargs)
         if debug:

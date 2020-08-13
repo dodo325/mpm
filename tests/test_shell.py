@@ -86,7 +86,7 @@ class TestZSH:
     )
     def test_check_command(self, fake_process, cmd):
         out = self.read_calls_file("bash_compgen.txt")
-        command = self.sh.get_full_command("compgen -abcdefgjksuv")
+        command = self.sh.get_full_command("compgen -c")  # abcdefgjksuv
         fake_process.register_subprocess(command, stdout=out.splitlines())
         assert self.sh.check_command(cmd)
 
@@ -203,7 +203,7 @@ class TestBash:
     def test_fake_compgen(self, fake_process):
         out = self.read_calls_file("bash_compgen.txt")
 
-        command = self.sh.get_full_command("compgen -abcdefgjksuv")
+        command = self.sh.get_full_command("compgen -c")  # abcdefgjksuv
         print(f"command = {command}")
         fake_process.register_subprocess(command, stdout=out.splitlines())
         assert type(self.sh.compgen()) == list
@@ -229,8 +229,9 @@ class TestBash:
         "cmd", ["python", "apt", "apt-get", "set", "bash", "nano", "sudo"]
     )
     def test_check_command(self, fake_process, cmd):
+        assert self.sh.name == "bash"
         out = self.read_calls_file("bash_compgen.txt")
-        command = self.sh.get_full_command("compgen -abcdefgjksuv")
+        command = self.sh.get_full_command("compgen -c")  # abcdefgjksuv
         fake_process.register_subprocess(command, stdout=out.splitlines())
         assert self.sh.check_command(cmd)
 
