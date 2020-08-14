@@ -13,7 +13,8 @@ import subprocess
 import pytest
 from pathlib import Path
 from typing import List, Tuple
-
+from mpm.core.logging import getLogger
+logger = getLogger(__name__)
 # @pytest.fixture(scope="session", autouse=True)
 # def auto_session_resource(request):
 #     """ Auto session resource fixture
@@ -60,15 +61,18 @@ def fake_bash_shell(request):
         fake_process,
         command_list: List[Tuple["cmd", "output_file"]] = [
             (["bash", "--version"], "bash_version.txt"),
-            (["compgen", "-abcdefgjksuv"], "bash_compgen_commands.txt"),
+            (["compgen -c"], "bash_compgen_commands.txt"),
+            (["compgen", "-abcdefgjksuv"], "bash_compgen_full.txt"),
         ],
         extend_list: List[Tuple["cmd", "output_file"]] = [],
     ) -> AbstractShell:
         sh = Bash()
         command_list.extend(extend_list)
         for cmd, file_name in command_list:
+            full_command = sh.get_full_command(cmd)
+            logger.debug(f"\n\tfull_command={full_command},\n\tfile_name={file_name}")
             fake_process = add_cmd_from_file(
-                fake_process, sh.get_full_command(cmd), file_name
+                fake_process, full_command, file_name
             )
             fake_process = add_cmd_from_file(fake_process, cmd, file_name)
         return sh

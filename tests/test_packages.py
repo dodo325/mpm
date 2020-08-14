@@ -4,7 +4,7 @@ from mpm.pm.packages import PipPackage, NPMPackage
 
 def test_pip_pkg_is_installed(fake_process, fake_bash_shell):
     sh = fake_bash_shell(
-        fake_process, extend_list=[(["pip", "freeze"], "pip_freeze.txt"),]
+        fake_process, extend_list=[(["pip", "freeze"], "pip_freeze.txt")]
     )
     pkg = PipPackage("numpy", shell=sh)
     assert pkg.is_installed()
@@ -15,7 +15,7 @@ def test_npm_pkg_show(fake_process, fake_bash_shell):
         fake_process, extend_list=[
             (["npm", "view", "mpm", "--json"], "mpm_view_mpm.txt"), ]
     )
-    pkg = NPMPackage("npm", shell=sh)
+    pkg = NPMPackage("mpm", shell=sh)
     d = pkg.show()
     assert type(d) == dict
 

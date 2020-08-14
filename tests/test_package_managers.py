@@ -1,6 +1,7 @@
 import pytest
 from mpm.pm.package_managers import Pip, BashAliasManager
 from mpm.shell import ZSH
+from .conftest import add_cmd_from_file
 
 def test_bash_1(fake_process, fake_bash_shell):
     sh = fake_bash_shell(fake_process)
@@ -74,4 +75,7 @@ def test_BashAliasManager_is_installed(fake_process, fake_bash_shell):
         ["echo $HOME/.zshrc"]), stdout="/home/user/.zshrc")
     pm = BashAliasManager(shell=sh)
     assert pm.shell.name == "bash"
-    assert pm.is_installed()
+    # fake_process = add_cmd_from_file(
+    #     fake_process, ["bash", "--version"], "bash_version.txt")
+    # assert pm.is_installed()
+    
