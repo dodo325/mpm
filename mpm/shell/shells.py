@@ -161,14 +161,15 @@ stderr = {stderr}\n\targs = {args}\n\tkwargs = {kwargs}"
         out = check_output(
             out_command, 
             shell=shell, 
-            universal_newlines=True,  #TODO: better make: .encode("utf8")
-            stderr=stderr, 
+            # universal_newlines=True,  #TODO: better make: .decode("utf8")
+            stderr=stderr,
             **kwargs)
+        out_str = out.decode("utf8")
         if debug:
-            self.logger.debug(f"Output: {out}")
-        if out.startswith("get-command"):
+            self.logger.debug(f"Output: {out_str}")
+        if out_str.startswith("get-command"):
             raise CommandNotFound(f"Command not found: {command}")
-        return self._call_filter(out)
+        return self._call_filter(out_str)
 
 
 class Bash(AbstractShell):
