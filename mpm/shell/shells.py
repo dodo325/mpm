@@ -258,20 +258,50 @@ stderr = {stderr}\n\targs = {args}\n\tkwargs = {kwargs}"
                 pass
         return False
 
-    _compgen_out = None
+    __compgen_out = None
+    def compgen(
+        self, 
+        perfix: str = None, 
+        only_commands: bool = False, 
+        no_cashe: bool = False,
+        exact_match: bool = False
+        ) -> list:
+        """
+        compgen is bash built-in Unix command and it will show all available commands, aliases, and functions for you!
 
-    def compgen(self, perfix: str = None, only_commands: bool = False) -> list:
+        only_commands - run 'compgen -c'
+
+        Using:
+        >>> sh = Bash()
+        >>> cmd_list = sh.compgen()
+        >>> len(cmd_list)
+        6315
+        >>> li = sh.compgen(only_commands=True, no_cashe=True)
+        >>> len(li)
+        5509
+        >>> li[:5]
+        ['if', 'then', 'else', 'elif', 'fi']
+        """
         command = "compgen -abcdefgjksuv"
         if only_commands:
             command = "compgen -c"
-        li = self._compgen_out
-        if not li:
+        li = self.__compgen_out
+        if not li or no_cashe:
             out = self.call(command, shell=False)
             out = out.replace("\n", " ")
             li = not_nan_split(out, delimiter=" ")
-            self._compgen_out = li
+
+            if not no_cashe:
+                self.__compgen_out = li
         if perfix != None:
-            li = list(filter(lambda c: c.startswith(perfix), li))
+            if exact_match:
+                try:
+                    li.index(perfix)
+                    return [perfix]
+                except ValueError:
+                    return []
+            else:
+                li = list(filter(lambda c: c.startswith(perfix), li))
         return li
 
     def alias_list(self, perfix: str = None) -> list:  # TODO: load user profile!

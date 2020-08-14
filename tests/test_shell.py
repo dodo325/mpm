@@ -85,7 +85,7 @@ class TestZSH:
         "cmd", ["python", "apt", "apt-get", "set", "bash", "nano", "sudo"]
     )
     def test_check_command(self, fake_process, cmd):
-        out = self.read_calls_file("bash_compgen.txt")
+        out = self.read_calls_file("bash_compgen_commands.txt")
         command = self.sh.get_full_command("compgen -c")  # abcdefgjksuv
         fake_process.register_subprocess(command, stdout=out.splitlines())
         assert self.sh.check_command(cmd)
@@ -199,14 +199,35 @@ class TestBash:
             "/home/user/anaconda3/bin/python",
             "/home/user/anaconda3/bin/python3.7m-config",
         ]
+    
+    @pytest.mark.xfail(platform.system() != "Linux", reason="requires Linux")
+    def test_compgen(self):
+        a = self.sh.compgen(only_commands=True, no_cashe=True)
+        b = self.sh.compgen(only_commands=False, no_cashe=True)
+        assert type(a) == list
+        assert type(b) == list
+        assert len(a) < len(b)
+        assert "python" in a
+        assert "python" in b
+        
+    @pytest.mark.xfail(platform.system() != "Linux", reason="requires Linux")
+    def test_compgen(self):
+        a = self.sh.compgen("python", exact_match=True, no_cashe=True)
+        assert len(a) == 1
+        assert a == ["python"]
+        
+        b = self.sh.compgen("dl,fkgnsldkjg;k", exact_match=True, no_cashe=True)
+        assert len(b) == 0
+        assert b == []
+
 
     def test_fake_compgen(self, fake_process):
-        out = self.read_calls_file("bash_compgen.txt")
+        out = self.read_calls_file("bash_compgen_commands.txt")
 
         command = self.sh.get_full_command("compgen -c")  # abcdefgjksuv
         print(f"command = {command}")
         fake_process.register_subprocess(command, stdout=out.splitlines())
-        assert type(self.sh.compgen()) == list
+        assert type(self.sh.compgen(only_commands=True)) == list
         print(self.sh.compgen("python"))
         assert self.sh.compgen("python") == [
             "python2.7",
@@ -222,7 +243,7 @@ class TestBash:
             "python3.8-config",
         ]
         assert set(self.sh.compgen("code")) == set(
-            ["codepage", "code", "code.url-handler"]
+            ["codepage", "code", "codecov", "code.url-handler"]
         )
 
     @pytest.mark.parametrize(
@@ -230,7 +251,7 @@ class TestBash:
     )
     def test_check_command(self, fake_process, cmd):
         assert self.sh.name == "bash"
-        out = self.read_calls_file("bash_compgen.txt")
+        out = self.read_calls_file("bash_compgen_commands.txt")
         command = self.sh.get_full_command("compgen -c")  # abcdefgjksuv
         fake_process.register_subprocess(command, stdout=out.splitlines())
         assert self.sh.check_command(cmd)

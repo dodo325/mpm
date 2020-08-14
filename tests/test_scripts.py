@@ -15,7 +15,7 @@ def test_bash_init():
 
     script = BashScriptFile(str(f))
     li = script.get_lines()
-    assert len(li) == 25
+    assert len(li) == 28
     assert li[1] == "    term=$(ps -p $(ps -p $$ -o ppid=) -o args=);"
 
 

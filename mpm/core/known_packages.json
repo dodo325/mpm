@@ -113,16 +113,6 @@
             }
         }
     },
-    "a": {
-        "dependence":[
-            "b", "a"
-        ]
-    },
-    "b": {
-        "dependence":[
-            "a"
-        ]
-    },
     "curl": {
         "package_managers":{
             "apt":{}
@@ -140,6 +130,11 @@
     },
     "oh-my-zsh": {
         "// хз что с этим делать":"",
+        "package_managers": {
+            "shell": {
+                "cmd": "export RUNZSH=no; sh -c '$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)'"
+            }
+        },
         "dependence":[
             "curl","git", "zsh"
         ]

@@ -60,7 +60,7 @@ def fake_bash_shell(request):
         fake_process,
         command_list: List[Tuple["cmd", "output_file"]] = [
             (["bash", "--version"], "bash_version.txt"),
-            (["compgen", "-abcdefgjksuv"], "bash_compgen.txt"),
+            (["compgen", "-abcdefgjksuv"], "bash_compgen_commands.txt"),
         ],
         extend_list: List[Tuple["cmd", "output_file"]] = [],
     ) -> AbstractShell:
