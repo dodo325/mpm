@@ -14,11 +14,28 @@ import subprocess
 import pytest
 from pathlib import Path
 
+def test_get_installed_shells():
+    pms = get_installed_shells()
 
 def test_AutoShell_init():
     sh = AutoShell()
     assert sh.is_installed()
 
+def test_AbstractShell_whereis():
+    sh = AbstractShell()
+    with pytest.raises(NotImplementedError):
+        sh.whereis()
+
+def test_AbstractShell_sudo_call():
+    sh = AbstractShell()
+    with pytest.raises(NotImplementedError):
+        sh.sudo_call("clear")
+
+def test_AbstractShell_check_command():
+    sh = AbstractShell()
+    assert sh.check_command("asd") == None
+    assert sh.check_command("aasdassafsd") == None
+    assert sh.check_command("python") == None
 
 def test_AbstractShell_inheritors():
     inheritors_list = AbstractShell._inheritors()
@@ -130,6 +147,7 @@ class TestBash:
     # def test_installed(self):
     # assert self.sh.is_installed()
 
+    @pytest.mark.linux
     def test_get_full_command(self):
         assert self.sh.get_full_command(["bash", "--version"]) == [
             "/bin/bash",
@@ -199,7 +217,8 @@ class TestBash:
             "/home/user/anaconda3/bin/python",
             "/home/user/anaconda3/bin/python3.7m-config",
         ]
-    
+
+    @pytest.mark.linux
     @pytest.mark.xfail(platform.system() != "Linux", reason="requires Linux")
     def test_compgen(self):
         a = self.sh.compgen(only_commands=True, no_cashe=True)
@@ -209,7 +228,8 @@ class TestBash:
         assert len(a) < len(b)
         assert "python" in a
         assert "python" in b
-        
+
+    @pytest.mark.linux
     @pytest.mark.xfail(platform.system() != "Linux", reason="requires Linux")
     def test_compgen(self):
         a = self.sh.compgen("python", exact_match=True, no_cashe=True)
