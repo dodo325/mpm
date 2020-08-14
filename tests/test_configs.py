@@ -1,7 +1,8 @@
 from mpm.core.configs import (
     get_settings, CONFIGS_DIR, USER_DATA_DIR, USER_SCRIPTS_DIR,
     settings_file, user_settings_file, USER_CONFIGS_DIR, init_user_configs_dir,
-    known_packages_file, get_known_packages, update_user_known_package,  get_remote_known_packages)
+    known_packages_file, get_known_packages, update_user_known_package, 
+    get_remote_known_packages, get_packages_dependences_order)
 import pytest
 
 def test_CONFIGS_DIR():
@@ -23,6 +24,31 @@ def test_get_known_packages(offline):
     known_packages = get_known_packages(offline=offline)
     assert "pytest" in known_packages
     assert user_settings_file.is_file()
+
+
+def test_get_packages_dependences_order():
+    known_packages = {
+        "A": {
+            "package_managers": {"apt": {}},
+            "dependence": ["B", "C"]
+        },
+        "B": {
+            "package_managers": {"apt": {}},
+            "dependence": ["C"]
+        },
+        "C": {
+            "package_managers": {"apt": {}}
+        }
+    }
+    assert get_packages_dependences_order(known_packages, "A") == ["C", "B", "A"]
+    assert get_packages_dependences_order(known_packages, "B") == ["C", "B"]
+    assert get_packages_dependences_order(known_packages, "C") == ["C"]
+
+def test_get_packages_dependences_order_oh_my_zsh():
+    known_packages = get_known_packages(offline=True)
+    assert get_packages_dependences_order(
+        known_packages, "oh-my-zsh") == ["curl", "git", "zsh"]
+
 
 def test_init_user_configs_dir():
     init_user_configs_dir()

@@ -2,6 +2,23 @@
     "pytest": {"package_managers":{"pip":{}}},
     "urwid": {"package_managers":{"pip":{}}},
     "dbus": {"package_managers":{"apt-get":{}}},
+    "pipver": {
+        "package_managers": {
+            "bash-alias": {
+                "cmd": "/home/dodo/.zshrc",
+                "profiles": [
+                    "/home/dodo/.zshrc",
+                    "/home/dodo/.bashrc"
+                ]
+            },
+            "pip": {}
+        }
+    },
+    "TauonMusicBox":{
+        "snap":{
+            "package_name": "tauon"
+        }
+    },
     "gnome-shell-extension-installer": {
         "package_managers":{
             "script":{
@@ -95,15 +112,14 @@
             }
         }
     },
-    "sshi": {
-        "package_managers": {
-            "bash-alias": {
-                "cmd": "ssh -o 'IdentitiesOnly=yes'",
-                "profiles": [
-                    "$HOME/.zshrc", 
-                    "$HOME/.bashrc"
-                ]
-            }
+    "curl": {
+        "package_managers":{
+            "apt":{}
+        }
+    },
+    "git": {
+        "package_managers":{
+            "apt":{}
         }
     },
     "zsh": {
@@ -112,16 +128,14 @@
         }
     },
     "oh-my-zsh": {
+        "// хз что с этим делать":"",
         "package_managers": {
-            "bash-script": {
-                "install":{
-                    "cmd":"sh -c '$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh) --unattended'"
-                }
+            "shell": {
+                "cmd": "export RUNZSH=no; sh -c '$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)'"
             }
         },
         "dependence":[
-            "zsh",
-            "curl"
+            "curl", "git", "zsh"
         ]
     },
     "vscode": {

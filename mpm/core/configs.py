@@ -106,4 +106,5 @@ def get_packages_dependences_order(known_packages: dict, package: list):
     graph = dict()
     for name, data in known_packages.items():
         graph[name] = data.get('dependence', [])
+    logger.debug(f"graph={graph}, known_packages keys={list(known_packages.keys())}")
     return iterative_topological_sort(graph, package, reverse=True)

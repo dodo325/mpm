@@ -1,6 +1,6 @@
 # https://click.palletsprojects.com/en/7.x/testing/
 from click.testing import CliRunner
-from mpm.core.cli import info, main, search, version, install
+from mpm.core.cli import info, main, search, version, install, list_command
 import pytest
 import mpm
 import mpm.__main__
@@ -14,6 +14,12 @@ def test_info_pass():
     assert result.exit_code == 0
     # assert result.output == 'Hello Peter!\n'
 
+@pytest.mark.cli
+def test_list_pass():
+    runner = CliRunner()
+    result = runner.invoke(list_command)
+    assert result.exit_code == 0
+    
 @pytest.mark.cli
 def test_install_pass():
     runner = CliRunner()
