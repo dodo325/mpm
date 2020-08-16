@@ -47,7 +47,7 @@ def test_get_packages_dependences_order():
 def test_get_packages_dependences_order_oh_my_zsh():
     known_packages = get_known_packages(offline=True)
     assert get_packages_dependences_order(
-        known_packages, "oh-my-zsh") == ["curl", "git", "zsh"]
+        known_packages, "oh-my-zsh") == ['zsh', 'git', 'curl', 'oh-my-zsh']
 
 
 def test_init_user_configs_dir():
