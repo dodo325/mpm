@@ -37,8 +37,11 @@ setup_config = {
             "pytest-cov",
             "coloredlogs",
             "codecov"
-            ]
-        },
+        ],
+        "docs": [
+            "markdown-fenced-code-tabs"
+        ]
+    },
     "classifiers": [
         "Environment :: Console",
         "Intended Audience :: Developers",

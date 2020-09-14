@@ -1,1 +1,18 @@
 site_name: mpm-core
+repo_url: https://github.com/dodo325/mpm
+nav:
+    - Home: index.md
+    - Install: install.md
+plugins:
+    - search
+theme: 
+    name: readthedocs
+    highlightjs: true
+markdown_extensions:
+    - admonition
+    - codehilite
+    - pymdownx.keys
+    - markdown_fenced_code_tabs:
+        template: 'default'
+extra_css:
+    - css/code-tabs.css
