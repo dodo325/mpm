@@ -5,8 +5,6 @@ GitHub: https://github.com/dodo325/mpm
 import sys
 __version__ = "0.1.12"
 
-from mpm.shell import *
-
 def getAbout() -> str:
     info = sys.modules[__name__].__doc__
     info += "Version: " + __version__
