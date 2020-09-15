@@ -1,7 +1,7 @@
-from typing import List
+from typing import List, Any
 
 
-def multiget(d: dict, keys: List[str], default=None):
+def multiget(d: dict, keys: List[str], default=None) -> Any:
     """
     Вытаскивает из словоря key из keys, если его нет, то пытается со следующим. 
     Если ничего не найденно то позвращает default

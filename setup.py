@@ -11,7 +11,10 @@ import mpm
 import os
 
 
-REQUIREMENTS = ["click>=7.0", "coloredlogs", "colorama"]
+REQUIREMENTS = [
+    "plumbum",
+    "rich"
+]
 
 
 def read(fname):

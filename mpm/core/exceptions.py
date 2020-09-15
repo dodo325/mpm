@@ -1,19 +1,7 @@
 """
 Global MPM exception and warning classes.
 """
-
-
-class ShellError(Exception):
-    """ Shell Error """
-
-    pass
-
-
-class CommandNotFound(ShellError):
-    """The Command Not Found"""
-
-    pass
-
+from plumbum.commands import ProcessExecutionError
 
 class PackageManagerNotInatalled(Exception):
     """Package Manager Not Inatalled"""
@@ -21,13 +9,16 @@ class PackageManagerNotInatalled(Exception):
     pass
 
 
-class PackageDoesNotExist(ShellError):
+class PackageDoesNotExist():
     """The Package does not exist"""
 
     pass
 
 
-class PackageDoesNotInatalled(ShellError):
+class PackageDoesNotInatalled():
     """The Package does not Inatalled"""
 
+    pass
+
+class PermissionDeniedError(ProcessExecutionError):
     pass
