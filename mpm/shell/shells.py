@@ -51,13 +51,13 @@ class Shell:
         return self.exec
 
     def get_sudo(self) -> bool:
+        sudo = self.exec["sudo"]
         try:
-            sudo = self.exec["sudo"]["--stdin"]
             sudo["ls"]()
         except ProcessExecutionError as e:
             if "no password" in e.stderr:
                 __pass = getpass("Sudo password: ")
-                p = sudo["ls"].popen(stdin=PIPE)
+                p = sudo["--stdin"]["ls"].popen(stdin=PIPE)
                 out = p.communicate(f"{__pass}\n".encode(), timeout=2)
                 self.logger.info(out)
             else:
