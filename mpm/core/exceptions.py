@@ -9,16 +9,13 @@ class PackageManagerNotInatalled(Exception):
     pass
 
 
-class PackageDoesNotExist():
+class PackageDoesNotExist(FileNotFoundError):
     """The Package does not exist"""
-
-    pass
-
-
-class PackageDoesNotInatalled():
-    """The Package does not Inatalled"""
-
     pass
 
 class PermissionDeniedError(ProcessExecutionError):
+    pass
+
+class PackageDoesNotInatalled(FileNotFoundError):
+    """The Package does not Inatalled"""
     pass
