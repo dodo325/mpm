@@ -9,7 +9,7 @@ from setuptools import setup, find_packages
 import sys
 import mpm
 import os
-
+from rich.console import Console
 
 REQUIREMENTS = [
     "plumbum",
@@ -21,6 +21,7 @@ def read(fname):
     try:
         return open(os.path.join(os.path.dirname(__file__), fname)).read()
     except IOError:
+        console.print_exception()
         return ""
 
 setup_config = {
