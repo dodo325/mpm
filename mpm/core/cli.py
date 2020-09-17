@@ -14,6 +14,7 @@ from plumbum import cli
 from rich.console import Console
 from rich.table import Table
 from rich import box
+from rich.scope import render_scope
 from rich.prompt import Prompt
 from rich.syntax import Syntax
 from rich.traceback import install
@@ -24,18 +25,34 @@ logger = getLogger(__name__)
 
 from mpm.__init__ import __version__ as version_str
 
+# def print_info(info: dict()):
+#     for pm_name, data in info.items():
+#         title = pm_name
+#         if data.get("is_installed", False):
+#             title += " ([bold green]INSTALLED[/bold green])"
+#         table = Table(title=title, box=box.ROUNDED)
+# 
+#         table.add_column("Field name", justify="right", style="cyan")
+#         table.add_column("Data", justify="left", style="deep_sky_blue3")
+#         for field_name, field_data in data.items():
+#             table.add_row(str(field_name), str(field_data))
+#         console.print(table)
 def print_info(info: dict()):
     for pm_name, data in info.items():
         title = pm_name
         if data.get("is_installed", False):
             title += " ([bold green]INSTALLED[/bold green])"
-        table = Table(title=title, box=box.ROUNDED)
 
-        table.add_column("Field name", justify="right", style="cyan")
-        table.add_column("Data", justify="left", style="deep_sky_blue3")
-        for field_name, field_data in data.items():
-            table.add_row(str(field_name), str(field_data))
-        console.print(table)
+        print(render_scope(data, title=title, sort_keys=False))
+
+def print_search_results(data):
+    for pm_name, pm_data in data.items():
+        print(f"\t[bold red]{pm_name}[/bold red]:")
+        for pkg_name, pkg_data in pm_data.items():
+            out = pkg_name
+            if "version" in pkg_data:
+                out += "@" + pkg_data['version']
+            print(out)
 
 class MainMixin():
     offline = cli.Flag(
@@ -132,10 +149,36 @@ class Install(cli.Application, MainMixin):
             package_name, 
             shell=shell, 
             pms_classes=self.PMs,
-            auto_update_conf = not self.no_auto_update_conf
+            auto_update_conf=not self.no_auto_update_conf
         )
         package.install()
 
+@Main.subcommand("search")
+class Search(cli.Application, MainMixin):
+    """
+    Поиск пакета
+    """
+    list_mode = cli.Flag(["l", "list"], help="List")
+
+    def main(self, package_name: str):
+        pretty.install()
+        install()
+        shell = AutoShell()
+        self.init(shell)
+        
+        data = {}
+        for pm in self.PMs:
+            try:
+                out = pm(shell=shell).search(package_name)
+                if out != {}:
+                    data[pm.name] = out
+            except NotImplementedError as e:
+                logger.warning(f"{pm.name} not have search method!")  # , exc_info=True)
+        
+        if self.list_mode:
+            print_search_results(data)
+        else:
+            print_info(data)
 
 
 def main():
