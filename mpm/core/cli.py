@@ -180,6 +180,40 @@ class Search(cli.Application, MainMixin):
         else:
             print_info(data)
 
+@Main.subcommand("list")
+class List(cli.Application, MainMixin):
+    """ List installed packages """
+
+    def main(self):
+        pretty.install()
+        install()
+        shell = AutoShell()
+        self.init(shell)
+        
+        out_list = []
+        if self.all_flag:
+            for PM in self.PMs:
+                pm = PM()
+                out_list.extend(pm.get_all_packages())
+        else:
+            for package_name in self.known_packages.keys():
+                try:
+                    package = UniversalePackage(
+                        package_name,
+                        shell=shell,
+                        pms_classes=self.PMs,  # не работает как надо!
+                        known_packages=self.known_packages,
+                    )
+                except PackageManagerNotInatalled:
+                    continue
+                if package.is_installed():
+                    ver = package.info.get("version", None)
+                    if not ver:
+                        out_list.append(f"{package_name}")
+                    else:
+                        out_list.append(f"{package_name}@{ver}")
+        for line in out_list:
+            print(line)
 
 def main():
     Main.run()
