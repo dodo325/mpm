@@ -38,11 +38,11 @@ class Package:
     pm_class: PackageManager = None
     pm = None
 
-    _info = None
+    _info = {}
 
     @property
     def info(self) -> dict:
-        if not self._info:
+        if self._info == {} or not self._info:
             self._info = self.get_info()
         return self._info
 
@@ -334,15 +334,16 @@ class UniversalePackage:
     pms_classes: List[PackageManager] = []
     auto_update_conf = True
     dependences_order = []
-    _info = None
+    _info = {}
     pm_packages: List[
         Package
     ] = []  # список валидных пакетных менеджеров для данного пакета
 
     @property
     def info(self) -> dict:
-        if not self._info:
+        if self._info == {} or not self._info:
             self._info = self.get_info()
+            self.is_installed()
         return self._info
 
     def is_installed(self) -> bool:
@@ -350,18 +351,26 @@ class UniversalePackage:
         Установленн ли пакет в системе
         """
         for pkg in self.pm_packages:
-            if pkg.is_installed():
-                self.logger.debug(
-                    "Package {self.package_name} installed in {pkg.pm.name} package manager"
+            is_installed = pkg.is_installed()
+            if pkg.pm.name in self._info:
+                if self._info[pkg.pm.name] == None:
+                    self._info[pkg.pm.name] = {}
+                self._info[pkg.pm.name]["is_installed"] = is_installed
+            else:
+                self._info[pkg.pm.name] = {"is_installed": is_installed}
+            if is_installed:
+                self.logger.info(
+                    f"Package '{self.package_name}' installed in '{pkg.pm.name}' package manager"
                 )
                 return True
         return False
 
-    def update_package_info(self):
+    def update_package_info(self, all_pm=False):
         """
         Update self.info
         """
-        self._info = self.get_info()
+        self._info = self.get_info(all_pm=all_pm)
+        self.is_installed()
 
     def __init__(
         self,

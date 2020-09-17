@@ -3,7 +3,7 @@ Author: Dodo325
 GitHub: https://github.com/dodo325/mpm
 """
 import sys
-__version__ = "0.1.12"
+__version__ = "0.2.0"
 
 def getAbout() -> str:
     info = sys.modules[__name__].__doc__

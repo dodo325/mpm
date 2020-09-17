@@ -153,7 +153,7 @@ class NPM(PackageManager):
     name = "npm"
 
     def get_all_packages(self) -> List[str]:
-        out = self.shell.call("npm list -g --depth=0")
+        out = self.shell.call(["npm list -g --depth=0"])
         # npm list -g --depth=0 --json
         rex = r"(?=\s).+(?=@)"
         li = re.findall(rex, out)

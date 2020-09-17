@@ -8,6 +8,7 @@ from mpm.pm import (
     get_installed_pms,
 )
 from mpm.shell import AutoShell
+from mpm.core.exceptions import PackageManagerNotInatalled
 import json
 from plumbum import cli
 from rich.console import Console
@@ -25,7 +26,10 @@ from mpm.__init__ import __version__ as version_str
 
 def print_info(info: dict()):
     for pm_name, data in info.items():
-        table = Table(title=pm_name, box=box.ROUNDED)
+        title = pm_name
+        if data.get("is_installed", False):
+            title += " ([bold green]INSTALLED[/bold green])"
+        table = Table(title=title, box=box.ROUNDED)
 
         table.add_column("Field name", justify="right", style="cyan")
         table.add_column("Data", justify="left", style="deep_sky_blue3")
@@ -54,8 +58,28 @@ class MainMixin():
                     exit()
         self.pm_names = PM_names
 
-    known_packages = cli.SwitchAttr(
+    _known_packages = cli.SwitchAttr(
         ["k", "package-manager"], cli.ExistingFile, help="known_packages.json file")
+    
+    def init(self, shell):
+        if self.quiet:
+            logging.disable(logging.CRITICAL)
+            
+        known_packages = get_known_packages(offline=self.offline)
+        if self._known_packages:
+            known_packages.update(json.load(self._known_packages)
+                                  )  # FIXME: _known_packages is not iostream
+        self.known_packages = known_packages
+        PMs = get_installed_pms(shell=shell)
+        if len(self.pm_names) > 0:
+            def pm_fliter(PM): return PM.name in self.pm_names
+            PMs = list(filter(pm_fliter, PMs))
+            logger.debug(f"PMs after filtering: {PMs}")
+        
+        if PMs == []:
+            raise PackageManagerNotInatalled(f"Not found Package Manager")
+
+        self.PMs = PMs
 
 class Main(cli.Application):
     PROGNAME = "mpm"
@@ -71,35 +95,47 @@ class Info(cli.Application, MainMixin):
     def main(self, package_name):
         pretty.install()
         install()
-        if self.quiet:
-            logging.disable(logging.CRITICAL)
+        shell = AutoShell()
+        self.init(shell)
 
         logger.debug(
             f"Args:\n\tpackage_name = {package_name},\n\tpm_names = {self.pm_names}\n\tall = {self.all_flag}\n\toffline = {self.offline}"
         )
-        known_packages = get_known_packages(offline=self.offline)
-        if self.known_packages:
-            known_packages.update(json.load(self.known_packages))
-
-        shell = AutoShell()
-        PMs = get_installed_pms(shell=shell)
-        if len(self.pm_names) > 0:
-            def pm_fliter(PM): return PM.name in self.pm_names
-            PMs = list(filter(pm_fliter, PMs))
-            logger.debug(f"PMs after filtering: {PMs}")
-
+        
         package = UniversalePackage(
-            package_name, shell=shell, pms_classes=PMs, known_packages=known_packages
+            package_name, shell=shell, pms_classes=self.PMs, known_packages=self.known_packages
         )
 
-        info = package.get_info(all_pm=self.all_flag)
+        package.update_package_info(all_pm=self.all_flag)
+        info = package.info
         if info == {}:
             logger.error("Package Does Not Found")
             return
 
         print_info(info)
-        if package_name not in known_packages:
+        if package_name not in self.known_packages:
             update_user_known_package(package_name, package.config)
+
+@Main.subcommand("install")
+class Install(cli.Application, MainMixin):
+    """
+    Показать дополнительные данные о пакете
+    """
+    no_auto_update_conf = cli.Flag("no-auto", help="Search for information not only in local the known_packages")
+    def main(self, package_name: str):
+        pretty.install()
+        install()
+        shell = AutoShell()
+        self.init(shell)
+
+        package = UniversalePackage(
+            package_name, 
+            shell=shell, 
+            pms_classes=self.PMs,
+            auto_update_conf = not self.no_auto_update_conf
+        )
+        package.install()
+
 
 
 def main():
