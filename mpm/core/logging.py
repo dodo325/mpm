@@ -2,11 +2,18 @@ import logging
 from logging.handlers import TimedRotatingFileHandler
 from rich.logging import RichHandler
 from mpm.core.__init__ import LOGGING_DIR, USER_DATA_DIR
+from rich.console import Console
+from rich.theme import Theme
+from rich.style import Style
 
 FORMATTER_FULL = logging.Formatter(
     "[%(levelname)s](%(asctime)s)LINE: %(lineno)d %(pathname)s - %(name)s %(funcName)s - %(message)s"
 )
 FORMATER = logging.Formatter("%(message)s")
+
+console = Console(theme=Theme({
+    "logging.level.success": Style(color="green", bold=True)
+}))
 
 def get_logging():
     SUCCESS_LEVEL = 25
@@ -23,7 +30,7 @@ def get_logging():
 logging = get_logging()
 
 def get_console_handler(level=logging.INFO):
-    console_handler = RichHandler()
+    console_handler = RichHandler(console=console, markup=True)
     console_handler.setFormatter(FORMATER)
     console_handler.setLevel(level)
     return console_handler
@@ -46,7 +53,7 @@ def getLogger(logger_name):
     logging.basicConfig(level=logging.DEBUG)
 
     logger = logging.getLogger(logger_name)
-
+    
     logger.addHandler(get_console_handler(level=logging.INFO))
     logger.addHandler(
         get_file_handler("debug.log", logging.DEBUG, formatter=FORMATTER_FULL)
