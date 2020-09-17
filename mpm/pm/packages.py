@@ -6,6 +6,7 @@
 
 from mpm.pm.package_managers import (get_installed_pms,
                                      AptGet,
+                                     Apt,
                                      Conda,
                                      Pip,
                                      Snap,
@@ -138,3 +139,83 @@ class AptGetPackage(Package):
         if info == {}:
             raise PackageDoesNotInatalled("Package not found: " + self.package_name)
         return info
+
+    def remove(self):
+        if not self.is_installed():
+            self.logger.info("Package not installed")
+            return
+        
+        self.shell.sudo_call(
+            [self.pm.name, "remove", "-y", self.package_name]
+        )
+
+        if not self.is_installed():
+            self.logger.success("Package removed!")
+        
+    def install(self, repository: str = None):
+        if self.is_installed():
+            self.logger.success("Package already installed")
+            return
+        self.logger.info(
+            f"Removing {self.package_name} ({self.info})...", extra={"markup": True})
+        if repository != None:
+            self.pm.add_repository(repository) # todo
+        
+        self.logger.info(f"Installing {self.package_name} ({self.info})...")
+        self.pm.update()
+        self.shell.sudo_call(
+            [self.pm.name, "install", "-y", self.package_name]
+        )
+
+        if self.is_installed():
+            self.logger.success("Package installed!")
+        else:
+            self.logger.warning("Package not installed")
+
+        
+
+class AptPackage(AptGetPackage):
+    """ Apt Package """
+    pm_class = Apt
+
+class PipPackage(Package):
+    """ Python PIP Package """
+
+    pm_class = Pip
+
+    def install(self):
+        if self.is_installed():
+            self.logger.success("Package already installed")
+            return
+
+        self.logger.info(f"Installing {self.package_name} ({self.info})...")
+        self.shell.call([self.pm.name, "install", self.package_name])
+
+        if self.is_installed():
+            self.logger.success("Package installed!")
+
+    def remove(self):
+        if not self.is_installed():
+            self.logger.info("Package not installed")
+            return
+
+        self.logger.info(f"Removing {self.package_name} ({self.info})...")
+        self.shell.call([self.pm.name, "uninstall", "-y", self.package_name])
+
+        if not self.is_installed():
+            self.logger.success("Package removed!")
+
+        def show(self) -> dict:
+        try:
+            out = self.shell.call(["pip", "show", self.package_name, "-v"])
+        except CalledProcessError as e:
+            if "not found:" in auto_decode(e.output):
+                raise PackageDoesNotInatalled("Package not found: " + self.package_name)
+            raise ShellError(
+                "command '{}' return with error (code {}): {}".format(
+                    e.cmd, e.returncode, e.output
+                )
+            )
+        info = parse_value_key_table(out, key_lower=True)
+        return info
+

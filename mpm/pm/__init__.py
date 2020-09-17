@@ -1,5 +1,6 @@
 from mpm.pm.package_managers import (get_installed_pms,
                                      AptGet,
+                                     Apt,
                                      Conda,
                                      Pip,
                                      Snap,
