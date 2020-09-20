@@ -1,13 +1,13 @@
 import pytest
-from mpm.shell.shells import (
-    AutoShell,
-    Bash,
-    ZSH,
-    PowerShell,
-    Cmd,
-    AbstractShell,
-    get_installed_shells,
-)
+#from mpm.shell.shells import (
+#    AutoShell,
+#    Bash,
+#    ZSH,
+#    PowerShell,
+#    Cmd,
+#    AbstractShell,
+#    get_installed_shells,
+#)
 import platform
 import subprocess
 import pytest
@@ -46,35 +46,36 @@ logger = getLogger(__name__)
 # request.addfinalizer(function_resource_teardown)
 
 
-def add_cmd_from_file(fake_process, command: list, file_name: str) -> "fake_process":
-    path = Path(__file__).parent / "callss_output" / file_name
-    with path.open() as f:
-        out = f.read()
-    # print(f"command = {command}, out = {out}")
-    fake_process.register_subprocess(command, stdout=out.splitlines())
-    return fake_process
-
-
-@pytest.fixture
-def fake_bash_shell(request):
-    def get_shell(
-        fake_process,
-        command_list: List[Tuple["cmd", "output_file"]] = [
-            (["bash", "--version"], "bash_version.txt"),
-            (["compgen -c"], "bash_compgen_commands.txt"),
-            (["compgen", "-abcdefgjksuv"], "bash_compgen_full.txt"),
-        ],
-        extend_list: List[Tuple["cmd", "output_file"]] = [],
-    ) -> AbstractShell:
-        sh = Bash()
-        command_list.extend(extend_list)
-        for cmd, file_name in command_list:
-            full_command = sh.get_full_command(cmd)
-            logger.debug(f"\n\tfull_command={full_command},\n\tfile_name={file_name}")
-            fake_process = add_cmd_from_file(
-                fake_process, full_command, file_name
-            )
-            fake_process = add_cmd_from_file(fake_process, cmd, file_name)
-        return sh
-
-    return get_shell
+#def add_cmd_from_file(fake_process, command: list, file_name: str) -> "fake_process":
+#    path = Path(__file__).parent / "callss_output" / file_name
+#    with path.open() as f:
+#        out = f.read()
+#    # print(f"command = {command}, out = {out}")
+#    fake_process.register_subprocess(command, stdout=out.splitlines())
+#    return fake_process
+#
+#
+#@pytest.fixture
+#def fake_bash_shell(request):
+#    def get_shell(
+#        fake_process,
+#        command_list: List[Tuple["cmd", "output_file"]] = [
+#            (["bash", "--version"], "bash_version.txt"),
+#            (["compgen -c"], "bash_compgen_commands.txt"),
+#            (["compgen", "-abcdefgjksuv"], "bash_compgen_full.txt"),
+#        ],
+#        extend_list: List[Tuple["cmd", "output_file"]] = [],
+#    ) -> AbstractShell:
+#        sh = Bash()
+#        command_list.extend(extend_list)
+#        for cmd, file_name in command_list:
+#            full_command = sh.get_full_command(cmd)
+#            logger.debug(f"\n\tfull_command={full_command},\n\tfile_name={file_name}")
+#            fake_process = add_cmd_from_file(
+#                fake_process, full_command, file_name
+#            )
+#            fake_process = add_cmd_from_file(fake_process, cmd, file_name)
+#        return sh
+#
+#    return get_shell
+#

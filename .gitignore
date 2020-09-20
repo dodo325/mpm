@@ -133,3 +133,6 @@ dmypy.json
 tmp*
 
 .pypirc
+
+# MkDocs
+site/

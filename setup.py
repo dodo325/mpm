@@ -10,8 +10,11 @@ import sys
 import mpm
 import os
 
-
-REQUIREMENTS = ["click>=7.0", "coloredlogs", "colorama"]
+REQUIREMENTS = [
+    "plumbum",
+    "rich",
+    "pyyaml"
+]
 
 
 def read(fname):
@@ -37,8 +40,11 @@ setup_config = {
             "pytest-cov",
             "coloredlogs",
             "codecov"
-            ]
-        },
+        ],
+        "docs": [
+            "markdown-fenced-code-tabs"
+        ]
+    },
     "classifiers": [
         "Environment :: Console",
         "Intended Audience :: Developers",

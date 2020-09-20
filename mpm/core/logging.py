@@ -1,37 +1,19 @@
-import sys
 import logging
 from logging.handlers import TimedRotatingFileHandler
-import coloredlogs
+from rich.logging import RichHandler
 from mpm.core.__init__ import LOGGING_DIR, USER_DATA_DIR
+from rich.console import Console
+from rich.theme import Theme
+from rich.style import Style
 
 FORMATTER_FULL = logging.Formatter(
     "[%(levelname)s](%(asctime)s)LINE: %(lineno)d %(pathname)s - %(name)s %(funcName)s - %(message)s"
 )
+FORMATER = logging.Formatter("%(message)s")
 
-
-# colors = red green magenta blue yellow black cyan white
-# params = bold faint
-LEVEL_STYLES = {
-    "critical": {"bold": True, "color": "red"},
-    "debug": {"color": "green"},
-    "error": {"color": "red"},
-    "info": {"color": "blue"},
-    "notice": {"color": "magenta"},
-    "spam": {"color": "green", "faint": True},
-    "success": {"bold": True, "color": "green"},
-    "verbose": {"color": "blue"},
-    "warning": {"color": "yellow"},
-}
-FIELD_STYLES = {
-    "asctime": {"bold": True, "color": "black"},
-    "hostname": {"color": "magenta"},
-    "levelname": {"bold": True, "color": "cyan"},
-    "name": {"color": "magenta"},
-    "programname": {"color": "cyan"},
-    "username": {"color": "yellow"},
-    "funcName": {"color": "magenta"},
-}
-
+console = Console(theme=Theme({
+    "logging.level.success": Style(color="green", bold=True)
+}))
 
 def get_logging():
     SUCCESS_LEVEL = 25
@@ -44,18 +26,12 @@ def get_logging():
 
     logging.Logger.success = success
     return logging
+
 logging = get_logging()
 
 def get_console_handler(level=logging.INFO):
-    console_handler = logging.StreamHandler()
-    # console_handler.addFilter(coloredlogs.HostNameFilter())  # %(hostname)s
-    # console_handler.addFilter(coloredlogs.UserNameFilter())  # %(username)s
-    formatter = coloredlogs.ColoredFormatter(
-        "[%(levelname)s](%(asctime)s) %(name)s %(funcName)s - %(message)s",
-        level_styles=LEVEL_STYLES,
-        field_styles=FIELD_STYLES,
-    )
-    console_handler.setFormatter(formatter)
+    console_handler = RichHandler(console=console, markup=True)
+    console_handler.setFormatter(FORMATER)
     console_handler.setLevel(level)
     return console_handler
 
@@ -77,7 +53,7 @@ def getLogger(logger_name):
     logging.basicConfig(level=logging.DEBUG)
 
     logger = logging.getLogger(logger_name)
-
+    
     logger.addHandler(get_console_handler(level=logging.INFO))
     logger.addHandler(
         get_file_handler("debug.log", logging.DEBUG, formatter=FORMATTER_FULL)

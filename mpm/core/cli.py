@@ -1,6 +1,5 @@
-import click
-import sys
-import json
+from mpm.core.configs import get_scripts, get_known_packages, update_user_known_package
+from mpm.core.logging import getLogger, logging
 from mpm.pm import (
     Package,
     UniversalePackage,
@@ -8,344 +7,225 @@ from mpm.pm import (
     PACKAGE_MANAGERS_NAMES,
     get_installed_pms,
 )
-from mpm.core.logging import getLogger, logging
-from mpm.core.exceptions import PackageManagerNotInatalled
 from mpm.shell import AutoShell
-from mpm.scripts import BashScriptFile
-from mpm.core.configs import get_scripts, get_known_packages, update_user_known_package
-from mpm.core import SCRIPTS_DIR, USER_SCRIPTS_DIR
-import mpm
+from mpm.core.exceptions import PackageManagerNotInatalled
+import json
+import yaml
+from plumbum import cli
+from rich.console import Console
+from rich.table import Table
+from rich import box
+from rich.scope import render_scope
+from rich.prompt import Prompt
+from rich.syntax import Syntax
+from rich.traceback import install
+from rich import print, pretty
+console = Console()
+
 logger = getLogger(__name__)
 
+from mpm.__init__ import __version__ as version_str
 
+# def print_info(info: dict()):
+#     for pm_name, data in info.items():
+#         title = pm_name
+#         if data.get("is_installed", False):
+#             title += " ([bold green]INSTALLED[/bold green])"
+#         table = Table(title=title, box=box.ROUNDED)
+# 
+#         table.add_column("Field name", justify="right", style="cyan")
+#         table.add_column("Data", justify="left", style="deep_sky_blue3")
+#         for field_name, field_data in data.items():
+#             table.add_row(str(field_name), str(field_data))
+#         console.print(table)
 def print_info(info: dict()):
     for pm_name, data in info.items():
-        click.echo(f"\n\t{pm_name}:", color="green")
-        for key, val in data.items():
-            click.echo(f"- {key}: {val}", color="green")
+        title = pm_name
+        if data.get("is_installed", False):
+            title += " ([bold green]INSTALLED[/bold green])"
 
+        print(render_scope(data, title=title, sort_keys=False))
 
-@click.group()
-def main():
-    pass
+def print_search_results(data):
+    for pm_name, pm_data in data.items():
+        print(f"\t[bold red]{pm_name}[/bold red]:")
+        for pkg_name, pkg_data in pm_data.items():
+            out = pkg_name
+            if "version" in pkg_data:
+                out += "@" + pkg_data['version']
+            print(out)
 
-@main.group()
-def script():
-    """
-    Работа со скриптами
-    """
+class MainMixin():
+    offline = cli.Flag(
+        ["off", "offline"], help="Search for information not only in local the known_packages")
+    all_flag = cli.Flag(
+        ["a", "all"], help="Search for information not only the known_packages")
+    quiet = cli.Flag(
+        ["q", "quiet"], help="Disable Logging")
 
-@script.command(name="list")
-def script_list():
-    """
-    Список найденных скриптов скрипт
-    """
-    scripts = get_scripts()
-    for name, path in scripts.items():
-        click.echo(name)
- 
- 
-@script.command()
-@click.argument("script_path") #, help="Path to script or file name in script/ directoriy")
-def run(script_path):
-    """
-    Выполнить скрипт
-    """
-    script = None
-    scripts = get_scripts()
-    if script_path in scripts:
-        script = BashScriptFile(scripts[script_path])
-    else:
-        script = BashScriptFile(script_path)
-    logger.info(scripts)
-    click.echo(
-        script.run()
-    )
+    pm_names = []
 
-@main.command()
-def version():
-    """
-    Вывести текущую версию MPM
-    """
-    click.echo(mpm.getAbout())
+    @cli.switch("--pm", str, list=True, help="Search in Package Manager: " + str(PACKAGE_MANAGERS_NAMES))
+    def pms(self, PM_names):
+        for pm in PM_names:
+            if pm not in PACKAGE_MANAGERS_NAMES:
+                try:
+                    raise ValueError(f"\"{pm}\" not found in known Package Managers")
+                except:
+                    console.print_exception()
+                    exit()
+        self.pm_names = PM_names
 
-@main.command()
-@click.argument("package_name")
-@click.option("-a", "--all", "all_flag", is_flag=True, help="")
-@click.option(
-    "-of",
-    "--offline",
-    "offline",
-    is_flag=True,
-    help="Search for information not only in local the known_packages",
-)
-# TODO: parse URL
-@click.option(
-    "-k",
-    "--known-packages-json",
-    type=click.Path(exists=True),
-    help="known_packages.json file",
-)
-@click.option(
-    "-pm",
-    "--package-manager",
-    "pm_name",
-    multiple=False,
-    type=click.Choice(PACKAGE_MANAGERS_NAMES, case_sensitive=False),
-)  # Не возможен мультивызов
-def install(
-    package_name, pm_name, known_packages_json, all_flag, offline
-):  # install kit
-    """
-    Установить пакет
-    """
-    logger.debug(
-        f"Args:\n\tpackage_name = {package_name},\n\tpm_name = {pm_name}\n\tall = {all_flag}\n\toffline = {offline}"
-    )
-    known_packages = get_known_packages(offline=offline)
-    if known_packages_json:
-        known_packages.update(json.load(known_packages_json))
-    shell = AutoShell()
-    PMs = get_installed_pms(shell=shell)
-    if pm_name:
-        pm_fliter = lambda PM: PM.name == pm_name
-        PMs = list(filter(pm_fliter, PMs))
+    _known_packages = cli.SwitchAttr(
+        ["k", "package-manager"], cli.ExistingFile, help="known_packages.json file")
+    
+    def init(self, shell):
+        if self.quiet:
+            logging.disable(logging.CRITICAL)
+            
+        known_packages = get_known_packages(offline=self.offline)
+        if self._known_packages:
+            known_packages.update(json.load(self._known_packages)
+                                  )  # FIXME: _known_packages is not iostream
+        self.known_packages = known_packages
+        PMs = get_installed_pms(shell=shell)
+        if len(self.pm_names) > 0:
+            def pm_fliter(PM): return PM.name in self.pm_names
+            PMs = list(filter(pm_fliter, PMs))
+            logger.debug(f"PMs after filtering: {PMs}")
+        
         if PMs == []:
-            raise PackageManagerNotInatalled(f"{pm_name} don't installed")
-    package = UniversalePackage(package_name, shell=shell, pms_classes=PMs)
-    package.install()
+            raise PackageManagerNotInatalled(f"Not found Package Manager")
 
+        self.PMs = PMs
 
-@main.command()
-@click.argument("package_name")
-@click.option(
-    "-a",
-    "--all",
-    "all_flag",
-    is_flag=True,
-    help="Search for information not only the known_packages",
-)
-@click.option(
-    "-of",
-    "--offline",
-    "offline",
-    is_flag=True,
-    help="Search for information not only in local the known_packages",
-)
-# TODO: parse URL
-@click.option(
-    "-k",
-    "--known-packages-json",
-    type=click.Path(exists=True),
-    help="known_packages.json file",
-)
-@click.option(
-    "-pm",
-    "--package-manager",
-    "pm_names",
-    multiple=True,
-    type=click.Choice(PACKAGE_MANAGERS_NAMES, case_sensitive=False),
-)  # Возможен мультивызов, например: -pm apt -pm pip
-@click.option('-q', '--quiet', default=False, is_flag=True, help="Выключить логирование")
-def info(package_name, pm_names, known_packages_json, all_flag, offline, quiet):
+class Main(cli.Application):
+    PROGNAME = "mpm"
+    VERSION = version_str
+    
+
+@Main.subcommand("info")
+class Info(cli.Application, MainMixin):
     """
     Показать дополнительные данные о пакете
     """
-    if quiet:
-        logging.disable(logging.CRITICAL)
-    logger.debug(
-        f"Args:\n\tpackage_name = {package_name},\n\tpm_names = {pm_names}\n\tall = {all_flag}\n\toffline = {offline}"
-    )
-    known_packages = get_known_packages(offline=offline)
-    if known_packages_json:
-        known_packages.update(json.load(known_packages_json))
 
-    shell = AutoShell()
-    PMs = get_installed_pms(shell=shell)
-    if len(pm_names) > 0:
-        pm_fliter = lambda PM: PM.name in pm_names
-        PMs = list(filter(pm_fliter, PMs))
-        logger.debug(f"PMs after filtering: {PMs}")
+    def main(self, package_name):
+        pretty.install()
+        install()
+        shell = AutoShell()
+        self.init(shell)
 
-    package = UniversalePackage(
-        package_name, shell=shell, pms_classes=PMs, known_packages=known_packages
-    )
+        logger.debug(
+            f"Args:\n\tpackage_name = {package_name},\n\tpm_names = {self.pm_names}\n\tall = {self.all_flag}\n\toffline = {self.offline}"
+        )
+        
+        package = UniversalePackage(
+            package_name, shell=shell, pms_classes=self.PMs, known_packages=self.known_packages
+        )
+ 
+        package.update_package_info(all_pm=self.all_flag)
+        info = package.info
+        if info == {}:
+            logger.error("Package Does Not Found")
+            return
 
-    info = package.get_info(all_pm=all_flag)
-    if info == {}:
-        logger.error("Package Does Not Found")
-        return
+        print_info(info)
+        if package_name not in self.known_packages:
+            update_user_known_package(package_name, package.config)
 
-    print_info(info)
-    if package_name not in known_packages:
-        update_user_known_package(package_name, package.config)
-
-
-@main.command()
-@click.argument("package_name")
-@click.option(
-    "-pm",
-    "--package-manager",
-    "pm_name",
-    type=click.Choice(PACKAGE_MANAGERS_NAMES, case_sensitive=False),
-)
-def remove(package_name, pm_name):
+@Main.subcommand("install")
+class Install(cli.Application, MainMixin):
     """
-    Удалить пакет
+    Показать дополнительные данные о пакете
     """
-    logger.debug(f"package_name = {package_name}, pm_name = {pm_name}")
-    click.echo("Syncing")
+    no_auto_update_conf = cli.Flag("no-auto", help="Search for information not only in local the known_packages")
+    def main(self, package_name: str):
+        pretty.install()
+        install()
+        shell = AutoShell()
+        self.init(shell)
 
+        package = UniversalePackage(
+            package_name, 
+            shell=shell, 
+            pms_classes=self.PMs,
+            auto_update_conf=not self.no_auto_update_conf
+        )
+        package.install()
 
-@main.command()
-@click.argument("package_name")
-@click.option(
-    "-pm",
-    "--package-manager",
-    "pm_names",
-    multiple=True,
-    type=click.Choice(PACKAGE_MANAGERS_NAMES, case_sensitive=False),
-)  # Возможен мультивызов, например: -pm apt -pm pip
-@click.option('-q', '--quiet', default=False, is_flag=True, help="Выключить логирование")
-def search(package_name, pm_names, quiet):
+@Main.subcommand("search")
+class Search(cli.Application, MainMixin):
     """
-    Найти пакет
+    Поиск пакета
     """
-    if quiet:
-        logging.disable(logging.CRITICAL)
-    logger.debug(f"package_name = {package_name}, pm_names = {pm_names}")
-    shell = AutoShell()
-    PMs = get_installed_pms(shell=shell)
-    if len(pm_names) > 0:
-        pm_fliter = lambda PM: PM.name in pm_names
-        PMs = list(filter(pm_fliter, PMs))
-        logger.debug(f"PMs after filtering: {PMs}")
-    data = {}
-    for pm in PMs:
-        try:
-            data[pm.name] = pm(shell=shell).search(package_name)
-        except NotImplementedError as e:
-            logger.warning(f"{pm.name} not have search method!")  # , exc_info=True)
-    print_info(data)
+    list_mode = cli.Flag(["l", "list"], help="List")
 
-
-@main.command()
-@click.argument("package_name")
-@click.option(
-    "-pm",
-    "--package-manager",
-    "pm_name",
-    type=click.Choice(PACKAGE_MANAGERS_NAMES, case_sensitive=False),
-)
-def reinstall(package_name, pm_name):
-    """
-    Переустановить пакет
-    """
-    logger.debug(f"package_name = {package_name}, pm_name = {pm_name}")
-    click.echo("Syncing")
-
-
-@main.command()
-@click.argument("package_name")
-@click.option(
-    "-pm",
-    "--package-manager",
-    "pm_name",
-    type=click.Choice(PACKAGE_MANAGERS_NAMES, case_sensitive=False),
-)
-def update(package_name, pm_name):
-    """
-    Обновить пакет
-    """
-    logger.debug(f"package_name = {package_name}\n\tpm_name = {pm_name}")
-    logger.info(f"package_name = {package_name}\n\tpm_name = {pm_name}")
-    logger.warning(f"package_name = {package_name}\n\tpm_name = {pm_name}")
-    logger.success(f"package_name = {package_name}\n\tpm_name = {pm_name}")
-    logger.error(f"package_name = {package_name}\n\tpm_name = {pm_name}")
-    logger.critical(f"package_name = {package_name}\n\tpm_name = {pm_name}")
-
-
-@main.command(name="list")
-@click.option(
-    "-a",
-    "--all",
-    "all_flag",
-    is_flag=True,
-    help="Search for information not only the known_packages",
-)
-@click.option(
-    "-of",
-    "--offline",
-    "offline",
-    is_flag=True,
-    help="Search for information not only in local the known_packages",
-)
-# TODO: parse URL
-@click.option('-q', '--quiet', default=False, is_flag=True)
-@click.option(
-    "-k",
-    "--known-packages-json",
-    type=click.Path(exists=True),
-    help="known_packages.json file",
-)
-@click.option(
-    "-pm",
-    "--package-manager",
-    "pm_names",
-    multiple=True,
-    type=click.Choice(PACKAGE_MANAGERS_NAMES, case_sensitive=False),
-)  # Возможен мультивызов, например: -pm apt -pm pip
-@click.option('-q', '--quiet', default=False, is_flag=True, help="Выключить логирование")
-def list_command(pm_names, offline, known_packages_json, all_flag, quiet):
-    """
-    Список пакетов
-    """
-    if quiet:
-        logging.disable(logging.CRITICAL)
-
-    logger.debug(
-        f"Args:\n\tpm_names = {pm_names}\n\tall_flag = {all_flag}\n\toffline = {offline}\n\tknown_packages_json= {known_packages_json}"
-    )
-    known_packages = get_known_packages(offline=offline)
-    if known_packages_json:
-        known_packages.update(json.load(known_packages_json))
-
-    shell = AutoShell()
-    PMs = get_installed_pms(shell=shell)
-    if len(pm_names) > 0:
-
-        def pm_fliter(PM):
-            return PM.name in pm_names
-
-        PMs = list(filter(pm_fliter, PMs))
-        logger.debug(f"PMs after filtering: {PMs}")
-
-    out_list = []
-    if all_flag:
-        for PM in PMs:
-            pm = PM()
-            out_list.extend(pm.get_all_packages())
-    else:
-        for package_name in known_packages.keys():
+    def main(self, package_name: str):
+        pretty.install()
+        install()
+        shell = AutoShell()
+        self.init(shell)
+        
+        data = {}
+        for pm in self.PMs:
             try:
-                package = UniversalePackage(
-                    package_name,
-                    shell=shell,
-                    pms_classes=PMs, # не работает как надо!
-                    known_packages=known_packages,
-                )
-            except PackageManagerNotInatalled:
-                continue
-            if package.is_installed():
-                ver = package.info.get("version", None)
-                if not ver:
-                    out_list.append(f"{package_name}")
-                else:
-                    out_list.append(f"{package_name}@{ver}")
+                out = pm(shell=shell).search(package_name)
+                if out != {}:
+                    data[pm.name] = out
+            except NotImplementedError as e:
+                logger.warning(f"{pm.name} not have search method!")  # , exc_info=True)
+        
+        if self.list_mode:
+            print_search_results(data)
+        else:
+            print_info(data)
 
-    for line in out_list:
-        click.echo(f"- {line}")
+@Main.subcommand("list")
+class List(cli.Application, MainMixin): 
+    """ List installed packages """     
 
+    output = cli.SwitchAttr(
+        ["o", "output"], cli.NonexistentPath, help="output in YAML file")
 
-if __name__ == "__main__":
+    def main(self):                     
+        pretty.install()
+        install()
+        shell = AutoShell()
+        self.init(shell)
+
+        out_list = []
+        if self.all_flag:
+            for PM in self.PMs:
+                pm = PM()
+                out_list.extend(pm.get_all_packages())
+        else:
+            for package_name in self.known_packages.keys():
+                try:
+                    package = UniversalePackage(
+                        package_name,
+                        shell=shell,
+                        pms_classes=self.PMs,  # не работает как надо!
+                        known_packages=self.known_packages,
+                    )
+                except PackageManagerNotInatalled:
+                    continue
+                if package.is_installed():
+                    ver = package.info.get("version", None)
+                    if not ver:
+                        out_list.append(f"{package_name}")
+                    else:
+                        out_list.append(f"{package_name}@{ver}")
+        for line in out_list:
+            print(line)
+
+        if self.output != None:
+            data = {"packages": out_list}
+            with open(self.output, 'w+') as f:
+                yaml.dump(data, f, default_flow_style=False)
+
+def main():
+    Main.run()
+
+if __name__ == '__main__':
     main()
