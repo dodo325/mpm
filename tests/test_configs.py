@@ -44,10 +44,10 @@ def test_get_packages_dependences_order():
     assert get_packages_dependences_order(known_packages, "B") == ["C", "B"]
     assert get_packages_dependences_order(known_packages, "C") == ["C"]
 
-def test_get_packages_dependences_order_oh_my_zsh():
-    known_packages = get_known_packages(offline=True)
-    assert get_packages_dependences_order(
-        known_packages, "oh-my-zsh") == ["curl", "git", "zsh"]
+# def test_get_packages_dependences_order_oh_my_zsh():
+#     known_packages = get_known_packages(offline=True)
+#     assert get_packages_dependences_order(
+#         known_packages, "oh-my-zsh") == ["curl", "git", "zsh"]
 
 
 def test_init_user_configs_dir():

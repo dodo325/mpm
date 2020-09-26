@@ -5,13 +5,12 @@
     "pipver": {
         "package_managers": {
             "bash-alias": {
-                "cmd": "/home/dodo/.zshrc",
+                "cmd": "pip freeze | grep",
                 "profiles": [
-                    "/home/dodo/.zshrc",
-                    "/home/dodo/.bashrc"
+                    "$HOME/.zshrc",
+                    "$HOME/.bashrc"
                 ]
-            },
-            "pip": {}
+            }
         }
     },
     "TauonMusicBox":{
@@ -35,7 +34,9 @@
         },
         "plugins_install": {
             "shell": {
-                "template_cmd": "{package_name} {plugin_id} --yes",
+                "install": {
+                    "template_cmd": "{package_name} {plugin_id} --yes",
+                },
                 "get_all": {
                     "cmd": "ls /usr/share/gnome-shell/extensions/ -1; ls $HOME/.local/share/gnome-shell/extensions -1",
                     "parser": {
@@ -131,7 +132,9 @@
         "// хз что с этим делать":"",
         "package_managers": {
             "shell": {
-                "cmd": "export RUNZSH=no; sh -c '$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)'"
+                "install":{
+                    "cmd": "export RUNZSH=no; sh -c '$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)'"
+                }
             }
         },
         "dependence":[
@@ -153,7 +156,9 @@
         },
         "plugins_install": {
             "shell": {
-                "template_cmd": "code --install-extension {plugin_name}",
+                "install": {
+                    "template_cmd": "code --install-extension {plugin_name}",
+                },
                 "get_all": {
                     "cmd": "code --list-extensions",
                     "parser": {

@@ -2,7 +2,6 @@
 # -*- coding: utf-8 -*-
 """ Main Package Manager 
 """
-import re
 from mpm.utils.tools import inheritors
 from mpm.shell import AutoShell, Bash, ZSH, Shell
 from plumbum import FG, BG
@@ -146,6 +145,12 @@ class Snap(PackageManager):
             return {}
         return parse_table_with_columns(out, key_lower=True)
 
+class ShellManager(PackageManager):
+    """ Shell scripts for install """
+    name = "shell"
+
+    def is_installed(self) -> bool:
+        return self.shell.is_installed()
 
 class NPM(PackageManager):
     """ Node js package manager """
@@ -221,6 +226,8 @@ class Pip(PackageManager):
                 continue
         return data
 
+
+
 def get_installed_pms(shell: AutoShell = None) -> List[PackageManager]:
     pms_list = []
     if not shell:
@@ -232,6 +239,7 @@ def get_installed_pms(shell: AutoShell = None) -> List[PackageManager]:
     pm_names = [pm.name for pm in pms_list]
     logger.info(f"Installed packege managers: {pm_names}")
     return pms_list
+
 
 NAMES_TO_PACKAGE_MANAGERS = {cls.name: cls for cls in inheritors(PackageManager)}
 PACKAGE_MANAGERS_TO_NAMES = {cls: cls.name for cls in inheritors(PackageManager)}

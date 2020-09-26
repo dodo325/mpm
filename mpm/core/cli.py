@@ -13,12 +13,11 @@ import json
 from plumbum import cli
 from rich.console import Console
 from rich.table import Table
-from rich import box
 from rich.scope import render_scope
 from rich.prompt import Prompt
 from rich.syntax import Syntax
 from rich.traceback import install
-from rich import print, pretty
+from rich import print, pretty, box
 console = Console()
 
 logger = getLogger(__name__)

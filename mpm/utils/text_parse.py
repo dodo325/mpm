@@ -10,7 +10,15 @@ def not_nan_split(string: str, delimiter="\n") -> list:
     li = string.split(delimiter)
     return list(filter(None, li))
 
-
+def list_parser(string: str, new_line="\n", remove_blank=True, re_inline=None, re_group=0) -> list:
+    li = string.split(new_line)
+    if remove_blank:
+        li = list(filter(None, li))
+    if re_inline != None:
+        re_filter = lambda s: re.search(re_inline, s).group(re_group)
+        li = list(map(re_filter, li))
+    return li
+    
 def parse_value_key_table(
     string: str,
     delimiter=":",

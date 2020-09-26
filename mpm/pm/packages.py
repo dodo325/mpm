@@ -11,6 +11,7 @@ from mpm.pm.package_managers import (get_installed_pms,
                                      Pip,
                                      Snap,
                                      PackageManager,
+                                     ShellManager,
                                      NPM,
                                      NAMES_TO_PACKAGE_MANAGERS,
                                      PACKAGE_MANAGERS_TO_NAMES,
@@ -125,6 +126,18 @@ class Package:
         """
         self._info = self.get_info()
 
+class ShellPackage(Package):
+    """ Artificial Package via Shell """
+
+    pm_class = ShellManager
+
+    def install(self, cmd: str, is_sudo=False):
+        self.logger.info(f"Installing {self.package_name} using {self.shell.name}...")
+        if is_sudo:
+            self.shell.sudo_call([cmd])
+        else:
+            self.shell.call([cmd])
+            
 class AptGetPackage(Package):
     """ AptGet Package """
 
