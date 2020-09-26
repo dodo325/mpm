@@ -12,7 +12,8 @@ import os
 
 REQUIREMENTS = [
     "plumbum",
-    "rich"
+    "rich",
+    "pyyaml"
 ]
 
 

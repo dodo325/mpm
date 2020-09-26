@@ -10,6 +10,7 @@ from mpm.pm import (
 from mpm.shell import AutoShell
 from mpm.core.exceptions import PackageManagerNotInatalled
 import json
+import yaml
 from plumbum import cli
 from rich.console import Console
 from rich.table import Table
@@ -121,7 +122,7 @@ class Info(cli.Application, MainMixin):
         package = UniversalePackage(
             package_name, shell=shell, pms_classes=self.PMs, known_packages=self.known_packages
         )
-
+ 
         package.update_package_info(all_pm=self.all_flag)
         info = package.info
         if info == {}:
@@ -180,15 +181,18 @@ class Search(cli.Application, MainMixin):
             print_info(data)
 
 @Main.subcommand("list")
-class List(cli.Application, MainMixin):
-    """ List installed packages """
+class List(cli.Application, MainMixin): 
+    """ List installed packages """     
 
-    def main(self):
+    output = cli.SwitchAttr(
+        ["o", "output"], cli.NonexistentPath, help="output in YAML file")
+
+    def main(self):                     
         pretty.install()
         install()
         shell = AutoShell()
         self.init(shell)
-        
+
         out_list = []
         if self.all_flag:
             for PM in self.PMs:
@@ -213,6 +217,11 @@ class List(cli.Application, MainMixin):
                         out_list.append(f"{package_name}@{ver}")
         for line in out_list:
             print(line)
+
+        if self.output != None:
+            data = {"packages": out_list}
+            with open(self.output, 'w+') as f:
+                yaml.dump(data, f, default_flow_style=False)
 
 def main():
     Main.run()
