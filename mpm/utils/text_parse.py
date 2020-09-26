@@ -153,7 +153,11 @@ def parse_table_with_columns(
     if delimiter:
         string = string.replace(delimiter, "")  # TODO: something...
     li = not_nan_split(string)
-    head = li[0]
+    try:
+        head = li[0]
+    except IndexError as e:
+        return {}
+        
     head_list = []
     for m in re.finditer("(\w+)", head):
         key = head[m.start(0) : m.end(0)]
