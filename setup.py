@@ -10,12 +10,22 @@ import sys
 import mpm
 import os
 
+from m2r import convert, parse_from_file
+
 REQUIREMENTS = [
     "plumbum",
     "rich",
     "pyyaml"
 ]
 
+readme_file = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'README.md')
+try:
+    from m2r import parse_from_file
+    readme = parse_from_file(readme_file)
+except ImportError:
+    # m2r may not be installed in user environment
+    with open(readme_file) as f:
+        readme = f.read()
 
 def read(fname):
     try:
@@ -27,7 +37,8 @@ setup_config = {
     "name": "mpm-core",
     "version": mpm.__version__,
     "description": sys.modules[__name__].__doc__,
-    # long_description=read("README"),
+    #"long_description": readme,
+    #"long_description_content_type": "text/x-rst",
     "author": "Dodo325",
     "url": "https://github.com/dodo325/mpm",
     "license": "GPLv3",
@@ -39,7 +50,8 @@ setup_config = {
             "pytest-subprocess",
             "pytest-cov",
             "coloredlogs",
-            "codecov"
+            "codecov",
+            "m2r"
         ],
         "docs": [
             "markdown-fenced-code-tabs"
