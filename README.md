@@ -36,6 +36,17 @@ Main Package Manager - Unites all package managers in themselves!
 
 В проекте все данные хранятся в [mpm/data/configs](mpm/data/configs/README.md)
 
+## TODO:
+
+- [ ] Реализавать зависимоть от платформы```
+        "requirements": {
+            "DE": {}
+        }
+      ```
+- [ ] Установка через shell (package_managers)
+- [ ] Установка плагинов plugins_install
+- [ ] bash-script (package_managers)
+
 ## CLI
 ```bash
 Usage: __main__.py [OPTIONS] COMMAND [ARGS]...

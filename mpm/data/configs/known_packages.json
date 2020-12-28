@@ -1,7 +1,19 @@
 {
-    "pytest": {"package_managers":{"pip":{}}},
-    "urwid": {"package_managers":{"pip":{}}},
-    "dbus": {"package_managers":{"apt-get":{}}},
+    "pytest": {
+        "package_managers": {
+            "pip": {}
+        }
+    },
+    "urwid": {
+        "package_managers": {
+            "pip": {}
+        }
+    },
+    "dbus": {
+        "package_managers": {
+            "apt-get": {}
+        }
+    },
     "pipver": {
         "package_managers": {
             "bash-alias": {
@@ -14,14 +26,14 @@
             "pip": {}
         }
     },
-    "TauonMusicBox":{
-        "snap":{
+    "TauonMusicBox": {
+        "snap": {
             "package_name": "tauon"
         }
     },
     "gnome-shell-extension-installer": {
-        "package_managers":{
-            "script":{
+        "package_managers": {
+            "bash-script": {
                 "file": "https://github.com/brunelli/gnome-shell-extension-installer/raw/master/gnome-shell-extension-installer",
                 "script_name": "gnome-shell-extension-installer",
                 "install": {
@@ -30,8 +42,12 @@
             }
         },
         "plugins": {
-            "arc-men": {"plugin_id": 1228},
-            "dash-to-panel": {"plugin_id": 1160}
+            "arc-men": {
+                "plugin_id": 1228
+            },
+            "dash-to-panel": {
+                "plugin_id": 1160
+            }
         },
         "plugins_install": {
             "shell": {
@@ -46,21 +62,23 @@
                 }
             }
         },
-        "requirements":{
+        "requirements": {
             "DE": {
-                "GNOME":{}
+                "GNOME": {}
             }
         },
-        "dependence":[
+        "dependence": [
             "dbus"
         ]
     },
     "django": {
-        "package_managers":{"pip":{}},
+        "package_managers": {
+            "pip": {}
+        },
         "plugins": {
-            "guardian":{},
-            "extensions":{},
-            "cors-headers":{}
+            "guardian": {},
+            "extensions": {},
+            "cors-headers": {}
         },
         "plugins_install": {
             "pip": {
@@ -68,10 +86,17 @@
             }
         }
     },
-    "qbittorrent": {"package_managers":{"apt":{}}},
+    "qbittorrent": {
+        "package_managers": {
+            "apt": {}
+        },
+        "requirements": {
+            "DE": {}
+        }
+    },
     "remmina": {
-        "package_managers":{
-            "apt":{
+        "package_managers": {
+            "apt": {
                 "repository": "ppa:remmina-ppa-team/remmina-next"
             }
         },
@@ -81,75 +106,113 @@
             }
         },
         "plugins": {
-            "rdp":{},
-            "secret":{}
+            "rdp": {},
+            "secret": {}
+        },
+        "requirements": {
+            "DE": {}
         }
     },
-    "google-chrome": {"package_managers":{"apt":{"package_name": "google-chrome-stable"}}},
-    "nodejs": {"package_managers":{"apt":{}}},
-    "npm": {
-        "package_managers":{"apt":{}},
-        "dependence":["nodejs"]
+    "google-chrome": {
+        "package_managers": {
+            "apt": {
+                "package_name": "google-chrome-stable"
+            }
+        },
+        "requirements": {
+            "DE": {}
+        }
     },
-    "synergy": {"package_managers":{"apt":{}}},
+    "nodejs": {
+        "package_managers": {
+            "apt": {}
+        }
+    },
+    "npm": {
+        "package_managers": {
+            "apt": {}
+        },
+        "dependence": [
+            "nodejs"
+        ]
+    },
+    "synergy": {
+        "package_managers": {
+            "apt": {}
+        },
+        "requirements": {
+            "DE": {}
+        }
+    },
     "telegram": {
-        "package_managers":{
+        "package_managers": {
             "snap": {},
             "apt": {
-                "install":{
+                "install": {
                     "repository": "ppa:atareao/telegram"
                 }
             }
+        },
+        "requirements": {
+            "DE": {}
         }
     },
     "discord": {
-        "package_managers":{
-            "snap":{
-                "install":{
-                    "repository": "ppa:atareao/telegram",
-                    "args": ["--classi"]
+        "package_managers": {
+            "snap": {
+                "install": {
+                    "args": [
+                        "--classi"
+                    ]
                 }
             }
+        },
+        "requirements": {
+            "DE": {}
         }
     },
     "curl": {
-        "package_managers":{
-            "apt":{}
+        "package_managers": {
+            "apt": {}
         }
     },
     "git": {
-        "package_managers":{
-            "apt":{}
+        "package_managers": {
+            "apt": {}
         }
     },
     "zsh": {
-        "package_managers":{
-            "apt":{}
+        "package_managers": {
+            "apt": {}
         }
     },
     "oh-my-zsh": {
-        "// хз что с этим делать":"",
+        "// хз что с этим делать": "",
         "package_managers": {
             "shell": {
                 "cmd": "export RUNZSH=no; sh -c '$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)'"
             }
         },
-        "dependence":[
-            "curl", "git", "zsh"
+        "dependence": [
+            "curl",
+            "git",
+            "zsh"
         ]
     },
     "vscode": {
-        "package_managers":{
-            "snap":{
+        "package_managers": {
+            "snap": {
                 "package_name": "code",
-                "install":{
-                    "args": ["--classi"]
+                "install": {
+                    "args": [
+                        "--classi"
+                    ]
                 }
             }
         },
         "plugins": {
-            "rogalmic.bash-debug":{},
-            "robbowen.synthwave-vscode ":{}
+            "rogalmic.bash-debug": {},
+            "robbowen.synthwave-vscode ": {}
         },
         "plugins_install": {
             "shell": {
@@ -163,8 +226,8 @@
                 }
             }
         },
-        "requirements":{
-            "DE":{}
+        "requirements": {
+            "DE": {}
         }
     }
 }

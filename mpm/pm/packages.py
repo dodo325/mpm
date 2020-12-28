@@ -18,7 +18,7 @@ from mpm.pm.package_managers import (
     NPM,
     BashAliasManager,
     get_installed_pms,
-    NAMES_TO_PACKAGE_MANAGERS,
+    NAMES_TO_PACKAGE_MANAGERS
 )
 from mpm.utils.text_parse import parse_table_with_columns, parse_value_key_table, not_nan_split
 from mpm.core.configs import get_known_packages, get_packages_dependences_order
@@ -38,7 +38,6 @@ class Package:
     pm = None
 
     _info = None
-
     @property
     def info(self) -> dict:
         if not self._info:
@@ -175,13 +174,13 @@ class AptGetPackage(Package):
         self.logger.info(f"Installing {self.package_name} ({self.info})...")
         self.pm.update(enter_password=enter_password)
         self.shell.sudo_call(
-            [self.pm.name, "install", "-y", self.package_name],
-            enter_password=enter_password,
+            [self.pm.name, "install", "-y", self.package_name]
         )
 
         if self.is_installed():
             self.logger.success("Package installed!")
-
+        else:
+            self.logger.warning("Package not installed")
 
 class AptPackage(AptGetPackage):
     """ Apt Package """
@@ -339,13 +338,9 @@ class BashAlias(Package):
     """
     Пользовательский alias. Устанавливается в .zshrc .bashrc или в файлы, которые указал пользователь
     """
-
     pm_class = BashAliasManager
-
-
     def __init__(
-        self, package_name: str, shell: AbstractShell = None, profiles: List[str] = None
-    ):
+        self, package_name: str, shell: AbstractShell = None, profiles: List[str] = None):
         super().__init__(package_name=package_name, shell=shell)
         self.pm.init_profiles(profiles=profiles)
 
